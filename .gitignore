@@ -1,0 +1,43 @@
+# Documentacion local de planificacion
+/.docs/
+
+# Unreal Engine 5: archivos generados del proyecto
+/Binaries/
+/DerivedDataCache/
+/Intermediate/
+/Saved/
+
+# Archivos temporales de plugins (tambien en subcarpetas)
+/Plugins/**/Intermediate/
+/Plugins/**/Saved/
+/Plugins/**/DerivedDataCache/
+# No ignorar Binaries de todos los plugins: algunos se distribuyen sin fuentes.
+# Agregar reglas especificas para plugins compilables cuando existan.
+
+# Soluciones y proyectos generados por Unreal
+*.sln
+*.slnx
+*.suo
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.VC.opendb
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.code-workspace
+*.xcodeproj/
+*.xcworkspace/
+
+# Estado local de IDEs
+.vs/
+.idea/
+.fleet/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Mantener Source/, Config/, Content/, Build/, *.uproject y *.uplugin.
+# Build/ puede contener recursos y configuracion necesarios para empaquetar.

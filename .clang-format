@@ -1,0 +1,37 @@
+# Unreal-oriented formatting for project C++ code.
+BasedOnStyle: Microsoft
+Language: Cpp
+UseTab: ForIndentation
+IndentWidth: 4
+TabWidth: 4
+ColumnLimit: 120
+BreakBeforeBraces: Allman
+PointerAlignment: Left
+ReferenceAlignment: Left
+NamespaceIndentation: All
+AccessModifierOffset: -4
+EmptyLineBeforeAccessModifier: Always
+EmptyLineAfterAccessModifier: Always
+SeparateDefinitionBlocks: Leave
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortEnumsOnASingleLine: false
+AllowShortLambdasOnASingleLine: None
+InsertBraces: true
+BinPackArguments: false
+BinPackParameters: false
+SortIncludes: Never
+IncludeBlocks: Preserve
+StatementMacros:
+  - UPROPERTY
+  - UFUNCTION
+  - GENERATED_BODY
+  - GENERATED_UCLASS_BODY
+  - GAMEPLAYATTRIBUTE_PROPERTY_GETTER
+  - GAMEPLAYATTRIBUTE_VALUE_GETTER
+  - GAMEPLAYATTRIBUTE_VALUE_SETTER
+  - GAMEPLAYATTRIBUTE_VALUE_INITTER
+  - UE_DECLARE_GAMEPLAY_TAG_EXTERN
+  - UE_DEFINE_GAMEPLAY_TAG
