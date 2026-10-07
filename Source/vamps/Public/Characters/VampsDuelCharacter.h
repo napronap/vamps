@@ -1,20 +1,16 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
-#include "Combat/Data/CombatConfig.h"
-#include "Combat/CombatRules.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "VampsDuelCharacter.generated.h"
 
 class UAbilitySystemComponent;
 class UVampsAttributeSet;
-class UGA_Attack;
-class UGA_Guard;
-class UGA_NA;
-class UGA_HitReaction;
+class UFistHitboxComponent;
 class USpringArmComponent;
 class UCameraComponent;
+class UAnimMontage;
 
 UCLASS()
 class VAMPS_API AVampsDuelCharacter : public ACharacter, public IAbilitySystemInterface
@@ -24,22 +20,19 @@ class VAMPS_API AVampsDuelCharacter : public ACharacter, public IAbilitySystemIn
 public:
 
 	AVampsDuelCharacter();
-
-	// Actor lifecycle and ability system access.
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	// Shared configuration and native components.
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Duel")
-	TObjectPtr<UCombatConfig> CombatConfig;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Duel")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystem;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Duel")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UVampsAttributeSet> Attributes;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UFistHitboxComponent> FistHitbox;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -47,97 +40,46 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	TObjectPtr<UCameraComponent> Camera;
 
-	// Results exposed to presentation and diagnostics.
-	UPROPERTY(BlueprintReadOnly, Category = "Duel")
-	EDuelResult LastResult = EDuelResult::None;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	TObjectPtr<UAnimMontage> AttackMontage;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Duel")
-	FString LastEvent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0"))
+	float AttackDamage = 12.f;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Duel")
-	int32 ContactsResolved = 0;
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void RequestAttack();
 
-	// Instanced abilities own the combat state.
-	UPROPERTY()
-	TObjectPtr<UGA_Attack> Attack;
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void RequestGuard(bool bPressed);
 
-	UPROPERTY()
-	TObjectPtr<UGA_Guard> Guard;
+	void CancelAttack();
+	void ReceiveHit(AVampsDuelCharacter* Attacker);
+	void ResetFighter(const FTransform& SpawnTransform);
 
-	UPROPERTY()
-	TObjectPtr<UGA_NA> NA;
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	bool IsAttacking() const;
 
-	UPROPERTY()
-	TObjectPtr<UGA_HitReaction> HitReaction;
+	UFUNCTION(BlueprintPure, Category = "Combat")
+	bool IsGuarding() const;
 
-	// Initialization and access to the common combat clock.
-	void InitializeCombat();
-	const UCombatConfig& Config() const;
-	double CombatTime() const;
-
-	// Requests shared by player input and AI.
-	UFUNCTION(BlueprintCallable, Category = "Duel")
-	void PressShared();
-
-	UFUNCTION(BlueprintCallable, Category = "Duel")
-	void SetMoveIntent(FVector WorldDirection);
-
-	UFUNCTION(BlueprintCallable, Category = "Duel")
-	void SetTarget(AVampsDuelCharacter* NewTarget);
-
-	// Read-only state for Blueprints, animation and HUD.
-	UFUNCTION(BlueprintPure, Category = "Duel")
-	AVampsDuelCharacter* GetTarget() const;
-
-	UFUNCTION(BlueprintPure, Category = "Duel")
-	bool IsDefeated() const;
-
-	UFUNCTION(BlueprintPure, Category = "Duel")
-	EDuelPhase GetPhase() const;
-
-	UFUNCTION(BlueprintPure, Category = "Duel")
+	UFUNCTION(BlueprintPure, Category = "Combat")
 	float GetHealth() const;
 
-	UFUNCTION(BlueprintPure, Category = "Duel")
+	UFUNCTION(BlueprintPure, Category = "Combat")
 	float GetMaxHealth() const;
 
-	UFUNCTION(BlueprintPure, Category = "Duel")
-	float GetNARemaining() const;
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void RequestMove(FVector WorldDirection);
 
-	UFUNCTION(BlueprintPure, Category = "Duel")
-	float GetNAPause() const;
+	UFUNCTION(BlueprintCallable, Category = "Camera")
+	void SetTarget(AVampsDuelCharacter* NewTarget);
 
-	// Action transitions and ordered contact resolution.
-	void ResetFighter(const FTransform& SpawnTransform);
-	void AdvanceActions(double Now);
-	void ConsumeInput(double Now);
-
-	void ClearInput()
-	{
-		Input.Clear();
-	}
-
-	void StartNA(double Now, bool bOffensive);
-	void StartGuard(double Now, bool bAlreadyBlocked);
-	EDuelResult ReceiveContact(AVampsDuelCharacter* Attacker, const FDuelStrike& Strike, double Now);
-
-	// Movement availability is independent of visual recovery.
-	bool CanMove(double Now) const;
-	void MoveSwept(FVector Delta);
-
-	// Presentation follows gameplay decisions.
-	void PlayAttackSection(const FDuelStrike& Strike, FName Section, double Duration);
-	void PlayReaction(bool bGuard);
-	void StopCombatAnimation();
-	void DrawCombat() const;
+	UFUNCTION(BlueprintPure, Category = "Camera")
+	AVampsDuelCharacter* GetTarget() const;
 
 private:
 
-	FDuelInputBuffer Input;
+	FGameplayAbilitySpecHandle AttackHandle;
+	FGameplayAbilitySpecHandle GuardHandle;
 	TWeakObjectPtr<AVampsDuelCharacter> Target;
-	FVector MoveIntent = FVector::ZeroVector;
-	bool bInitialized = false;
-
-	bool TryInput(EDuelInputIntent Intent, double Now);
-	void ResetOnParry();
 };

@@ -1,69 +1,22 @@
 #include "Combat/Abilities/GA_Guard.h"
 #include "Combat/CombatTags.h"
-#include "Characters/VampsDuelCharacter.h"
 
 UGA_Guard::UGA_Guard()
 {
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 	ActivationOwnedTags.AddTag(DuelTags::Guard);
+	ActivationBlockedTags.AddTag(DuelTags::Attack);
 }
 
-void UGA_Guard::Start(double Now, bool bAlreadyBlocked)
+void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+                                const FGameplayAbilityActorInfo* ActorInfo,
+                                const FGameplayAbilityActivationInfo ActivationInfo,
+                                const FGameplayEventData* TriggerEventData)
 {
-	bAwaitingPress = true;
-	ContinueUntil = Now + FMath::Max(0.01f, Fighter()->Config().GuardContinuation);
-
-	if (bAlreadyBlocked)
+	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		Blocked(Now);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 	}
-	else
-	{
-		Press(Now);
-	}
-}
-
-bool UGA_Guard::Press(double Now)
-{
-	if (!IsActive() || !bAwaitingPress || Now >= ContinueUntil)
-	{
-		return false;
-	}
-
-	bAwaitingPress = false;
-	ArmedUntil = Now + FMath::Max(0.01f, Fighter()->Config().GuardWindow);
-	Fighter()->PlayReaction(true);
-	return true;
-}
-
-bool UGA_Guard::CanBlock(double Now) const
-{
-	return IsActive() && !bAwaitingPress && Now < ArmedUntil;
-}
-
-void UGA_Guard::Blocked(double Now)
-{
-	bAwaitingPress = true;
-	ArmedUntil = Now;
-	ContinueUntil = Now + FMath::Max(0.01f, Fighter()->Config().GuardContinuation);
-	Fighter()->PlayReaction(true);
-}
-
-void UGA_Guard::Advance(double Now)
-{
-	if (IsActive() && Now >= (bAwaitingPress ? ContinueUntil : ArmedUntil))
-	{
-		Leave(Now);
-	}
-}
-
-void UGA_Guard::Leave(double Now)
-{
-	if (!IsActive())
-	{
-		return;
-	}
-
-	Finish();
-	Fighter()->ClearInput();
-	Fighter()->StartNA(Now, false);
+	// The ability stays active until the guard button is released.
 }

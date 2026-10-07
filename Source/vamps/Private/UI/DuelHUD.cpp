@@ -1,10 +1,7 @@
 #include "UI/DuelHUD.h"
+#include "AI/DuelAIController.h"
 #include "Characters/VampsDuelCharacter.h"
 #include "GameModes/DuelGameMode.h"
-#include "AI/DuelAIController.h"
-#include "Player/DuelPlayerController.h"
-#include "Combat/Abilities/GA_Attack.h"
-#include "Combat/Abilities/GA_Guard.h"
 #include "Engine/Canvas.h"
 #include "Engine/World.h"
 
@@ -15,7 +12,7 @@ void ADuelHUD::DrawFighter(AVampsDuelCharacter* Fighter, const FString& Label, f
 		return;
 	}
 
-	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), X, 20, Width, 130);
+	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), X, 20, Width, 90);
 	DrawText(FString::Printf(TEXT("%s   %.0f / %.0f"), *Label, Fighter->GetHealth(), Fighter->GetMaxHealth()),
 	         FLinearColor::White,
 	         X + 12,
@@ -26,76 +23,36 @@ void ADuelHUD::DrawFighter(AVampsDuelCharacter* Fighter, const FString& Label, f
 	         52,
 	         (Width - 24) * FMath::Clamp(Fighter->GetHealth() / FMath::Max(1.f, Fighter->GetMaxHealth()), 0.f, 1.f),
 	         10);
-	FString State = StaticEnum<EDuelPhase>()->GetNameStringByValue(int64(Fighter->GetPhase()));
 
-	if (Fighter->Attack && Fighter->Attack->IsActive())
-	{
-		State += FString::Printf(TEXT("  %d/3"), Fighter->Attack->StrikeIndex + 1);
-	}
-
-	if (Fighter->Guard && Fighter->Guard->IsActive())
-	{
-		State += Fighter->Guard->bAwaitingPress ? TEXT(" - press to continue") : TEXT(" - guard active");
-	}
-
+	const FString State = Fighter->IsGuarding()    ? TEXT("GUARD")
+	                      : Fighter->IsAttacking() ? TEXT("ATTACK")
+	                                               : TEXT("IDLE");
 	DrawText(State, FLinearColor::White, X + 12, 72);
-	DrawText(FString::Printf(TEXT("NA %.2f   Pause %.2f"), Fighter->GetNARemaining(), Fighter->GetNAPause()),
-	         FLinearColor(1, 0.7f, 0.3f),
-	         X + 12,
-	         95);
-	DrawText(Fighter->LastEvent, FLinearColor(0.7f, 0.8f, 0.9f), X + 12, 118);
 }
 
 void ADuelHUD::DrawHUD()
 {
 	Super::DrawHUD();
-
 	if (!Canvas || !PlayerOwner)
 	{
 		return;
 	}
 
-	ADuelGameMode* GameMode = GetWorld()->GetAuthGameMode<ADuelGameMode>();
-	AVampsDuelCharacter* Player = Cast<AVampsDuelCharacter>(PlayerOwner->GetPawn());
 	const float Width = FMath::Min(380.f, Canvas->SizeX * 0.43f);
-	DrawFighter(Player, TEXT("PLAYER"), 20, Width);
-
-	if (GameMode)
+	DrawFighter(Cast<AVampsDuelCharacter>(PlayerOwner->GetPawn()), TEXT("PLAYER"), 20, Width);
+	if (ADuelGameMode* GameMode = GetWorld()->GetAuthGameMode<ADuelGameMode>())
 	{
 		DrawFighter(GameMode->Opponent, TEXT("OPPONENT"), Canvas->SizeX - Width - 20, Width);
+		if (GameMode->Opponent)
+		{
+			const ADuelAIController* AI = Cast<ADuelAIController>(GameMode->Opponent->GetController());
+			const FString Mode =
+			    AI ? StaticEnum<EDuelAIMode>()->GetNameStringByValue(int64(AI->Mode)) : TEXT("Unavailable");
+			DrawText(TEXT("AI: ") + Mode, FLinearColor::White, 20, Canvas->SizeY - 75);
+		}
 	}
-
-	DrawText(TEXT("WASD move | Mouse free camera | Click attack/guard | Tab lock | R reset | F1 AI mode"),
+	DrawText(TEXT("WASD move | LMB attack | Hold RMB guard | Tab lock | R reset | F1 AI mode"),
 	         FLinearColor::White,
 	         20,
 	         Canvas->SizeY - 50);
-
-	if (GameMode && GameMode->Opponent)
-	{
-		if (ADuelAIController* AI = Cast<ADuelAIController>(GameMode->Opponent->GetController()))
-		{
-			DrawText(TEXT("AI: ") + StaticEnum<EDuelAIMode>()->GetNameStringByValue(int64(AI->Mode)),
-			         FLinearColor::White,
-			         20,
-			         Canvas->SizeY - 75);
-		}
-
-		if (Player && (Player->IsDefeated() || GameMode->Opponent->IsDefeated()))
-		{
-			DrawText(Player->IsDefeated() ? TEXT("DEFEAT - R to reset") : TEXT("VICTORY - R to reset"),
-			         FLinearColor::Yellow,
-			         Canvas->SizeX * 0.35f,
-			         Canvas->SizeY * 0.4f,
-			         nullptr,
-			         1.8f);
-		}
-	}
-
-	if (const ADuelPlayerController* DuelController = Cast<ADuelPlayerController>(PlayerOwner))
-	{
-		if (!DuelController->DuelMapping)
-		{
-			DrawText(TEXT("Assign IMC_Duel in BP_DuelPlayerController"), FLinearColor::Red, 20, 165);
-		}
-	}
 }

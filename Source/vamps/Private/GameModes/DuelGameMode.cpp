@@ -1,7 +1,7 @@
 #include "GameModes/DuelGameMode.h"
+#include "AI/DuelAIController.h"
 #include "Characters/VampsDuelCharacter.h"
 #include "Player/DuelPlayerController.h"
-#include "AI/DuelAIController.h"
 #include "UI/DuelHUD.h"
 #include "Engine/World.h"
 
@@ -21,6 +21,11 @@ void ADuelGameMode::StartPlay()
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	Opponent = GetWorld()->SpawnActor<AVampsDuelCharacter>(OpponentClass, OpponentSpawn, SpawnParameters);
+	if (Opponent)
+	{
+		Opponent->AIControllerClass = ADuelAIController::StaticClass();
+		Opponent->SpawnDefaultController();
+	}
 	ResetDuel();
 }
 
@@ -36,11 +41,6 @@ void ADuelGameMode::ResetDuel()
 
 	for (AVampsDuelCharacter* Fighter : {Player, Opponent.Get()})
 	{
-		if (SharedConfig)
-		{
-			Fighter->CombatConfig = SharedConfig;
-		}
-
 		Fighter->ResetFighter(Fighter == Player ? PlayerSpawn : OpponentSpawn);
 	}
 
@@ -49,7 +49,7 @@ void ADuelGameMode::ResetDuel()
 
 	if (ADuelAIController* AI = Cast<ADuelAIController>(Opponent->GetController()))
 	{
-		AI->ResetSequence(Opponent->CombatTime());
+		AI->ResetBehavior();
 	}
 
 	PlayerController->SetControlRotation(FRotator(-18, 0, 0));

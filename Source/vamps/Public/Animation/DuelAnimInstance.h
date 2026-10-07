@@ -1,10 +1,9 @@
 #pragma once
 
 #include "Animation/AnimInstance.h"
-#include "Combat/Data/CombatConfig.h"
 #include "DuelAnimInstance.generated.h"
 
-/** Presentation data for a new AnimBP. No notify participates in combat decisions. */
+/** Locomotion and guard presentation; no independent combat state. */
 UCLASS(Transient, Blueprintable)
 class VAMPS_API UDuelAnimInstance : public UAnimInstance
 {
@@ -24,8 +23,5 @@ public:
 	bool bInAir = false;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Duel")
-	EDuelPhase Phase = EDuelPhase::Default;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Duel")
-	int32 StrikeIndex = 0;
+	bool bIsGuarding = false;
 };

@@ -1,10 +1,12 @@
 #include "Player/DuelPlayerController.h"
+#include "AI/DuelAIController.h"
 #include "Characters/VampsDuelCharacter.h"
 #include "GameModes/DuelGameMode.h"
-#include "AI/DuelAIController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "InputAction.h"
+#include "InputCoreTypes.h"
 #include "Engine/LocalPlayer.h"
 #include "Engine/World.h"
 
@@ -33,6 +35,25 @@ void ADuelPlayerController::BeginPlay()
 	bShowMouseCursor = false;
 }
 
+void ADuelPlayerController::EndPlay(const EEndPlayReason::Type Reason)
+{
+	if (ULocalPlayer* Local = GetLocalPlayer())
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Input = Local->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (CombatMapping)
+			{
+				Input->RemoveMappingContext(CombatMapping);
+			}
+			if (DuelMapping)
+			{
+				Input->RemoveMappingContext(DuelMapping);
+			}
+		}
+	}
+	Super::EndPlay(Reason);
+}
+
 void ADuelPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -47,8 +68,6 @@ void ADuelPlayerController::SetupInputComponent()
 	if (MoveAction)
 	{
 		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADuelPlayerController::Move);
-		Input->BindAction(MoveAction, ETriggerEvent::Completed, this, &ADuelPlayerController::StopMove);
-		Input->BindAction(MoveAction, ETriggerEvent::Canceled, this, &ADuelPlayerController::StopMove);
 	}
 
 	if (LookAction)
@@ -56,10 +75,38 @@ void ADuelPlayerController::SetupInputComponent()
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADuelPlayerController::Look);
 	}
 
-	if (SharedAction)
+	if (ULocalPlayer* Local = GetLocalPlayer())
 	{
-		Input->BindAction(SharedAction, ETriggerEvent::Started, this, &ADuelPlayerController::Shared);
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = Local->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			if (CombatMapping)
+			{
+				Subsystem->RemoveMappingContext(CombatMapping);
+			}
+		}
 	}
+	AttackAction = NewObject<UInputAction>(this);
+	GuardAction = NewObject<UInputAction>(this);
+	AIModeAction = NewObject<UInputAction>(this);
+	CombatMapping = NewObject<UInputMappingContext>(this);
+	AttackAction->ValueType = EInputActionValueType::Boolean;
+	GuardAction->ValueType = EInputActionValueType::Boolean;
+	AIModeAction->ValueType = EInputActionValueType::Boolean;
+	CombatMapping->MapKey(AttackAction, EKeys::LeftMouseButton);
+	CombatMapping->MapKey(GuardAction, EKeys::RightMouseButton);
+	CombatMapping->MapKey(AIModeAction, EKeys::F1);
+	if (ULocalPlayer* Local = GetLocalPlayer())
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = Local->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
+		{
+			Subsystem->AddMappingContext(CombatMapping, 1);
+		}
+	}
+	Input->BindAction(AttackAction, ETriggerEvent::Started, this, &ADuelPlayerController::Attack);
+	Input->BindAction(GuardAction, ETriggerEvent::Started, this, &ADuelPlayerController::Guard);
+	Input->BindAction(GuardAction, ETriggerEvent::Completed, this, &ADuelPlayerController::StopGuard);
+	Input->BindAction(GuardAction, ETriggerEvent::Canceled, this, &ADuelPlayerController::StopGuard);
+	Input->BindAction(AIModeAction, ETriggerEvent::Started, this, &ADuelPlayerController::CycleAI);
 
 	if (LockAction)
 	{
@@ -70,21 +117,16 @@ void ADuelPlayerController::SetupInputComponent()
 	{
 		Input->BindAction(ResetAction, ETriggerEvent::Started, this, &ADuelPlayerController::ResetDuel);
 	}
-
-	if (AIModeAction)
-	{
-		Input->BindAction(AIModeAction, ETriggerEvent::Started, this, &ADuelPlayerController::CycleAI);
-	}
 }
 
 void ADuelPlayerController::Move(const FInputActionValue& Value)
 {
-	MoveAxes = Value.Get<FVector2D>();
-}
-
-void ADuelPlayerController::StopMove(const FInputActionValue& Value)
-{
-	MoveAxes = FVector2D::ZeroVector;
+	if (AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetPawn()))
+	{
+		const FVector2D Axes = Value.Get<FVector2D>();
+		const FRotator Yaw(0, GetControlRotation().Yaw, 0);
+		Fighter->RequestMove(Yaw.Vector() * Axes.Y + FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y) * Axes.X);
+	}
 }
 
 void ADuelPlayerController::Look(const FInputActionValue& Value)
@@ -103,11 +145,27 @@ void ADuelPlayerController::Look(const FInputActionValue& Value)
 	SetControlRotation(Rotation);
 }
 
-void ADuelPlayerController::Shared()
+void ADuelPlayerController::Attack()
 {
 	if (AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetPawn()))
 	{
-		Fighter->PressShared();
+		Fighter->RequestAttack();
+	}
+}
+
+void ADuelPlayerController::Guard()
+{
+	if (AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetPawn()))
+	{
+		Fighter->RequestGuard(true);
+	}
+}
+
+void ADuelPlayerController::StopGuard()
+{
+	if (AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetPawn()))
+	{
+		Fighter->RequestGuard(false);
 	}
 }
 
@@ -128,15 +186,10 @@ void ADuelPlayerController::PlayerTick(float DeltaTime)
 		Desired.Roll = 0;
 		SetControlRotation(FMath::RInterpTo(GetControlRotation(), Desired, DeltaTime, 8));
 	}
-
-	const FRotator Yaw(0, GetControlRotation().Yaw, 0);
-	Fighter->SetMoveIntent(Yaw.Vector() * MoveAxes.Y + FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y) * MoveAxes.X);
 }
 
 void ADuelPlayerController::ResetDuel()
 {
-	MoveAxes = FVector2D::ZeroVector;
-
 	if (ADuelGameMode* GameMode = GetWorld()->GetAuthGameMode<ADuelGameMode>())
 	{
 		GameMode->ResetDuel();
@@ -156,14 +209,12 @@ void ADuelPlayerController::ToggleLock()
 
 void ADuelPlayerController::CycleAI()
 {
-	if (ADuelGameMode* GameMode = GetWorld()->GetAuthGameMode<ADuelGameMode>())
+	ADuelGameMode* GameMode = GetWorld()->GetAuthGameMode<ADuelGameMode>();
+	if (GameMode && GameMode->Opponent)
 	{
-		if (GameMode->Opponent)
+		if (ADuelAIController* AI = Cast<ADuelAIController>(GameMode->Opponent->GetController()))
 		{
-			if (ADuelAIController* AI = Cast<ADuelAIController>(GameMode->Opponent->GetController()))
-			{
-				AI->CycleMode();
-			}
+			AI->CycleMode();
 		}
 	}
 }

@@ -12,9 +12,9 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 [Roadmap de prototipos](roadmap.md).
 
-1. Resolver las [preguntas de la primera versión](combat/functional.md#reglas-del-núcleo) y especificar sus casos de combate.
-2. Ejecutar los [accionables técnicos de combate](combat/technical.md) y los [ensayos de rendimiento](game/technical.md#accionables-rendimiento).
-3. Avanzar por el roadmap e incorporar las funcionalidades adicionales en sus propias carpetas cuando corresponda.
+1. Leer el [flujo básico de GAS](combat/technical.md#cómo-leer-el-código).
+2. Completar la [configuración del puño y las trazas](reports/006-golpe-de-puno/editor.md), con los controles de IA existentes.
+3. Observar daño y bloqueo antes de agregar otra regla.
 
 ## Edición
 
@@ -27,5 +27,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 | Tema | Cambios y verificaciones | Pasos del editor |
 |---|---|---|
-| Preparación del MVP y flujo MCP | [Reporte](reports/preparacion-mvp.md) | [Guía](reports/preparacion-mvp-editor.md) |
-| MVP del duelo local | [Reporte](reports/mvp-duelo.md) | [Guía](reports/mvp-duelo-editor.md) |
+| 001 — Preparación del MVP y flujo MCP | [Reporte](reports/001-preparacion-mvp/reporte.md) | [Guía](reports/001-preparacion-mvp/editor.md) |
+| 002 — MVP del duelo local | [Reporte](reports/002-mvp-duelo/reporte.md) | [Guía](reports/002-mvp-duelo/editor.md) |
+| 003 — Combate animado y acciones explícitas | [Reporte](reports/003-combate-animado/reporte.md) | [Guía](reports/003-combate-animado/editor.md) |
+| 004 — Un ataque y una guardia | [Reporte](reports/004-hit-y-guard/reporte.md) | [Guía](reports/004-hit-y-guard/editor.md) |
+| 005 — IA básica y controles de prueba | [Reporte](reports/005-ia-basica/reporte.md) | [Guía](reports/005-ia-basica/editor.md) |
+| 006 — Golpe de puño con hitbox y trazas | [Reporte](reports/006-golpe-de-puno/reporte.md) | [Guía](reports/006-golpe-de-puno/editor.md) |
+| 007 — Revisión de scripts de build y editor | [Reporte](reports/007-revision-scripts/reporte.md) | [Guía](reports/007-revision-scripts/editor.md) |

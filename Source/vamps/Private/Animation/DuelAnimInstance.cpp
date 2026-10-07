@@ -1,6 +1,5 @@
 #include "Animation/DuelAnimInstance.h"
 #include "Characters/VampsDuelCharacter.h"
-#include "Combat/Abilities/GA_Attack.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void UDuelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -14,7 +13,6 @@ void UDuelAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		                                                       Fighter->GetVelocity().Rotation().Yaw)
 		                        : 0.f;
 		bInAir = Fighter->GetCharacterMovement()->IsFalling();
-		Phase = Fighter->GetPhase();
-		StrikeIndex = Fighter->Attack && Fighter->Attack->IsActive() ? Fighter->Attack->StrikeIndex : 0;
+		bIsGuarding = Fighter->IsGuarding();
 	}
 }

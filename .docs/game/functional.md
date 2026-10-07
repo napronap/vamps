@@ -1,24 +1,37 @@
 # Juego y partida
 
-Juego 3D de acción online con personajes diferenciados por sus habilidades. El [sistema de combate](../combat/functional.md) toma como referencia FGO Arcade.
-
-## Formato
-
-Las partidas enfrentan equipos de combatientes. El desarrollo avanza desde duelos contra la IA hasta el formato completo según el [roadmap](../roadmap.md).
+El prototipo actual permite observar [un ataque y una guardia](../combat/functional.md). El formato de equipos y los perfiles de personajes pertenecen a etapas posteriores.
 
 ## Duelo local de prueba
 
-Un jugador y un rival comparten las reglas y parámetros del [primer combate](../combat/functional.md#primera-versión). Llegar a cero de vida muestra victoria o derrota. `R` reinicia posiciones, vida, habilidades, inputs pendientes y la secuencia de IA.
+El escenario contiene al jugador y un rival con IA básica para observar distintas situaciones. Los dos usan las mismas reglas de ataque y guardia.
 
-Controles iniciales: WASD para moverse, click izquierdo para el shared button, Tab para activar o liberar lock-on, mouse para cámara libre y F1 para cambiar el modo del rival.
+| Control | Acción |
+|---|---|
+| WASD | Movimiento |
+| Mouse | Cámara libre cuando no hay lock-on |
+| LMB | Un ataque |
+| RMB mantenido | Guardia |
+| Tab | Activar o liberar lock-on |
+| R | Restaurar posiciones y vida; cancelar acciones |
+| F1 | Cambiar el modo del rival |
 
-La IA ofrece cinco modos reproducibles: `Passive` espera; `Combo` se acerca y encadena ataques; `Reactive` intenta parry o continuación defensiva según las ventanas visibles; `Sidestep` se mueve lateralmente al detectar un ataque; `Mixed` alterna los tres comportamientos activos cada cuatro segundos. El reinicio conserva el modo elegido y reinicia su secuencia, con 0,75 s antes de comenzar.
+El HUD conserva vida y estado de ambos personajes: IDLE, ATTACK o GUARD. También muestra el modo del rival. No hay mensajes de victoria/derrota.
 
-## Preguntas
+## Modos del rival
 
-1. ¿Cuántos combatientes forman cada equipo y cuántos equipos se enfrentan?
-2. ¿Qué objetivo persigue cada jugador o equipo y qué condición determina la victoria o derrota?
-3. ¿Cómo transcurre una partida desde la entrada hasta el resultado: selección de personaje, preparación, combate, rondas y revancha?
-4. ¿Qué ocurre cuando un personaje es derrotado: queda eliminado, reaparece o se cambia por otro?
-5. ¿Cómo es el espacio de juego: arena cerrada, zonas conectadas o recorrido con objetivos?
-6. ¿Qué duración buscamos para una partida y cómo termina si se agota el tiempo?
+F1 recorre estos modos y vuelve al primero:
+
+| Modo | Comportamiento |
+|---|---|
+| Passive | Quieto, sin atacar ni cubrirse; modo inicial |
+| Attack | Se acerca y repite el único ataque, esperando a terminarlo y al intervalo entre intentos |
+| Guard | Quieto, mantiene guardia; permite comprobar la cancelación del atacante |
+| Sidestep | Se desplaza lateralmente alrededor del jugador, sin atacar ni cubrirse |
+| Mixed | Alterna Attack, Guard y Sidestep, cuatro segundos cada uno |
+
+Cambiar de modo cancela la acción y el movimiento anteriores. Después de cambiar o reiniciar, el rival espera 0,75 segundos antes de actuar. R conserva el modo seleccionado y reinicia su secuencia. La IA no se detiene por vida cero: todavía no hay muerte ni fin de partida.
+
+El acercamiento es en línea recta, sin buscar rutas alrededor de obstáculos. La distancia inicial para intentar atacar es 100 cm entre personajes; la hitbox del puño debe alcanzar de verdad al receptor para producir un contacto. Los intentos se separan al menos un segundo.
+
+La [guía del golpe de puño](../reports/006-golpe-de-puno/editor.md) reúne la configuración vigente y enlaza las comprobaciones de IA.

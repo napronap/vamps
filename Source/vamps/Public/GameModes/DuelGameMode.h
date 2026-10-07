@@ -4,7 +4,6 @@
 #include "DuelGameMode.generated.h"
 
 class AVampsDuelCharacter;
-class UCombatConfig;
 
 UCLASS()
 class VAMPS_API ADuelGameMode : public AGameModeBase
@@ -19,9 +18,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Duel")
 	TSubclassOf<AVampsDuelCharacter> OpponentClass;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Duel")
-	TObjectPtr<UCombatConfig> SharedConfig;
 
 	UPROPERTY(EditAnywhere, Category = "Duel")
 	FTransform PlayerSpawn;

@@ -8,7 +8,7 @@ Las declaraciones `.h` van en `Source/vamps/Public/`; sus implementaciones `.cpp
 
 | Carpeta | Contenido |
 |---|---|
-| `Combat/` | Reglas, tags y coordinación temporal de contactos |
+| `Combat/` | Reglas, tags y trazas del arma |
 | `Combat/Abilities/` | Habilidades GAS y su base común |
 | `Combat/Attributes/` | Attribute Sets |
 | `Combat/Effects/` | Gameplay Effects |
@@ -17,7 +17,7 @@ Las declaraciones `.h` van en `Source/vamps/Public/`; sus implementaciones `.cpp
 | `AI/` | Controladores del rival |
 | `Player/` | Input y cámara del jugador |
 | `GameModes/` | Preparación y reinicio de la partida |
-| `Animation/` | Datos de presentación para AnimBP |
+| `Animation/` | Datos de presentación para AnimBP y notifies de ventanas |
 | `UI/` | HUD e interfaz |
 
 Ejemplo: `Public/Combat/Abilities/GA_Attack.h` y `Private/Combat/Abilities/GA_Attack.cpp`. El include es `"Combat/Abilities/GA_Attack.h"`; no incluye `Public` ni `Private`. Unreal Build Tool descubre estas carpetas dentro del módulo.
@@ -35,16 +35,12 @@ El nombre de carpeta organiza archivos; no cambia el identificador de clase `/Sc
 - Comentarios para explicar responsabilidad, restricciones y motivos; no narrar cada sentencia.
 
 ```cpp
-void UGA_Guard::Leave(double Now)
+void AVampsDuelCharacter::RequestAttack()
 {
-	if (!IsActive())
+	if (HasAuthority())
 	{
-		return;
+		AbilitySystem->TryActivateAbility(AttackHandle);
 	}
-
-	Finish();
-	Fighter()->ClearInput();
-	Fighter()->StartNA(Now, false);
 }
 ```
 

@@ -17,6 +17,7 @@ public:
 	ADuelPlayerController();
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void SetupInputComponent() override;
 	virtual void PlayerTick(float DeltaTime) override;
 
@@ -30,16 +31,10 @@ public:
 	TObjectPtr<UInputAction> LookAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> SharedAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> LockAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> ResetAction;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> AIModeAction;
 
 	UFUNCTION(BlueprintCallable, Category = "Duel")
 	void ResetDuel();
@@ -52,10 +47,21 @@ public:
 
 private:
 
-	FVector2D MoveAxes = FVector2D::ZeroVector;
+	UPROPERTY(Transient)
+	TObjectPtr<UInputAction> AttackAction;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UInputAction> GuardAction;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UInputAction> AIModeAction;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UInputMappingContext> CombatMapping;
 
 	void Move(const FInputActionValue& Value);
-	void StopMove(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void Shared();
+	void Attack();
+	void Guard();
+	void StopGuard();
 };

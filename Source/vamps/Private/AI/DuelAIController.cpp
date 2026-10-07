@@ -1,90 +1,151 @@
 #include "AI/DuelAIController.h"
 #include "Characters/VampsDuelCharacter.h"
-#include "Combat/Abilities/GA_Attack.h"
-#include "Combat/Abilities/GA_Guard.h"
-#include "Combat/Abilities/GA_HitReaction.h"
+#include "Engine/World.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
-void ADuelAIController::ResetSequence(double Now)
+ADuelAIController::ADuelAIController()
 {
-	Epoch = Now;
-	NextDecision = Now + 0.75;
-	NextPress = NextDecision;
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = false;
+}
+
+void ADuelAIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	ResetBehavior();
+}
+
+void ADuelAIController::OnUnPossess()
+{
+	GetWorldTimerManager().ClearTimer(DecisionTimer);
+	StopActions();
+	Super::OnUnPossess();
+}
+
+void ADuelAIController::EndPlay(const EEndPlayReason::Type Reason)
+{
+	GetWorldTimerManager().ClearTimer(DecisionTimer);
+	StopActions();
+	Super::EndPlay(Reason);
+}
+
+void ADuelAIController::ResetBehavior()
+{
+	StopActions();
+	StartedAt = GetWorld()->GetTimeSeconds() + 0.75;
+	NextAttackAt = StartedAt;
+	GetWorldTimerManager().SetTimer(DecisionTimer, this, &ADuelAIController::Decide, 0.1f, true, 0.75f);
 }
 
 void ADuelAIController::CycleMode()
 {
 	Mode = EDuelAIMode((int32(Mode) + 1) % 5);
+	ResetBehavior();
+}
 
+void ADuelAIController::StopActions()
+{
+	MoveDirection = FVector::ZeroVector;
+	SetActorTickEnabled(false);
 	if (AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetPawn()))
 	{
-		Fighter->SetMoveIntent(FVector::ZeroVector);
-		ResetSequence(Fighter->CombatTime());
+		Fighter->RequestGuard(false);
+		Fighter->CancelAttack();
+		Fighter->ConsumeMovementInputVector();
+		Fighter->GetCharacterMovement()->StopMovementImmediately();
 	}
 }
 
-void ADuelAIController::Advance(double Now)
+void ADuelAIController::Tick(float DeltaSeconds)
 {
-	AVampsDuelCharacter* ControlledFighter = Cast<AVampsDuelCharacter>(GetPawn());
-
-	if (!ControlledFighter || !ControlledFighter->Attack || Now < NextDecision)
+	Super::Tick(DeltaSeconds);
+	// CharacterMovement consumes input each frame; decisions run in Decide.
+	if (AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetPawn()))
 	{
+		Fighter->RequestMove(MoveDirection);
+	}
+}
+
+void ADuelAIController::Decide()
+{
+	MoveDirection = FVector::ZeroVector;
+	AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetPawn());
+	AVampsDuelCharacter* Target = Fighter ? Fighter->GetTarget() : nullptr;
+	if (!Target)
+	{
+		StopActions();
 		return;
 	}
 
-	NextDecision = Now + 0.03;
-	ControlledFighter->SetMoveIntent(FVector::ZeroVector);
-	AVampsDuelCharacter* Opponent = ControlledFighter->GetTarget();
-
-	if (ControlledFighter->IsDefeated() || !Opponent || Mode == EDuelAIMode::Passive)
-	{
-		return;
-	}
-
-	const FVector Offset = Opponent->GetActorLocation() - ControlledFighter->GetActorLocation();
-	const float Distance = Offset.Size2D();
-	EDuelAIMode Current = Mode;
-
+	EDuelAIMode Behavior = Mode;
 	if (Mode == EDuelAIMode::Mixed)
 	{
-		Current = EDuelAIMode(1 + (int32((Now - Epoch) / 4.) % 3));
+		const double Elapsed = GetWorld()->GetTimeSeconds() - StartedAt;
+		Behavior = EDuelAIMode(1 + (int32(Elapsed / 4.) % 3));
 	}
 
-	if (Current == EDuelAIMode::Sidestep)
+	const FVector ToTarget = Target->GetActorLocation() - Fighter->GetActorLocation();
+	switch (Behavior)
 	{
-		if (Opponent->Attack->IsActive())
-		{
-			ControlledFighter->SetMoveIntent(FVector::CrossProduct(FVector::UpVector, Offset.GetSafeNormal2D()));
-		}
+	case EDuelAIMode::Attack:
+		ApproachAndAttack(Fighter, ToTarget);
+		break;
+	case EDuelAIMode::Guard:
+		HoldGuard(Fighter);
+		break;
+	case EDuelAIMode::Sidestep:
+		Sidestep(Fighter, ToTarget);
+		break;
+	default:
+		StopActions();
+		break;
+	}
+	SetActorTickEnabled(!MoveDirection.IsNearlyZero());
+}
 
+void ADuelAIController::ApproachAndAttack(AVampsDuelCharacter* Fighter, const FVector& ToTarget)
+{
+	Fighter->RequestGuard(false);
+	if (Fighter->IsAttacking())
+	{
+		return;
+	}
+	if (ToTarget.SizeSquared2D() > FMath::Square(AttackDistance))
+	{
+		MoveDirection = ToTarget.GetSafeNormal2D();
 		return;
 	}
 
-	if (Current == EDuelAIMode::Combo && Distance > 170.f && !ControlledFighter->Attack->IsActive())
+	Fighter->ConsumeMovementInputVector();
+	Fighter->GetCharacterMovement()->StopMovementImmediately();
+	const double Now = GetWorld()->GetTimeSeconds();
+	if (Now >= NextAttackAt)
 	{
-		ControlledFighter->SetMoveIntent(Offset.GetSafeNormal2D());
+		Fighter->RequestAttack();
+		NextAttackAt = Now + FMath::Max(0.1f, AttackInterval);
 	}
+}
 
-	if (Now < NextPress)
+void ADuelAIController::HoldGuard(AVampsDuelCharacter* Fighter)
+{
+	Fighter->ConsumeMovementInputVector();
+	Fighter->GetCharacterMovement()->StopMovementImmediately();
+	if (Fighter->IsAttacking())
 	{
-		return;
+		Fighter->CancelAttack();
 	}
+	if (!Fighter->IsGuarding())
+	{
+		Fighter->RequestGuard(true);
+	}
+}
 
-	bool bPress = false;
-
-	if (Current == EDuelAIMode::Combo)
+void ADuelAIController::Sidestep(AVampsDuelCharacter* Fighter, const FVector& ToTarget)
+{
+	Fighter->RequestGuard(false);
+	if (Fighter->IsAttacking())
 	{
-		bPress = Distance <= 250.f && ControlledFighter->GetPhase() != EDuelPhase::NA;
+		Fighter->CancelAttack();
 	}
-	else if (Opponent->Attack->IsActive())
-	{
-		const double UntilContact = Opponent->Attack->ActiveAt() - Now;
-		bPress = (UntilContact >= 0 && UntilContact <= 0.05) || ControlledFighter->Guard->IsActive() ||
-		         ControlledFighter->HitReaction->CanRespond(Now);
-	}
-
-	if (bPress)
-	{
-		ControlledFighter->PressShared();
-		NextPress = Now + 0.12;
-	}
+	MoveDirection = FVector::CrossProduct(FVector::UpVector, ToTarget.GetSafeNormal2D());
 }

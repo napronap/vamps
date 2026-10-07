@@ -32,7 +32,7 @@ No reutilizar, copiar ni heredar código, clases, Blueprints o Animation Bluepri
 
 ## Entregables de cada iteración
 
-- Crear o actualizar `.docs/reports/<tema>.md` con todos los cambios realizados, sus motivos, relaciones entre clases y conexiones con Blueprints y otros assets. Incluir verificaciones y pendientes relevantes.
-- Mantener además `.docs/reports/<tema>-editor.md`: un instructivo ordenado de todas las operaciones necesarias fuera de la edición de código, incluidas las ya realizadas por MCP. Identificar claramente lo hecho por Codex, lo hecho por el usuario y lo pendiente para el usuario.
-- Actualizar ambos documentos durante el trabajo o al terminar. Mantener un informe consolidado por tema, sin un registro de cada llamada a herramientas. Escribir en español, de forma directa y concisa.
+- Crear o actualizar `.docs/reports/<NNN-iteracion>/reporte.md` con todos los cambios realizados, sus motivos, relaciones entre clases y conexiones con Blueprints y otros assets. Incluir verificaciones y pendientes relevantes.
+- Mantener además `.docs/reports/<NNN-iteracion>/editor.md`: un instructivo ordenado de todas las operaciones necesarias fuera de la edición de código, incluidas las ya realizadas por MCP. Identificar claramente lo hecho por Codex, lo hecho por el usuario y lo pendiente para el usuario.
+- Actualizar ambos documentos durante el trabajo o al terminar. Mantener un informe consolidado por iteración, sin un registro de cada llamada a herramientas. Crear una carpeta numerada y descriptiva por iteración; no dejar reportes sueltos en reports. Conservar las iteraciones anteriores con enlaces a la vigente. Escribir en español, de forma directa y concisa.
 - Seguir las [convenciones de reportes y guías](.docs/AGENTS.md#reportes-y-guías-del-editor) y enlazar los entregables desde el índice de documentación.
