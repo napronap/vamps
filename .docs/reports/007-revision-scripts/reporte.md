@@ -1,5 +1,7 @@
 # 007 — Revisión de scripts de build y editor
 
+Diagnóstico posterior del entorno: [iteración 008 — Generación de proyectos Visual Studio](../008-generacion-visual-studio/reporte.md). No reemplaza las observaciones sobre estos scripts.
+
 Revisión estática de `build.bat`, `editor.bat` y `vars.bat`, agregados y probados por el usuario. Codex no modifica los scripts, código C++ ni assets.
 
 ## Resultado

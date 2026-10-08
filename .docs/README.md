@@ -25,6 +25,8 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
+Iteración vigente de diagnóstico del entorno: [008 — Generación de proyectos Visual Studio](reports/008-generacion-visual-studio/reporte.md). [Pasos pendientes](reports/008-generacion-visual-studio/editor.md). La configuración del combate conserva sus guías anteriores.
+
 | Tema | Cambios y verificaciones | Pasos del editor |
 |---|---|---|
 | 001 — Preparación del MVP y flujo MCP | [Reporte](reports/001-preparacion-mvp/reporte.md) | [Guía](reports/001-preparacion-mvp/editor.md) |
@@ -34,3 +36,4 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 | 005 — IA básica y controles de prueba | [Reporte](reports/005-ia-basica/reporte.md) | [Guía](reports/005-ia-basica/editor.md) |
 | 006 — Golpe de puño con hitbox y trazas | [Reporte](reports/006-golpe-de-puno/reporte.md) | [Guía](reports/006-golpe-de-puno/editor.md) |
 | 007 — Revisión de scripts de build y editor | [Reporte](reports/007-revision-scripts/reporte.md) | [Guía](reports/007-revision-scripts/editor.md) |
+| 008 — Bloqueo de generación de proyectos Visual Studio | [Reporte](reports/008-generacion-visual-studio/reporte.md) | [Guía](reports/008-generacion-visual-studio/editor.md) |
