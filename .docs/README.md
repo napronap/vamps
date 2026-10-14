@@ -25,7 +25,7 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
-Iteración vigente de diagnóstico del entorno: [008 — Generación de proyectos Visual Studio](reports/008-generacion-visual-studio/reporte.md). [Pasos pendientes](reports/008-generacion-visual-studio/editor.md). La configuración del combate conserva sus guías anteriores.
+Iteración vigente de implementación: [009 — Base definitiva de personajes](reports/009-personajes-base/reporte.md). [Preparación del editor](reports/009-personajes-base/editor.md). El duelo anterior queda como referencia; las piezas compartidas de combate y animación usan la base nueva. Diagnóstico del entorno: [008 — Generación de proyectos Visual Studio](reports/008-generacion-visual-studio/reporte.md).
 
 | Tema | Cambios y verificaciones | Pasos del editor |
 |---|---|---|
@@ -37,3 +37,4 @@ Iteración vigente de diagnóstico del entorno: [008 — Generación de proyecto
 | 006 — Golpe de puño con hitbox y trazas | [Reporte](reports/006-golpe-de-puno/reporte.md) | [Guía](reports/006-golpe-de-puno/editor.md) |
 | 007 — Revisión de scripts de build y editor | [Reporte](reports/007-revision-scripts/reporte.md) | [Guía](reports/007-revision-scripts/editor.md) |
 | 008 — Bloqueo de generación de proyectos Visual Studio | [Reporte](reports/008-generacion-visual-studio/reporte.md) | [Guía](reports/008-generacion-visual-studio/editor.md) |
+| 009 — Base definitiva de personajes | [Reporte](reports/009-personajes-base/reporte.md) | [Guía](reports/009-personajes-base/editor.md) |

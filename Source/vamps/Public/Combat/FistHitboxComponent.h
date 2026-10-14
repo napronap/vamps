@@ -3,7 +3,7 @@
 #include "Components/SphereComponent.h"
 #include "FistHitboxComponent.generated.h"
 
-class AVampsDuelCharacter;
+class AVampsCharacter;
 
 UCLASS()
 class VAMPS_API UFistHitboxComponent : public USphereComponent
@@ -30,7 +30,7 @@ private:
 
 	FVector PreviousPosition = FVector::ZeroVector;
 	bool bHasPreviousPosition = false;
-	TSet<TWeakObjectPtr<AVampsDuelCharacter>> HitActors;
+	TSet<TWeakObjectPtr<AVampsCharacter>> HitActors;
 
-	void TraceHitbox(const FVector& Start, const FVector& End, AVampsDuelCharacter* Fighter);
+	void TraceHitbox(const FVector& Start, const FVector& End, AVampsCharacter* Fighter);
 };

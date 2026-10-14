@@ -1,5 +1,7 @@
 # 006 — Golpe de puño con hitbox y trazas
 
+Implementación vigente: [009 — Base definitiva de personajes](../009-personajes-base/reporte.md). Las piezas compartidas del puño y la animación ahora usan VampsCharacter; el duelo descrito aquí queda como referencia hasta su rollout.
+
 Código y documentación. Los assets quedan pendientes para el usuario según la [guía](editor.md).
 
 Se reemplaza toda la lógica de arma del combate propio por una esfera sobre un socket del puño. Se mantiene un solo ataque y las dos reglas: guardia cancela al agresor sin daño; sin guardia se resta vida. IA, controles, HUD y lock-on siguen disponibles.

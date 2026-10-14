@@ -1,5 +1,7 @@
 # 008 — Bloqueo de generación de proyectos Visual Studio
 
+Implementación posterior: [009 — Base definitiva de personajes](../009-personajes-base/reporte.md). Esta nueva iteración no confirma la resolución del bloqueo de entorno diagnosticado aquí.
+
 ## Alcance y resultado
 
 Diagnóstico del fallo de **Generate Visual Studio project files** del 8 de octubre de 2026. La causa inicial confirmada es una política de control de aplicaciones de Windows que impide cargar `C:\Users\student\AppData\Local\UnrealEngine\Intermediate\Build\BuildRules\MarketplaceRules.dll`. La generación sigue pendiente de una nueva ejecución después de resolver ese bloqueo.

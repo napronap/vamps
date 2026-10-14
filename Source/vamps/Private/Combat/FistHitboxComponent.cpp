@@ -1,5 +1,5 @@
 #include "Combat/FistHitboxComponent.h"
-#include "Characters/VampsDuelCharacter.h"
+#include "Characters/VampsCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 
@@ -16,25 +16,16 @@ UFistHitboxComponent::UFistHitboxComponent()
 void UFistHitboxComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	if (AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetOwner()))
-	{
-		AttachToComponent(Fighter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
-		AddTickPrerequisiteComponent(Fighter->GetMesh());
-		if (!HasFistSocket())
-		{
-			UE_LOG(LogTemp,
-			       Warning,
-			       TEXT("%s: missing fist socket '%s'; attacks are disabled."),
-			       *Fighter->GetName(),
-			       *SocketName.ToString());
-		}
-	}
+	AVampsCharacter* Fighter = CastChecked<AVampsCharacter>(GetOwner());
+	checkf(HasFistSocket(), TEXT("%s: missing fist socket '%s'."), *Fighter->GetName(), *SocketName.ToString());
+	AttachToComponent(Fighter->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+	AddTickPrerequisiteComponent(Fighter->GetMesh());
 }
 
 bool UFistHitboxComponent::HasFistSocket() const
 {
-	const AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetOwner());
-	return Fighter && Fighter->GetMesh()->DoesSocketExist(SocketName);
+	const AVampsCharacter* Fighter = CastChecked<AVampsCharacter>(GetOwner());
+	return Fighter->GetMesh()->DoesSocketExist(SocketName);
 }
 
 void UFistHitboxComponent::ResetHits()
@@ -59,8 +50,8 @@ void UFistHitboxComponent::TickComponent(float DeltaTime,
                                          FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetOwner());
-	if (!Fighter || !Fighter->HasAuthority() || !Fighter->IsAttacking() || !HasFistSocket())
+	AVampsCharacter* Fighter = CastChecked<AVampsCharacter>(GetOwner());
+	if (!Fighter->HasAuthority() || !Fighter->IsAttacking())
 	{
 		StopTracing();
 		return;
@@ -73,7 +64,7 @@ void UFistHitboxComponent::TickComponent(float DeltaTime,
 	bHasPreviousPosition = true;
 }
 
-void UFistHitboxComponent::TraceHitbox(const FVector& Start, const FVector& End, AVampsDuelCharacter* Fighter)
+void UFistHitboxComponent::TraceHitbox(const FVector& Start, const FVector& End, AVampsCharacter* Fighter)
 {
 	FCollisionQueryParams Query(SCENE_QUERY_STAT(FistHit), false, Fighter);
 	TArray<FHitResult> Hits;
@@ -91,7 +82,7 @@ void UFistHitboxComponent::TraceHitbox(const FVector& Start, const FVector& End,
 		{
 			break;
 		}
-		AVampsDuelCharacter* Target = Cast<AVampsDuelCharacter>(Hit.GetActor());
+		AVampsCharacter* Target = Cast<AVampsCharacter>(Hit.GetActor());
 		if (!Target || HitActors.Contains(Target))
 		{
 			continue;

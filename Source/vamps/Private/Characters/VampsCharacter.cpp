@@ -1,75 +1,127 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "Characters/VampsCharacter.h"
-#include "Engine/LocalPlayer.h"
+#include "AbilitySystemComponent.h"
+#include "Combat/Abilities/GA_Attack.h"
+#include "Combat/Abilities/GA_Guard.h"
+#include "Combat/Attributes/VampsAttributeSet.h"
+#include "Combat/CombatTags.h"
+#include "Combat/Effects/GE_DuelDamage.h"
+#include "Combat/FistHitboxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
-#include "InputActionValue.h"
-#include "vamps.h"
 
 AVampsCharacter::AVampsCharacter()
 {
-	// CHECK: Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-
-	// CHECK!!! maybe I need this
-	bUseControllerRotationPitch = false;
+	PrimaryActorTick.bCanEverTick = false;
+	AutoPossessAI = EAutoPossessAI::Disabled;
+	GetCapsuleComponent()->InitCapsuleSize(34.f, 88.f);
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -88.f));
+	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+	GetMesh()->bEnableUpdateRateOptimizations = false;
 	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
-
-	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 500.f, 0.f);
+	GetCharacterMovement()->MaxWalkSpeed = 420.f;
 
-	// CHECK
-	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
-	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 500.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
-	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
-	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+	AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
+	AbilitySystem->SetIsReplicated(true);
+	Attributes = CreateDefaultSubobject<UVampsAttributeSet>(TEXT("Attributes"));
+	FistHitbox = CreateDefaultSubobject<UFistHitboxComponent>(TEXT("FistHitbox"));
+	FistHitbox->SetupAttachment(GetMesh(), FistHitbox->SocketName);
 }
 
-// This should all be in PC
-void AVampsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AVampsCharacter::BeginPlay()
 {
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVampsCharacter::Move);
-		// EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AVampsCharacterNew::Look);
-	}
-	else
+	AbilitySystem->InitAbilityActorInfo(this, this);
+
+	if (HasAuthority())
 	{
-		UE_LOG(Logvamps, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+		AttackHandle = AbilitySystem->GiveAbility(FGameplayAbilitySpec(UGA_Attack::StaticClass(), 1));
+		GuardHandle = AbilitySystem->GiveAbility(FGameplayAbilitySpec(UGA_Guard::StaticClass(), 1));
+	}
+	Super::BeginPlay();
+}
+
+void AVampsCharacter::EndPlay(const EEndPlayReason::Type Reason)
+{
+	AbilitySystem->CancelAllAbilities();
+	FistHitbox->StopTracing();
+	Super::EndPlay(Reason);
+}
+
+void AVampsCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	AbilitySystem->InitAbilityActorInfo(this, this);
+}
+
+void AVampsCharacter::UnPossessed()
+{
+	AbilitySystem->CancelAllAbilities();
+	FistHitbox->StopTracing();
+	Super::UnPossessed();
+	AbilitySystem->InitAbilityActorInfo(this, this);
+}
+
+UAbilitySystemComponent* AVampsCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystem;
+}
+
+void AVampsCharacter::RequestAttack()
+{
+	if (HasAuthority())
+	{
+		AbilitySystem->TryActivateAbility(AttackHandle);
 	}
 }
 
-void AVampsCharacter::DoMove(const FInputActionValue& Value)
+void AVampsCharacter::RequestGuard(bool bPressed)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	// route the input
-	if (GetController() != nullptr)
+	if (!HasAuthority())
 	{
-		// find out which way is forward
-		const FRotator Rotation = GetController()->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-		// get right vector
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement
-		AddMovementInput(ForwardDirection, Forward);
-		AddMovementInput(RightDirection, Right);
+		return;
 	}
+
+	if (bPressed)
+	{
+		AbilitySystem->TryActivateAbility(GuardHandle);
+		return;
+	}
+	AbilitySystem->CancelAbilityHandle(GuardHandle);
+}
+
+bool AVampsCharacter::IsAttacking() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(DuelTags::Attack);
+}
+
+bool AVampsCharacter::IsGuarding() const
+{
+	return AbilitySystem->HasMatchingGameplayTag(DuelTags::Guard);
+}
+
+void AVampsCharacter::ReceiveHit(AVampsCharacter* Attacker)
+{
+	check(Attacker && Attacker != this);
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	if (IsGuarding())
+	{
+		Attacker->AbilitySystem->CancelAbilityHandle(Attacker->AttackHandle);
+		return;
+	}
+
+	FGameplayEffectContextHandle Context = Attacker->AbilitySystem->MakeEffectContext();
+	Context.AddSourceObject(Attacker);
+	FGameplayEffectSpecHandle Damage =
+	    Attacker->AbilitySystem->MakeOutgoingSpec(UGE_DuelDamage::StaticClass(), 1, Context);
+	check(Damage.IsValid());
+	Damage.Data->SetSetByCallerMagnitude(DuelTags::Damage, -FMath::Max(0.f, Attacker->AttackDamage));
+	Attacker->AbilitySystem->ApplyGameplayEffectSpecToTarget(*Damage.Data, AbilitySystem);
 }

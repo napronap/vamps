@@ -2,7 +2,7 @@
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "Characters/VampsDuelCharacter.h"
+#include "Characters/VampsCharacter.h"
 #include "Combat/FistHitboxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
@@ -26,8 +26,8 @@ void UANS_AttackTrace::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& Pay
 
 void UANS_AttackTrace::SetTracing(FBranchingPointNotifyPayload& Payload, bool bEnabled)
 {
-	AVampsDuelCharacter* Fighter =
-	    Payload.SkelMeshComponent ? Cast<AVampsDuelCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
+	AVampsCharacter* Fighter =
+	    Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
 	if (!Fighter || !Fighter->HasAuthority() || !Fighter->IsAttacking() ||
 	    Payload.SkelMeshComponent != Fighter->GetMesh())
 	{

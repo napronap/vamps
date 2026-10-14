@@ -22,7 +22,14 @@ No reutilizar, copiar ni heredar código, clases, Blueprints o Animation Bluepri
 - Usar includes relativos a la raíz `Public`, sin prefijos `Public/` ni `Private/`. El `.cpp` incluye primero su propio header; en headers reflejados, el include `.generated.h` siempre es el último.
 - Seguir las convenciones de Epic adaptadas en `.clang-format` y `.editorconfig`: tabs de cuatro columnas, llaves en líneas separadas, bloques completos incluso para una sola sentencia y separación entre funciones y grupos de responsabilidades. No comprimir funciones, condiciones o declaraciones en una sola línea.
 - Mantener `UPROPERTY` y `UFUNCTION` en una línea independiente de su declaración. Usar nombres descriptivos y variables locales que expliquen su propósito.
+- Evitar shadowing de tipos y miembros de Unreal, incluidos los heredados: no declarar variables locales, parámetros ni miembros que oculten esos nombres. Revisar las clases base al elegir identificadores; por ejemplo, usar `ControlledPawn` en lugar de `Character` dentro de un PlayerController, porque `AController` ya declara `Character`.
 - Aplicar el formateador a los archivos propios modificados. Revisar el resultado: el formateador no reemplaza la organización lógica ni la claridad de los nombres. Ver [convenciones C++](.docs/cpp-style.md).
+- Se valora especialmente robustez, minimizar cantidad de líneas de código, evitar bloat, evitar duplicación.
+- Se deben evitar fallbacks, if-else statements innecesarios (cosas como ramas de else que simplemente describan que algo esta roto, preferir que el codigo falle y tire un error para poder detectarlo y actuar acorde). Los fallbacks tienden a esconder bugs y generar bloat.
+- No agregar compatibilidad con scope o backwards compatibility a menos que el usuario lo pida explicitamente.
+- Asimismo, no hacer futurologia (por ejemplo, getters y setters innecesarios, bindings que "pueden ser usados en el futuro"). Mantener el scope a la tarea que se esta desarrollando actualmente. Si luego se necesitan otros bindings, se haran cuando sean necesarios.
+- No agregar comentarios a menos que el usuario lo pida o pregunte mas aclaracion sobre alguna parte del código.
+- No actualizar documentacion ni ningun .md (excepto reportes, obviamente) a menos que sea pedido por el usuario.
 
 ## Sin tests automatizados
 

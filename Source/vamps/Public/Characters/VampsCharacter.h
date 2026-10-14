@@ -1,104 +1,60 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayAbilitySpecHandle.h"
-#include "InputActionValue.h"
 #include "VampsCharacter.generated.h"
 
 class UAbilitySystemComponent;
 class UVampsAttributeSet;
 class UFistHitboxComponent;
 class UAnimMontage;
-class UInputAction;
 
-UCLASS(abstract)
-class AVampsCharacter : public ACharacter, public IAbilitySystemInterface
+UCLASS(Abstract)
+class VAMPS_API AVampsCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
 public:
-	AVampsCharacter();
 
+	AVampsCharacter();
 	virtual void BeginPlay() override;
-	virtual void EndPlay(const EEndplayReason::Type Reason) override; // CHECK
-	virtual void Tick(float DeltaSeconds) override;
-	// for now there's no reason to keep the ASC in any other place than the character
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystem;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UVampsAttributeSet> Attributes;
 
-	// CHECK: probably move this to another AC
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UFistHitboxComponent> FistHitbox;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0"))
 	float AttackDamage = 12.f;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestAttack();
 
-	UFUNCTION(BlueprintCallable)
-	void RequestGuard();
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void RequestGuard(bool bPressed);
 
-	void CancelAttack();
 	void ReceiveHit(AVampsCharacter* Attacker);
-	void ResetFighter(const FTransform& SpawnTransform);
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Combat")
 	bool IsAttacking() const;
 
-	UFUNCTION(BlueprintPure)
+	UFUNCTION(BlueprintPure, Category = "Combat")
 	bool IsGuarding() const;
 
-	UFUNCTION(BlueprintPure)
-	bool GetHealth() const;
-
-	UFUNCTION(BlueprintPure)
-	bool GetMaxHealth() const;
-
-	UFUNCTION(BlueprintCallable)
-	bool RequestMove(FVector WorldDirection);
-
-	UFUNCTION(BlueprintCallable)
-	void SetTarget(AVampsCharacter* NewTarget);
-
-	UFUNCTION(BlueprintPure)
-	AVampsCharacter* GetTarget();
-
-
-	UFUNCTION(BlueprintCallable, Category="Input")
-	void DoMove(const FInputActionValue& Value);
-
-protected:
-
-	/** Input actions */
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* MoveAction;
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* LookAction;
-
-	UPROPERTY(EditAnywhere, Category="Input")
-	UInputAction* MouseLookAction;
-
-	// CHECK
-	/** Initialize input action bindings */
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 private:
+
 	FGameplayAbilitySpecHandle AttackHandle;
 	FGameplayAbilitySpecHandle GuardHandle;
-	TWeakObjectPtr<AVampsCharacter> Target;
 };
-

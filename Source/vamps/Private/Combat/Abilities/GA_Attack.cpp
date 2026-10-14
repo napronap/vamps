@@ -1,6 +1,6 @@
 #include "Combat/Abilities/GA_Attack.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-#include "Characters/VampsDuelCharacter.h"
+#include "Characters/VampsCharacter.h"
 #include "Combat/CombatTags.h"
 #include "Combat/FistHitboxComponent.h"
 
@@ -17,9 +17,10 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
                                  const FGameplayAbilityActivationInfo ActivationInfo,
                                  const FGameplayEventData* TriggerEventData)
 {
-	AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetAvatarActorFromActorInfo());
-	if (!Fighter || !Fighter->AttackMontage || !Fighter->FistHitbox->HasFistSocket() ||
-	    !CommitAbility(Handle, ActorInfo, ActivationInfo))
+	AVampsCharacter* Fighter = CastChecked<AVampsCharacter>(GetAvatarActorFromActorInfo());
+	checkf(Fighter->AttackMontage, TEXT("%s: AttackMontage must be assigned."), *Fighter->GetName());
+	checkf(Fighter->FistHitbox->HasFistSocket(), TEXT("%s: the fist socket must exist."), *Fighter->GetName());
+	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
@@ -45,7 +46,7 @@ void UGA_Attack::FinishAttack()
 
 void UGA_Attack::StopTracing()
 {
-	if (AVampsDuelCharacter* Fighter = Cast<AVampsDuelCharacter>(GetAvatarActorFromActorInfo()))
+	if (AVampsCharacter* Fighter = Cast<AVampsCharacter>(GetAvatarActorFromActorInfo()))
 	{
 		Fighter->FistHitbox->StopTracing();
 	}
