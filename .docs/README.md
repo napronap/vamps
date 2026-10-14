@@ -25,7 +25,7 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
-Iteración vigente de implementación: [009 — Base definitiva de personajes](reports/009-personajes-base/reporte.md). [Preparación del editor](reports/009-personajes-base/editor.md). El duelo anterior queda como referencia; las piezas compartidas de combate y animación usan la base nueva. Diagnóstico del entorno: [008 — Generación de proyectos Visual Studio](reports/008-generacion-visual-studio/reporte.md).
+Iteración vigente: [015 — Retirada de Duel](reports/015-retirada-duel/reporte.md). [Limpieza residual y consolidación](reports/015-retirada-duel/editor.md). El setup Vamps conserva las clases y conexiones de [014](reports/014-copias-nomenclatura-vamps/reporte.md) y la [configuración de personajes y animación](reports/013-recuperacion-blueprints/reporte.md). La IA mantiene [011](reports/011-ia-combate-prueba/reporte.md) y sus [controles F6/R](reports/011-ia-combate-prueba/editor.md).
 
 | Tema | Cambios y verificaciones | Pasos del editor |
 |---|---|---|
@@ -38,3 +38,9 @@ Iteración vigente de implementación: [009 — Base definitiva de personajes](r
 | 007 — Revisión de scripts de build y editor | [Reporte](reports/007-revision-scripts/reporte.md) | [Guía](reports/007-revision-scripts/editor.md) |
 | 008 — Bloqueo de generación de proyectos Visual Studio | [Reporte](reports/008-generacion-visual-studio/reporte.md) | [Guía](reports/008-generacion-visual-studio/editor.md) |
 | 009 — Base definitiva de personajes | [Reporte](reports/009-personajes-base/reporte.md) | [Guía](reports/009-personajes-base/editor.md) |
+| 010 — HUD de prueba para los personajes nuevos | [Reporte](reports/010-hud-prueba/reporte.md) | [Guía](reports/010-hud-prueba/editor.md) |
+| 011 — IA nueva y GameMode de prueba de combate | [Reporte](reports/011-ia-combate-prueba/reporte.md) | [Guía](reports/011-ia-combate-prueba/editor.md) |
+| 012 — AnimInstance y AnimBP Vamps | [Reporte](reports/012-animacion-vamps/reporte.md) | [Guía](reports/012-animacion-vamps/editor.md) |
+| 013 — Recuperación de Blueprints y animación Vamps | [Reporte](reports/013-recuperacion-blueprints/reporte.md) | [Guía](reports/013-recuperacion-blueprints/editor.md) |
+| 014 — Copias con nomenclatura Vamps | [Reporte](reports/014-copias-nomenclatura-vamps/reporte.md) | [Guía](reports/014-copias-nomenclatura-vamps/editor.md) |
+| 015 — Retirada de Duel | [Reporte](reports/015-retirada-duel/reporte.md) | [Guía](reports/015-retirada-duel/editor.md) |

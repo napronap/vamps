@@ -1,5 +1,9 @@
 # 009 — Base definitiva de personajes
 
+Configuración vigente de la escena: [011 — IA y GameMode de prueba](../011-ia-combate-prueba/reporte.md). Reemplaza el receptor colocado, el override del mapa y los defaults del duelo; conserva personajes, recursos visuales y las cuatro entradas normales.
+
+Continuación: [010 — HUD de prueba](../010-hud-prueba/reporte.md) asigna DuelHUD al GameMode nuevo. Reemplaza la configuración de HUD nativo de esta iteración; los demás assets y pendientes del combate conservan su alcance.
+
 ## Alcance y resultado
 
 Se completan `AVampsCharacter` y `AVampsCharacter_Player` para movimiento, cámara libre, un ataque con clic izquierdo y guardia mantenida con clic derecho. Los bindings pertenecen a `AVampsPlayerController` y actúan sobre el pawn que controle. El usuario confirmó la compilación con el nombre definitivo. Codex preparó diez assets por MCP y verificó el inicio de la escena en PIE; la revisión del notify y las comprobaciones de interacción/combate siguen pendientes en la [guía](editor.md).

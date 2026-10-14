@@ -1,5 +1,9 @@
 # 009 — Preparar los personajes nuevos
 
+El receptor colocado y el GameMode del paso 5 quedan reemplazados por [011 — IA y GameMode de prueba](../011-ia-combate-prueba/editor.md). El rival lo crea el modo de prueba; los assets de personaje, mesh y combate de esta guía se conservan.
+
+La asignación de HUD nativo del paso 5 queda reemplazada por [010 — HUD de prueba](../010-hud-prueba/editor.md): BP_VampsGameMode ya usa DuelHUD, que permite observar vida y estados durante las comprobaciones del paso 6.
+
 **Pendiente para el usuario:** revisar el notify Attack Trace de AM_BasicAttack y comprobar movimiento, mirada, ataque, daño y guardia en PIE. Los diez assets nuevos están creados, configurados y guardados; los cuatro Blueprints compilaron. El editor quedó en /Game/Vamps/Maps/L_CharacterBasic, con PIE detenido. El duelo anterior queda como referencia.
 
 [Reporte](reporte.md).

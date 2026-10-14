@@ -3,8 +3,8 @@
 #include "Combat/Abilities/GA_Attack.h"
 #include "Combat/Abilities/GA_Guard.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
-#include "Combat/CombatTags.h"
-#include "Combat/Effects/GE_DuelDamage.h"
+#include "Combat/VampsCombatTags.h"
+#include "Combat/Effects/GE_VampsDamage.h"
 #include "Combat/FistHitboxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -95,12 +95,12 @@ void AVampsCharacter::RequestGuard(bool bPressed)
 
 bool AVampsCharacter::IsAttacking() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(DuelTags::Attack);
+	return AbilitySystem->HasMatchingGameplayTag(VampsTags::Attack);
 }
 
 bool AVampsCharacter::IsGuarding() const
 {
-	return AbilitySystem->HasMatchingGameplayTag(DuelTags::Guard);
+	return AbilitySystem->HasMatchingGameplayTag(VampsTags::Guard);
 }
 
 void AVampsCharacter::ReceiveHit(AVampsCharacter* Attacker)
@@ -120,8 +120,8 @@ void AVampsCharacter::ReceiveHit(AVampsCharacter* Attacker)
 	FGameplayEffectContextHandle Context = Attacker->AbilitySystem->MakeEffectContext();
 	Context.AddSourceObject(Attacker);
 	FGameplayEffectSpecHandle Damage =
-	    Attacker->AbilitySystem->MakeOutgoingSpec(UGE_DuelDamage::StaticClass(), 1, Context);
+	    Attacker->AbilitySystem->MakeOutgoingSpec(UGE_VampsDamage::StaticClass(), 1, Context);
 	check(Damage.IsValid());
-	Damage.Data->SetSetByCallerMagnitude(DuelTags::Damage, -FMath::Max(0.f, Attacker->AttackDamage));
+	Damage.Data->SetSetByCallerMagnitude(VampsTags::Damage, -FMath::Max(0.f, Attacker->AttackDamage));
 	Attacker->AbilitySystem->ApplyGameplayEffectSpecToTarget(*Damage.Data, AbilitySystem);
 }

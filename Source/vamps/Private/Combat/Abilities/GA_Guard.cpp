@@ -1,12 +1,12 @@
 #include "Combat/Abilities/GA_Guard.h"
-#include "Combat/CombatTags.h"
+#include "Combat/VampsCombatTags.h"
 
 UGA_Guard::UGA_Guard()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
-	ActivationOwnedTags.AddTag(DuelTags::Guard);
-	ActivationBlockedTags.AddTag(DuelTags::Attack);
+	ActivationOwnedTags.AddTag(VampsTags::Guard);
+	ActivationBlockedTags.AddTag(VampsTags::Attack);
 }
 
 void UGA_Guard::ActivateAbility(const FGameplayAbilitySpecHandle Handle,

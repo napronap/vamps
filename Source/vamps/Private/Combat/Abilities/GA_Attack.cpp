@@ -1,15 +1,15 @@
 #include "Combat/Abilities/GA_Attack.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Characters/VampsCharacter.h"
-#include "Combat/CombatTags.h"
+#include "Combat/VampsCombatTags.h"
 #include "Combat/FistHitboxComponent.h"
 
 UGA_Attack::UGA_Attack()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
-	ActivationOwnedTags.AddTag(DuelTags::Attack);
-	ActivationBlockedTags.AddTag(DuelTags::Guard);
+	ActivationOwnedTags.AddTag(VampsTags::Attack);
+	ActivationBlockedTags.AddTag(VampsTags::Guard);
 }
 
 void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
