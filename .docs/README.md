@@ -16,6 +16,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 2. Completar la [configuración del puño y las trazas](reports/006-golpe-de-puno/editor.md), con los controles de IA existentes.
 3. Observar daño y bloqueo antes de agregar otra regla.
 
+## Análisis de referencia
+
+[016 — Cuatro videos de FGO Arcade](reports/016-analisis-fgo-arcade/analisis.md): [escenas y evidencia](reports/016-analisis-fgo-arcade/escenas.md), [contraste con documentos/código](reports/016-analisis-fgo-arcade/comparacion.md), [decisiones y precisiones restantes](reports/016-analisis-fgo-arcade/preguntas.md) y [reporte](reports/016-analisis-fgo-arcade/reporte.md). Revisión de videos cerrada. El diálogo se integra en un [alcance funcional](reports/016-analisis-fgo-arcade/alcance/functional.md) y [base técnica](reports/016-analisis-fgo-arcade/alcance/technical.md) separados; las especificaciones del prototipo y el setup Unreal conservan su contenido.
+
 ## Edición
 
 - [Reglas de trabajo del repositorio: MCP y entregables](../AGENTS.md).
@@ -25,7 +29,7 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
-Iteración vigente: [015 — Retirada de Duel](reports/015-retirada-duel/reporte.md). [Limpieza residual y consolidación](reports/015-retirada-duel/editor.md). El setup Vamps conserva las clases y conexiones de [014](reports/014-copias-nomenclatura-vamps/reporte.md) y la [configuración de personajes y animación](reports/013-recuperacion-blueprints/reporte.md). La IA mantiene [011](reports/011-ia-combate-prueba/reporte.md) y sus [controles F6/R](reports/011-ia-combate-prueba/editor.md).
+Iteración vigente: [016 — Análisis de FGO Arcade](reports/016-analisis-fgo-arcade/reporte.md), con [continuación documental](reports/016-analisis-fgo-arcade/editor.md). El setup Unreal sigue en [015 — Retirada de Duel](reports/015-retirada-duel/reporte.md) y su [guía](reports/015-retirada-duel/editor.md), con las clases/conexiones de [014](reports/014-copias-nomenclatura-vamps/reporte.md) y la [configuración de personajes y animación](reports/013-recuperacion-blueprints/reporte.md). La IA mantiene [011](reports/011-ia-combate-prueba/reporte.md) y sus [controles F6/R](reports/011-ia-combate-prueba/editor.md).
 
 | Tema | Cambios y verificaciones | Pasos del editor |
 |---|---|---|
@@ -44,3 +48,4 @@ Iteración vigente: [015 — Retirada de Duel](reports/015-retirada-duel/reporte
 | 013 — Recuperación de Blueprints y animación Vamps | [Reporte](reports/013-recuperacion-blueprints/reporte.md) | [Guía](reports/013-recuperacion-blueprints/editor.md) |
 | 014 — Copias con nomenclatura Vamps | [Reporte](reports/014-copias-nomenclatura-vamps/reporte.md) | [Guía](reports/014-copias-nomenclatura-vamps/editor.md) |
 | 015 — Retirada de Duel | [Reporte](reports/015-retirada-duel/reporte.md) | [Guía](reports/015-retirada-duel/editor.md) |
+| 016 — Análisis de cuatro videos de FGO Arcade | [Reporte](reports/016-analisis-fgo-arcade/reporte.md) | [Guía](reports/016-analisis-fgo-arcade/editor.md) |
