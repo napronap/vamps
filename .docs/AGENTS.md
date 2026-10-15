@@ -17,9 +17,9 @@ Para agregar, modificar o revisar una funcionalidad, leer y aplicar [game-featur
 
 ## Reportes y guías del editor
 
-Aplicar las [reglas de trabajo del repositorio](../AGENTS.md). Guardar los entregables en `.docs/reports/`, con nombres por tema, por ejemplo `mvp-duelo.md` y `mvp-duelo-editor.md`. Reutilizar el mismo par al continuar ese trabajo y enlazar ambos desde [el índice](README.md).
+Aplicar las [reglas de trabajo del repositorio](../AGENTS.md). Guardar cada iteración en `.docs/reports/<NNN-nombre>/`, con `reporte.md` y `editor.md`. Usar numeración creciente y un nombre descriptivo, por ejemplo `003-combate-animado`. No crear Markdown suelto en reports. Reutilizar el par mientras continúe esa iteración; una iteración nueva tiene su carpeta. Enlazar ambos desde [el índice](README.md). Mantener las comprobaciones anteriores en su carpeta e indicar cuándo otra iteración reemplaza su configuración.
 
-### Reporte de cambios: `<tema>.md`
+### Reporte de cambios: `reporte.md`
 
 - Indicar alcance y resultado de la iteración.
 - Enumerar archivos, clases y assets agregados, modificados o eliminados. Para cada clase afectada, explicar brevemente su responsabilidad, el motivo del cambio y cómo interactúa con otras clases.
@@ -28,7 +28,7 @@ Aplicar las [reglas de trabajo del repositorio](../AGENTS.md). Guardar los entre
 - Registrar pendientes y enlazar los pasos manuales de la guía del editor. Atribuir correctamente los cambios del usuario; no contarlos como cambios hechos por Codex.
 - Si no hubo cambios de código o assets, decirlo en una línea. No llenar tablas con piezas sin cambios.
 
-### Guía reproducible: `<tema>-editor.md`
+### Guía reproducible: `editor.md`
 
 - Cubrir, en orden de dependencia, todas las operaciones necesarias fuera de la edición de código: preparación, plugins, assets, configuración, asignaciones, compilación, guardado y comprobaciones manuales que correspondan al trabajo. No incluir creación ni ejecución de tests automatizados.
 - Incluir también los pasos ya realizados por MCP, con una explicación que el usuario pueda reproducir en el editor. No limitar la guía a los pendientes.
