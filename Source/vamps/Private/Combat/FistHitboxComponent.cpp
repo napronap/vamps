@@ -1,5 +1,6 @@
 #include "Combat/FistHitboxComponent.h"
 #include "Characters/VampsCharacter.h"
+#include "Combat/VampsCombatResolver.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 
@@ -51,7 +52,7 @@ void UFistHitboxComponent::TickComponent(float DeltaTime,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	AVampsCharacter* Fighter = CastChecked<AVampsCharacter>(GetOwner());
-	if (!Fighter->HasAuthority() || !Fighter->IsAttacking())
+	if (!Fighter->HasAuthority() || !Fighter->CombatState.bCanDealDamage)
 	{
 		StopTracing();
 		return;
@@ -78,10 +79,6 @@ void UFistHitboxComponent::TraceHitbox(const FVector& Start, const FVector& End,
 
 	for (const FHitResult& Hit : Hits)
 	{
-		if (!IsComponentTickEnabled())
-		{
-			break;
-		}
 		AVampsCharacter* Target = Cast<AVampsCharacter>(Hit.GetActor());
 		if (!Target || HitActors.Contains(Target))
 		{
@@ -98,6 +95,6 @@ void UFistHitboxComponent::TraceHitbox(const FVector& Start, const FVector& End,
 		}
 
 		HitActors.Add(Target);
-		Target->ReceiveCombatHit(Fighter);
+		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContact(Fighter, Target);
 	}
 }

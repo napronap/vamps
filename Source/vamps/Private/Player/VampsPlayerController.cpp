@@ -46,18 +46,13 @@ void AVampsPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(InputComponent);
-	checkf(MoveAction && AttackAction && GuardAction && CycleTargetAction,
-	       TEXT("All four input actions must be assigned."));
+	checkf(MoveAction && CombatAction && CycleTargetAction, TEXT("All three input actions must be assigned."));
 	check(MoveAction->ValueType == EInputActionValueType::Axis2D);
-	check(AttackAction->ValueType == EInputActionValueType::Boolean);
-	check(GuardAction->ValueType == EInputActionValueType::Boolean);
+	check(CombatAction->ValueType == EInputActionValueType::Boolean);
 	check(CycleTargetAction->ValueType == EInputActionValueType::Boolean);
 
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVampsPlayerController::Move);
-	Input->BindAction(AttackAction, ETriggerEvent::Started, this, &AVampsPlayerController::Attack);
-	Input->BindAction(GuardAction, ETriggerEvent::Started, this, &AVampsPlayerController::Guard, true);
-	Input->BindAction(GuardAction, ETriggerEvent::Completed, this, &AVampsPlayerController::Guard, false);
-	Input->BindAction(GuardAction, ETriggerEvent::Canceled, this, &AVampsPlayerController::Guard, false);
+	Input->BindAction(CombatAction, ETriggerEvent::Started, this, &AVampsPlayerController::RequestCombat);
 	Input->BindAction(CycleTargetAction, ETriggerEvent::Started, this, &AVampsPlayerController::CycleTarget);
 }
 
@@ -72,19 +67,11 @@ void AVampsPlayerController::Move(const FInputActionValue& Value)
 	}
 }
 
-void AVampsPlayerController::Attack()
+void AVampsPlayerController::RequestCombat()
 {
 	if (APawn* ControlledPawn = GetPawn())
 	{
-		CastChecked<AVampsCharacter>(ControlledPawn)->RequestAttack();
-	}
-}
-
-void AVampsPlayerController::Guard(bool bPressed)
-{
-	if (APawn* ControlledPawn = GetPawn())
-	{
-		CastChecked<AVampsCharacter>(ControlledPawn)->RequestGuard(bPressed);
+		CastChecked<AVampsCharacter>(ControlledPawn)->RequestCombatAction();
 	}
 }
 

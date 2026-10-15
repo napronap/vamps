@@ -59,6 +59,8 @@ World Settings de L_CharacterBasic → GameMode Override = BP_VampsCombatTestGam
 
 ## 5. Comprobaciones
 
+**Actualización de estado:** contacto/daño del montage y observación básica del escenario quedaron confirmados por el usuario al cerrar la etapa 0 el 15 de octubre de 2026; [registro en 020](../020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0). Las indicaciones siguientes conservan el setup histórico de 013; cámara/input actuales se consultan en [019](../019-camara-lockon/editor.md).
+
 **Hecho — Codex por MCP, inspección de estado.** EditorAppToolset inició y detuvo PIE para Passive, Attack temporal y modo normal temporal. SceneTools, ActorTools, ObjectTools y AbilitySystemInspectorToolset confirmaron personajes, componentes, habilidades y referencias. LogsToolset no encontró errores/warnings de LogPlayLevel. AssetTools confirmó todo Vamps guardado y sin dependencias a assets Duel. Passive y override de prueba restaurados.
 
 **Pendiente — usuario, comprobación visual e inputs.** Play en L_CharacterBasic: verificar idle, WASD y cámara; LMB reproduce el golpe y RMB mantiene guardia. F6 cambia los modos sin wireframe y R reinicia el combate. El graph conserva la locomoción anterior; todavía no contiene una pose de guardia.

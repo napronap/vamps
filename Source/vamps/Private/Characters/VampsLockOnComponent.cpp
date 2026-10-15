@@ -1,6 +1,5 @@
 #include "Characters/VampsLockOnComponent.h"
 #include "Characters/VampsCharacter.h"
-#include "Combat/Attributes/VampsAttributeSet.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
 
@@ -96,5 +95,5 @@ void UVampsLockOnComponent::RegisterCandidate(AActor* SpawnedActor)
 bool UVampsLockOnComponent::IsEligible(const AVampsCharacter* Candidate) const
 {
 	return IsValid(Candidate) && Candidate != GetOwner() && Candidate->HasActorBegunPlay() &&
-	       !Candidate->IsActorBeingDestroyed() && Candidate->Attributes->GetHealth() > 0.f;
+	       !Candidate->IsActorBeingDestroyed() && Candidate->CombatState.bIsAlive;
 }

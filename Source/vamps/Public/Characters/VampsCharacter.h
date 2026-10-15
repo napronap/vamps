@@ -3,6 +3,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "Combat/VampsCombatState.h"
 #include "VampsCharacter.generated.h"
 
 class UAbilitySystemComponent;
@@ -10,6 +11,8 @@ class UVampsAttributeSet;
 class UFistHitboxComponent;
 class UVampsLockOnComponent;
 class UAnimMontage;
+struct FBranchingPointNotifyPayload;
+struct FOnAttributeChangeData;
 
 UCLASS(Abstract)
 class VAMPS_API AVampsCharacter : public ACharacter, public IAbilitySystemInterface
@@ -44,21 +47,23 @@ public:
 	float AttackDamage = 12.f;
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void RequestAttack();
+	void RequestCombatAction();
 
-	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void RequestGuard(bool bPressed);
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
+	FVampsCombatState CombatState;
 
-	void ReceiveCombatHit(AVampsCharacter* Attacker);
-
-	UFUNCTION(BlueprintPure, Category = "Combat")
-	bool IsAttacking() const;
-
-	UFUNCTION(BlueprintPure, Category = "Combat")
-	bool IsGuarding() const;
+	void BeginCombatAction(int32 PlaybackInstanceID);
+	void FinishCombatAction();
+	void SetCombatContacts(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
+	void ConsumeDefenseRequest();
+	void RegisterCombatContact(bool bBlocked);
+	void ReceiveCombatHit(AVampsCharacter* Attacker, bool bBlocked);
+	void ResetCombatState();
 
 private:
 
 	FGameplayAbilitySpecHandle AttackHandle;
-	FGameplayAbilitySpecHandle GuardHandle;
+
+	void SetCombatPhase(EVampsActionPhase NewPhase);
+	void HandleCombatHealthChanged(const FOnAttributeChangeData& AttributeChange);
 };

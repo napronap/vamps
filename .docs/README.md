@@ -21,7 +21,9 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
-[Roadmap de implementación](roadmap.md): intercambio/cadena → recuperación y recursos → movilidad/cámara → partida por equipos → extensiones propias.
+[Roadmap hacia la emulación FGOA](roadmap.md): consolidar contacto/cámara → botón compartido y fases → cadena/NA → daño/guardia → movilidad → presentación → equipos → red → calibración → extensiones propias. Incluye estado actual, decisiones previas y criterios de cierre; distingue combate local y base completa.
+
+**Avance:** etapa 0 completada por confirmación del usuario el 2026-10-15; [registro](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0). Etapa 1 en curso: input y Blueprints configurados/compilados/guardados por MCP; pendientes el notify manual y PIE. [Registro 021](reports/021-solicitud-compartida/reporte.md). El estado se controla en el roadmap.
 
 1. Leer el [alcance y exclusiones](game/functional.md#alcance-de-la-base), seguido de combate y jugador.
 2. Consultar el [flujo GAS existente](prototype/technical.md#cómo-leer-el-código) para ubicar el punto de partida.
@@ -40,7 +42,7 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
-Iteración vigente: [019 — Cámara automática sobre lock-on](reports/019-camara-lockon/reporte.md), implementada y configurada por MCP, con seguimiento, pérdida y readquisición comprobados en PIE. Quedan [compilación completa y comprobaciones visuales](reports/019-camara-lockon/editor.md). El componente y HUD están en [018](reports/018-lockon-component/reporte.md), y la reorganización documental en [017](reports/017-base-fgoa-y-extensiones/reporte.md). El setup Unreal anterior sigue en [015 — Retirada de Duel](reports/015-retirada-duel/reporte.md) y su [guía](reports/015-retirada-duel/editor.md), con las clases/conexiones de [014](reports/014-copias-nomenclatura-vamps/reporte.md) y la [configuración de personajes y animación](reports/013-recuperacion-blueprints/reporte.md). La IA mantiene [011](reports/011-ia-combate-prueba/reporte.md) y sus [controles F6/R](reports/011-ia-combate-prueba/editor.md).
+Iteración vigente: [021 — Solicitud compartida y fases de una acción](reports/021-solicitud-compartida/reporte.md), con input y Blueprints configurados/compilados/guardados por MCP; su [guía del editor](reports/021-solicitud-compartida/editor.md) deja el notify sin soporte MCP y la comprobación en PIE. El plan y el cierre de etapa 0 permanecen en [020](reports/020-roadmap-emulacion-fgoa/reporte.md). La cámara automática de [019](reports/019-camara-lockon/reporte.md) y la selección/HUD de [018](reports/018-lockon-component/reporte.md) se conservan. El setup anterior sigue en [015 — Retirada de Duel](reports/015-retirada-duel/reporte.md) y su [guía](reports/015-retirada-duel/editor.md), con las clases/conexiones de [014](reports/014-copias-nomenclatura-vamps/reporte.md) y la [configuración de personajes y animación](reports/013-recuperacion-blueprints/reporte.md). Los controles de observación de [011](reports/011-ia-combate-prueba/editor.md) se adaptan en 021 a la solicitud compartida.
 
 | Tema | Cambios y verificaciones | Pasos del editor |
 |---|---|---|
@@ -63,3 +65,5 @@ Iteración vigente: [019 — Cámara automática sobre lock-on](reports/019-cama
 | 017 — Base FGOA y extensiones Vamps | [Reporte](reports/017-base-fgoa-y-extensiones/reporte.md) | [Guía](reports/017-base-fgoa-y-extensiones/editor.md) |
 | 018 — Componente de lock-on y HUD de debug | [Reporte](reports/018-lockon-component/reporte.md) | [Guía](reports/018-lockon-component/editor.md) |
 | 019 — Cámara automática sobre lock-on | [Reporte](reports/019-camara-lockon/reporte.md) | [Guía](reports/019-camara-lockon/editor.md) |
+| 020 — Plan de emulación FGOA | [Reporte](reports/020-roadmap-emulacion-fgoa/reporte.md) | [Guía](reports/020-roadmap-emulacion-fgoa/editor.md) |
+| 021 — Solicitud compartida y fases | [Reporte](reports/021-solicitud-compartida/reporte.md) | [Guía](reports/021-solicitud-compartida/editor.md) |

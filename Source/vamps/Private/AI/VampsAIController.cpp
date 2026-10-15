@@ -1,5 +1,4 @@
 #include "AI/VampsAIController.h"
-#include "AbilitySystemComponent.h"
 #include "Characters/VampsCharacter.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -66,7 +65,7 @@ void AVampsAIController::StopActions()
 	MoveDirection = FVector::ZeroVector;
 	if (AVampsCharacter* ControlledCharacter = Cast<AVampsCharacter>(GetPawn()))
 	{
-		ControlledCharacter->AbilitySystem->CancelAllAbilities();
+		ControlledCharacter->ResetCombatState();
 		ControlledCharacter->ConsumeMovementInputVector();
 		ControlledCharacter->GetCharacterMovement()->StopMovementImmediately();
 	}
@@ -101,7 +100,7 @@ void AVampsAIController::Decide()
 	case EVampsAIMode::Passive:
 		return;
 	case EVampsAIMode::Attack:
-		if (ControlledCharacter->IsAttacking())
+		if (!ControlledCharacter->CombatState.bCanStartAction)
 		{
 			return;
 		}
@@ -114,14 +113,14 @@ void AVampsAIController::Decide()
 		ControlledCharacter->GetCharacterMovement()->StopMovementImmediately();
 		if (Now >= NextAttackAt)
 		{
-			ControlledCharacter->RequestAttack();
+			ControlledCharacter->RequestCombatAction();
 			NextAttackAt = Now + AttackInterval;
 		}
 		return;
 	case EVampsAIMode::Guard:
-		if (!ControlledCharacter->IsGuarding())
+		if (!ControlledCharacter->CombatState.bCanDefend)
 		{
-			ControlledCharacter->RequestGuard(true);
+			ControlledCharacter->RequestCombatAction();
 		}
 		return;
 	case EVampsAIMode::Sidestep:

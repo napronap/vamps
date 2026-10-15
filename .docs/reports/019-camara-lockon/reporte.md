@@ -1,10 +1,12 @@
 # 019 — Cámara automática sobre lock-on
 
+Plan de continuación: [020 — Roadmap de emulación FGOA](../020-roadmap-emulacion-fgoa/reporte.md). Esa revisión documental conserva los resultados y pendientes de implementación de esta iteración.
+
 ## Alcance y resultado
 
 Se implementa el seguimiento automático elegido para la cámara local. `AVampsPlayerCameraManager` consulta el objetivo de `UVampsLockOnComponent`, corrige gradualmente el yaw con tolerancia horizontal y mantiene una inclinación fija. Sin objetivo vuelve detrás del personaje. Cámara y HUD consumen la misma selección; el manager no mantiene otra lista ni elige rivales.
 
-La clase nativa compiló y aplicó cambios mediante Live Coding (`Success`, no `NoChanges`). Los assets están configurados y guardados por MCP; siete Blueprints compilaron con warnings como errores. En PIE se verificaron seguimiento lateral, ausencia de objetivos y readquisición mediante propiedades y transformaciones. Falta la comprobación visual y de inputs físicos de [editor.md](editor.md), además de la compilación completa requerida por el aviso de Live Coding sobre tipos reflejados.
+La clase nativa compiló y aplicó cambios mediante Live Coding (`Success`, no `NoChanges`). Los assets están configurados y guardados por MCP; siete Blueprints compilaron con warnings como errores. En PIE se verificaron seguimiento lateral, ausencia de objetivos y readquisición mediante propiedades y transformaciones. La compilación completa y comprobación visual de [editor.md](editor.md) se cerraron después por confirmación del usuario de la etapa 0 el 15 de octubre de 2026; [registro en 020](../020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0).
 
 Esta iteración continúa [018](../018-lockon-component/reporte.md) y reemplaza su configuración de cámara libre/Look. Es una primera implementación del seguimiento: los cambios de distancia, planos de ataque/defensa y desvanecimiento de oclusores de la especificación FGOA quedan fuera de esta entrega.
 
@@ -48,12 +50,12 @@ También se compilaron y guardaron `BP_VampsCharacter`, `BP_VampsCharacter_Playe
 ## Verificaciones y límites
 
 - Se aplicó clang-format a los seis archivos C++ de esta iteración. `git diff --check` no detectó errores de whitespace. No se agregaron ni ejecutaron tests automatizados.
-- `CompileLiveCoding` devolvió `Success` y enlazó/aplicó cambios. Unreal advirtió que los cambios de tipos pueden causar fallas de empaquetado: queda una compilación completa con el editor cerrado antes de consolidar el binario. No se ocultó el aviso ni se modificó el motor.
+- `CompileLiveCoding` devolvió `Success` y enlazó/aplicó cambios. Unreal advirtió que los cambios de tipos podían causar fallas de empaquetado; la compilación completa con el editor cerrado quedó posteriormente cerrada por confirmación del usuario de la etapa 0. No se ocultó el aviso ni se modificó el motor.
 - Los siete Blueprints indicados compilaron con `warnings_as_errors = true`, sin errores ni warnings. Los nueve assets quedaron guardados y `is_dirty = false`; se releyeron padre, parámetros y referencias de ambos controllers.
 - En `L_CharacterBasic`, PIE creó `BP_VampsPlayerCameraManager_C_0` y el controller lo referenció. Había un rival colocado en el mapa además del creado por el GameMode; Codex no creó ese actor.
 - Con jugador en `(-220, 0)` y target en `(200, -280)`, el yaw de cámara se estabilizó en −27,69°, frente a un rumbo de −33,69°. Al mover temporalmente ese mismo target a `(200, 280)`, se observó un yaw intermedio de +20,20° y luego +27,69°. La selección conservó el mismo actor.
 - Con Health de ambos rivales a cero, `currentTarget` pasó a `None`, el yaw volvió aproximadamente a 0° como el del jugador y el pitch permaneció en −15°. Al restaurar Health del rival desplazado volvió la selección y el yaw +27,69°.
-- Se restauraron vida y posición temporales y se detuvo PIE. La posición del actor del mapa fuente se confirmó en `(200, -280, 88)`, igual a la observada al iniciar. El mapa terminó con `is_dirty = true` y no se guardó. Su contenido pendiente debe revisarlo el usuario.
+- Se restauraron vida y posición temporales y se detuvo PIE. La posición del actor del mapa fuente se confirmó en `(200, -280, 88)`, igual a la observada al iniciar. El mapa terminó con `is_dirty = true` y no se guardó por Codex. La revisión posterior del mapa forma parte del cierre de 0 confirmado por el usuario; no se consultó de nuevo su estado de guardado.
 - LogPlayLevel no devolvió errores/warnings en la consulta. La verificación fue por referencias y transformaciones, no una aprobación visual del encuadre, colisión o movimiento con teclado.
 
-La [guía](editor.md) reúne la compilación completa, revisión del mapa y comprobación visual de F, WASD y seguimiento. No se verificó un cambio de target por guardia efectiva ni los planos de combate. Las limitaciones previas de contacto del puño siguen en los reportes anteriores.
+La [guía](editor.md) conserva los pasos de compilación, revisión del mapa y observación de F, WASD y seguimiento, cerrados por el usuario junto con contacto/daño. El cambio de target con la defensa rediseñada se comprueba en la etapa 1; los planos de combate se implementan y verifican en 5.

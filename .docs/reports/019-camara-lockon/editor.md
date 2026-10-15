@@ -1,12 +1,12 @@
 # 019 — Configurar y comprobar la cámara automática
 
-**Pendiente para el usuario:** compilar `vampsEditor` con Unreal cerrado para consolidar la clase reflejada, revisar los cambios sin guardar del mapa y comprobar visualmente seguimiento, F y WASD. Los assets de cámara e input ya están configurados, compilados y guardados por MCP. PIE quedó detenido. Esta guía reemplaza las instrucciones de cámara libre y Look de [018](../018-lockon-component/editor.md).
+**Estado actual:** compilación completa, revisión del mapa y observación de cámara/WASD/F cerradas por el usuario al confirmar la etapa 0 el 15 de octubre de 2026; [registro en 020](../020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0). No quedan esos pasos pendientes. Los assets de cámara e input fueron configurados, compilados y guardados por MCP. Esta guía conserva las instrucciones reproducibles y reemplaza las de cámara libre y Look de [018](../018-lockon-component/editor.md).
 
 ## 1. Compilación nativa
 
 **Hecho — Codex por MCP.** Con PIE detenido, `LiveCodingToolset.LiveCodingToolset.CompileLiveCoding` compiló y aplicó los cambios con resultado `Success`. No fue `NoChanges`. La clase nueva estuvo disponible para crear el Blueprint y luego se instanció correctamente en PIE.
 
-**Pendiente — usuario, compilación completa.** Live Coding avisó que los cambios en tipos reflejados pueden afectar el empaquetado. Guardar el trabajo que se quiera conservar, cerrar Unreal y en Rider o Visual Studio compilar el target **vampsEditor**, configuración **Development Editor**, plataforma **Win64**, del proyecto `C:\fran\vamps\vamps.uproject`. Reabrirlo al terminar. El MCP disponible permite Live Coding, pero no se dispone de una operación directa verificada para este ciclo con el editor cerrado; no se ejecutó una compilación de shell como sustituto.
+**Hecho — usuario, compilación completa, por confirmación de la etapa 0.** Live Coding había avisado que los cambios en tipos reflejados podían afectar el empaquetado. Para reproducir: guardar el trabajo, cerrar Unreal y en Rider o Visual Studio compilar el target **vampsEditor**, configuración **Development Editor**, plataforma **Win64**, del proyecto `C:\fran\vamps\vamps.uproject`; reabrir al terminar. El cierre fue confirmado por el usuario, sin un nuevo log aportado. Codex no ejecutó una compilación de shell como sustituto del MCP.
 
 ## 2. Crear y configurar el manager
 
@@ -66,9 +66,9 @@ Se restauraron las propiedades temporales y se detuvo PIE. Se confirmó la posic
 
 ## 6. Revisar mapa y encuadre
 
-**Pendiente — usuario, mapa.** `L_CharacterBasic` terminó con cambios sin guardar (`is_dirty = true`). Codex no guardó el mapa. Revisar su contenido antes de guardar o descartar. Al iniciar la comprobación ya había un `BP_VampsCharacter` colocado además del rival que crea el GameMode; no fue creado por Codex.
+**Hecho — usuario, revisión del mapa, por confirmación de la etapa 0.** Al terminar la comprobación MCP de 019, `L_CharacterBasic` tenía cambios sin guardar (`is_dirty = true`) y Codex no lo guardó. Esa revisión quedó cerrada por el usuario; no se consultó de nuevo el estado de guardado. Al iniciar la comprobación ya había un `BP_VampsCharacter` colocado además del rival que crea el GameMode; no fue creado por Codex.
 
-**Pendiente — usuario, presentación e inputs físicos.** Tras la compilación completa, abrir el mapa y comprobar **World Settings → GameMode Override = BP_VampsCombatTestGameMode**. Iniciar PIE y observar:
+**Hecho — usuario, observación básica de presentación e inputs, por confirmación de la etapa 0.** Para reproducir: abrir el mapa con **World Settings → GameMode Override = BP_VampsCombatTestGameMode**, iniciar PIE y observar:
 
 1. La cámara sigue al rival con franja dorada y coincide con `LOCK ON` del HUD. El mouse no la orbita.
 2. Con dos rivales vivos, F cambia selección y la cámara acompaña con transición gradual. Mantener F no recorre repetidamente la lista.
@@ -77,4 +77,4 @@ Se restauraron las propiedades temporales y se detuvo PIE. Se confirmó la posic
 5. Cerca de paredes, el brazo retrae la cámara mediante colisión nativa y se extiende al liberar el espacio. No se implementó fade de materiales.
 6. LMB, RMB, F6 y R conservan sus funciones de prototipo. El retarget por bloqueo requiere contacto real en guardia; consultar [013](../013-recuperacion-blueprints/editor.md#5-comprobaciones) si el golpe no produce contacto.
 
-La comprobación por MCP no aprobó visualmente encuadre, colisiones o cambio por pulsación física de F. Las capturas disponibles habían mostrado el viewport del editor o fallado al capturar ventanas; estos puntos quedan como observación manual, sin alternativa por automatización de UI.
+La comprobación MCP fue parcial: sus capturas mostraron el viewport del editor o fallaron. La confirmación posterior del usuario cierra la observación manual de la etapa 0. El retarget con la nueva defensa se comprueba en la etapa 1; cámara de acciones y fade pertenecen a 5, sin darse por aprobados con este cierre.

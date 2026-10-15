@@ -26,7 +26,4 @@ private:
 
 	UFUNCTION()
 	void FinishAttack();
-
-	UFUNCTION()
-	void StopTracing();
 };

@@ -3,7 +3,6 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsCharacter_Player.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
-#include "Combat/FistHitboxComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/VampsCombatTestPlayerController.h"
@@ -49,8 +48,7 @@ void AVampsCombatTestGameMode::ResetCombat()
 	AVampsCharacter* PlayerCharacter = CastChecked<AVampsCharacter>(TestPlayerController->GetPawn());
 	for (AVampsCharacter* Fighter : {PlayerCharacter, Opponent.Get()})
 	{
-		Fighter->AbilitySystem->CancelAllAbilities();
-		Fighter->FistHitbox->StopTracing();
+		Fighter->ResetCombatState();
 		Fighter->AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetHealthAttribute(),
 		                                                Fighter->Attributes->GetMaxHealth());
 		Fighter->SetActorTransform(

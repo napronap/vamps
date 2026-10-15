@@ -20,5 +20,5 @@ void UVampsAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	                ? FMath::FindDeltaAngleDegrees(OwningCharacter->GetActorRotation().Yaw, Velocity.Rotation().Yaw)
 	                : 0.f;
 	bInAir = OwningCharacter->GetCharacterMovement()->IsFalling();
-	bIsGuarding = OwningCharacter->IsGuarding();
+	bIsGuarding = OwningCharacter->CombatState.bCanDefend;
 }

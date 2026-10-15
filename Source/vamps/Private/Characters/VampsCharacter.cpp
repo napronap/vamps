@@ -1,14 +1,18 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "AbilitySystemComponent.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/AnimNotifies/AnimNotify.h"
 #include "Combat/Abilities/GA_Attack.h"
-#include "Combat/Abilities/GA_Guard.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
 #include "Combat/VampsCombatTags.h"
 #include "Combat/Effects/GE_VampsDamage.h"
 #include "Combat/FistHitboxComponent.h"
+#include "Combat/VampsCombatResolver.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 AVampsCharacter::AVampsCharacter()
@@ -41,15 +45,17 @@ void AVampsCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		AttackHandle = AbilitySystem->GiveAbility(FGameplayAbilitySpec(UGA_Attack::StaticClass(), 1));
-		GuardHandle = AbilitySystem->GiveAbility(FGameplayAbilitySpec(UGA_Guard::StaticClass(), 1));
 	}
+	AbilitySystem->GetGameplayAttributeValueChangeDelegate(UVampsAttributeSet::GetHealthAttribute())
+	    .AddUObject(this, &AVampsCharacter::HandleCombatHealthChanged);
+	SetCombatPhase(EVampsActionPhase::Idle);
 	Super::BeginPlay();
 }
 
 void AVampsCharacter::EndPlay(const EEndPlayReason::Type Reason)
 {
-	AbilitySystem->CancelAllAbilities();
-	FistHitbox->StopTracing();
+	AbilitySystem->GetGameplayAttributeValueChangeDelegate(UVampsAttributeSet::GetHealthAttribute()).RemoveAll(this);
+	ResetCombatState();
 	Super::EndPlay(Reason);
 }
 
@@ -61,8 +67,7 @@ void AVampsCharacter::PossessedBy(AController* NewController)
 
 void AVampsCharacter::UnPossessed()
 {
-	AbilitySystem->CancelAllAbilities();
-	FistHitbox->StopTracing();
+	ResetCombatState();
 	Super::UnPossessed();
 	AbilitySystem->InitAbilityActorInfo(this, this);
 }
@@ -72,40 +77,137 @@ UAbilitySystemComponent* AVampsCharacter::GetAbilitySystemComponent() const
 	return AbilitySystem;
 }
 
-void AVampsCharacter::RequestAttack()
-{
-	if (HasAuthority())
-	{
-		AbilitySystem->TryActivateAbility(AttackHandle);
-	}
-}
-
-void AVampsCharacter::RequestGuard(bool bPressed)
+void AVampsCharacter::RequestCombatAction()
 {
 	if (!HasAuthority())
 	{
 		return;
 	}
 
-	if (bPressed)
+	++CombatState.RequestCount;
+	CombatState.LastRequest = EVampsCombatRequest::Rejected;
+	if (!CombatState.bCanRequestCombat)
 	{
-		AbilitySystem->TryActivateAbility(GuardHandle);
 		return;
 	}
-	AbilitySystem->CancelAbilityHandle(GuardHandle);
+
+	if (CombatState.bCanStartAction)
+	{
+		if (AbilitySystem->TryActivateAbility(AttackHandle))
+		{
+			CombatState.LastRequest = EVampsCombatRequest::ActionStarted;
+		}
+		return;
+	}
+
+	CombatState.bCanDefend = true;
+	CombatState.LastRequest = EVampsCombatRequest::DefenseRearmed;
 }
 
-bool AVampsCharacter::IsAttacking() const
+void AVampsCharacter::BeginCombatAction(int32 PlaybackInstanceID)
 {
-	return AbilitySystem->HasMatchingGameplayTag(VampsTags::Attack);
+	check(CombatState.bCanStartAction && PlaybackInstanceID != INDEX_NONE);
+	++CombatState.ActionNumber;
+	CombatState.MontageInstanceID = PlaybackInstanceID;
+	CombatState.bCanDefend = true;
+	CombatState.bActionConnected = false;
+	CombatState.LastOutgoingContact = EVampsContactResult::None;
+	CombatState.LastOutgoingContactFrame = 0;
+	FistHitbox->ResetHits();
+	SetCombatPhase(EVampsActionPhase::Preparation);
 }
 
-bool AVampsCharacter::IsGuarding() const
+void AVampsCharacter::FinishCombatAction()
 {
-	return AbilitySystem->HasMatchingGameplayTag(VampsTags::Guard);
+	if (CombatState.Phase != EVampsActionPhase::Idle && !CombatState.bActionConnected)
+	{
+		CombatState.LastOutgoingContact = EVampsContactResult::Miss;
+		CombatState.LastOutgoingContactFrame = GFrameCounter;
+	}
+	CombatState.MontageInstanceID = INDEX_NONE;
+	SetCombatPhase(EVampsActionPhase::Idle);
 }
 
-void AVampsCharacter::ReceiveCombatHit(AVampsCharacter* Attacker)
+void AVampsCharacter::SetCombatContacts(const FBranchingPointNotifyPayload& Payload, bool bEnabled)
+{
+	if (!HasAuthority() || Payload.SkelMeshComponent != GetMesh() ||
+	    Payload.MontageInstanceID != CombatState.MontageInstanceID)
+	{
+		return;
+	}
+	UAnimInstance* Animation = GetMesh()->GetAnimInstance();
+	const FAnimMontageInstance* Playback =
+	    Animation ? Animation->GetMontageInstanceForID(CombatState.MontageInstanceID) : nullptr;
+	if (!Playback || Playback->Montage != AttackMontage)
+	{
+		return;
+	}
+
+	if (bEnabled)
+	{
+		checkf(CombatState.Phase == EVampsActionPhase::Preparation, TEXT("Combat contacts must follow preparation."));
+		SetCombatPhase(EVampsActionPhase::Contacts);
+		return;
+	}
+	checkf(CombatState.Phase == EVampsActionPhase::Contacts, TEXT("Combat recovery must follow contacts."));
+	SetCombatPhase(EVampsActionPhase::Recovery);
+}
+
+void AVampsCharacter::ConsumeDefenseRequest()
+{
+	CombatState.bCanDefend = false;
+}
+
+void AVampsCharacter::RegisterCombatContact(bool bBlocked)
+{
+	const EVampsContactResult ContactResult = bBlocked ? EVampsContactResult::Blocked : EVampsContactResult::OpenHit;
+	CombatState.LastOutgoingContactFrame = GFrameCounter;
+	CombatState.LastOutgoingContact = CombatState.bActionConnected && CombatState.LastOutgoingContact != ContactResult
+	                                      ? EVampsContactResult::Mixed
+	                                      : ContactResult;
+	CombatState.bActionConnected = true;
+}
+
+void AVampsCharacter::ResetCombatState()
+{
+	AbilitySystem->CancelAllAbilities();
+	FinishCombatAction();
+	GetWorld()->GetSubsystem<UVampsCombatResolver>()->DiscardContactsFor(this);
+	FistHitbox->ResetHits();
+	CombatState = FVampsCombatState();
+	SetCombatPhase(EVampsActionPhase::Idle);
+}
+
+void AVampsCharacter::SetCombatPhase(EVampsActionPhase NewPhase)
+{
+	const bool bWasDamageEnabled = CombatState.bCanDealDamage;
+	CombatState.Phase = NewPhase;
+	CombatState.bIsAlive = Attributes->GetHealth() > 0.f;
+	CombatState.bIsRecovering = NewPhase == EVampsActionPhase::Recovery;
+	CombatState.bCanRequestCombat = CombatState.bIsAlive && !CombatState.bIsRecovering;
+	CombatState.bCanStartAction = CombatState.bIsAlive && NewPhase == EVampsActionPhase::Idle;
+	CombatState.bCanDealDamage = CombatState.bIsAlive && NewPhase == EVampsActionPhase::Contacts;
+	CombatState.bCanDefend = CombatState.bCanDefend && CombatState.bIsAlive &&
+	                         (NewPhase == EVampsActionPhase::Preparation || NewPhase == EVampsActionPhase::Contacts);
+
+	if (bWasDamageEnabled == CombatState.bCanDealDamage)
+	{
+		return;
+	}
+	if (CombatState.bCanDealDamage)
+	{
+		FistHitbox->StartTracing();
+		return;
+	}
+	FistHitbox->StopTracing();
+}
+
+void AVampsCharacter::HandleCombatHealthChanged(const FOnAttributeChangeData&)
+{
+	SetCombatPhase(CombatState.Phase);
+}
+
+void AVampsCharacter::ReceiveCombatHit(AVampsCharacter* Attacker, bool bBlocked)
 {
 	check(Attacker && Attacker != this);
 	if (!HasAuthority())
@@ -113,10 +215,10 @@ void AVampsCharacter::ReceiveCombatHit(AVampsCharacter* Attacker)
 		return;
 	}
 
-	if (IsGuarding())
+	CombatState.LastIncomingContact = bBlocked ? EVampsContactResult::Blocked : EVampsContactResult::OpenHit;
+	CombatState.LastIncomingContactFrame = GFrameCounter;
+	if (bBlocked)
 	{
-		LockOn->SelectTarget(Attacker);
-		Attacker->AbilitySystem->CancelAbilityHandle(Attacker->AttackHandle);
 		return;
 	}
 

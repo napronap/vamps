@@ -2,6 +2,8 @@
 
 La [guía de 019](../019-camara-lockon/editor.md) reemplaza las indicaciones de conservar Look y cámara libre de este documento. Los pasos de selección y HUD siguen siendo aplicables.
 
+**Actualización de estado:** el usuario cerró la observación de F, HUD, varios rivales y seguimiento al confirmar la etapa 0 el 15 de octubre de 2026; [registro en 020](../020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0). Los pendientes originales que siguen abajo se conservan como registro de 018. El retarget con la defensa nueva se verificará en 1; destrucción y spawn tardío no se dan por comprobados mediante esta confirmación.
+
 **Pendiente para el usuario:** observar el HUD y comprobar F, su mantenimiento, recorrido con varios rivales y retarget por bloqueo. La acción, mappings y controllers ya están configurados, compilados y guardados por MCP. La adquisición, pérdida por vida cero y readquisición se comprobaron en PIE, que quedó detenido. No hay assets ni compilación adicional pendientes por esta configuración.
 
 ## 1. Compilar la clase y recargar componentes nativos

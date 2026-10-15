@@ -29,10 +29,7 @@ protected:
 	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	TObjectPtr<UInputAction> AttackAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	TObjectPtr<UInputAction> GuardAction;
+	TObjectPtr<UInputAction> CombatAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> CycleTargetAction;
@@ -40,7 +37,6 @@ protected:
 private:
 
 	void Move(const FInputActionValue& Value);
-	void Attack();
-	void Guard(bool bPressed);
+	void RequestCombat();
 	void CycleTarget();
 };
