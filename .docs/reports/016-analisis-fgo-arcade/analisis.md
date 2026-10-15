@@ -1,6 +1,6 @@
 # Análisis consolidado de FGO Arcade
 
-Revisión del 15 de octubre de 2026, integrada con las respuestas R01–R07 y comprobación de las escenas señaladas. La referencia queda separada del [alcance funcional de Vamps](alcance/functional.md) y su [base técnica](alcance/technical.md). Las precisiones restantes están en [preguntas.md](preguntas.md); no se piden nuevas grabaciones.
+Revisión del 15 de octubre de 2026, integrada con las respuestas R01–R07 y comprobación de las escenas señaladas. La referencia queda separada de la especificación vigente de [juego](../../game/functional.md), [combate](../../combat/functional.md) y [jugador](../../player/functional.md), integrada por [017](../017-base-fgoa-y-extensiones/reporte.md). [preguntas.md](preguntas.md) enlaza las precisiones de cada área; no se piden nuevas grabaciones.
 
 | Fuente | Duración nominal | Fotogramas | Aporte principal |
 |---|---:|---:|---|
@@ -170,4 +170,4 @@ Las partidas muestran `BATTLE FINISH` y WIN/LOSE sin consumir necesariamente tod
 
 El núcleo queda explicado mediante solicitud compartida, fases propias, defensa durante la acción, continuación por pulsación válida/contacto incluso con otro rival, cierre voluntario al final del paso, draw/NA y acercamiento limitado. Guardia efectiva puede cambiar target; un contacto ofensivo no seleccionado no obliga a hacerlo. Se suma tolerancia de encuadre y desvanecimiento de obstáculos visibles.
 
-Las particularidades de mano lista/utilizada permanecen solo como funcionamiento original. Vamps representa cadena y recuperación directamente, sin cartas ni preparación para agregarlas. Las decisiones adoptadas están en [alcance/functional.md](alcance/functional.md); [preguntas.md](preguntas.md) conserva solo precisiones restantes para cerrar el alcance.
+Las particularidades de mano lista/utilizada permanecen solo como funcionamiento original. Vamps representa cadena y recuperación directamente, sin cartas ni preparación para agregarlas. Las decisiones adoptadas se integran en la [base FGOA adaptada](../../game/functional.md), con [extensiones propias](../../extensions/functional.md) posteriores. [preguntas.md](preguntas.md) indica dónde resolver las precisiones restantes.

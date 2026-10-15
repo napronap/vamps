@@ -98,6 +98,6 @@ void UFistHitboxComponent::TraceHitbox(const FVector& Start, const FVector& End,
 		}
 
 		HitActors.Add(Target);
-		Target->ReceiveHit(Fighter);
+		Target->ReceiveCombatHit(Fighter);
 	}
 }

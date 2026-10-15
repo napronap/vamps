@@ -1,24 +1,35 @@
 # Documentación del juego
 
-| Área | Comportamiento | Implementación |
+Primero se reproduce la **base FGOA adaptada**; después se agregan las **extensiones propias de Vamps**. El estado del prototipo existente se documenta aparte. Las especificaciones describen el comportamiento objetivo; no certifican que ya esté implementado.
+
+| Base FGOA adaptada | Comportamiento | Implementación |
 |---|---|---|
 | Juego y partida | [Funcional](game/functional.md) | [Técnico](game/technical.md) |
 | Combate | [Funcional](combat/functional.md) | [Técnico](combat/technical.md) |
-| Identidad de personajes — después de la demo | [Funcional](characters/functional.md) | [Técnico](characters/technical.md) |
+| Controles, movilidad, target, cámara y HUD | [Funcional](player/functional.md) | [Técnico](player/technical.md) |
+
+| Extensiones Vamps, después de la base | Comportamiento | Implementación |
+|---|---|---|
+| Alcance propio: parry y ultimate | [Funcional](extensions/functional.md) | [Técnico](extensions/technical.md) |
+| Identidades, perfiles y dos skills por personaje | [Funcional](extensions/characters/functional.md) | [Técnico](extensions/characters/technical.md) |
+
+| Punto de partida existente | Comportamiento | Implementación |
+|---|---|---|
+| Prototipo local de observación | [Funcional](prototype/functional.md) | [Técnico, clases y assets](prototype/technical.md) |
 
 Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las subfuncionalidades pueden anidarse cuando necesiten documentación propia.
 
 ## Orden de trabajo
 
-[Roadmap de prototipos](roadmap.md).
+[Roadmap de implementación](roadmap.md): intercambio/cadena → recuperación y recursos → movilidad/cámara → partida por equipos → extensiones propias.
 
-1. Leer el [flujo básico de GAS](combat/technical.md#cómo-leer-el-código).
-2. Completar la [configuración del puño y las trazas](reports/006-golpe-de-puno/editor.md), con los controles de IA existentes.
-3. Observar daño y bloqueo antes de agregar otra regla.
+1. Leer el [alcance y exclusiones](game/functional.md#alcance-de-la-base), seguido de combate y jugador.
+2. Consultar el [flujo GAS existente](prototype/technical.md#cómo-leer-el-código) para ubicar el punto de partida.
+3. Resolver las preguntas al final de la funcionalidad que se implemente; las preguntas de extensiones no bloquean la base.
 
 ## Análisis de referencia
 
-[016 — Cuatro videos de FGO Arcade](reports/016-analisis-fgo-arcade/analisis.md): [escenas y evidencia](reports/016-analisis-fgo-arcade/escenas.md), [contraste con documentos/código](reports/016-analisis-fgo-arcade/comparacion.md), [decisiones y precisiones restantes](reports/016-analisis-fgo-arcade/preguntas.md) y [reporte](reports/016-analisis-fgo-arcade/reporte.md). Revisión de videos cerrada. El diálogo se integra en un [alcance funcional](reports/016-analisis-fgo-arcade/alcance/functional.md) y [base técnica](reports/016-analisis-fgo-arcade/alcance/technical.md) separados; las especificaciones del prototipo y el setup Unreal conservan su contenido.
+[016 — Cuatro videos de FGO Arcade](reports/016-analisis-fgo-arcade/analisis.md): [escenas y evidencia](reports/016-analisis-fgo-arcade/escenas.md), [comparación histórica con el prototipo](reports/016-analisis-fgo-arcade/comparacion.md), [decisiones y ubicación de preguntas](reports/016-analisis-fgo-arcade/preguntas.md) y [reporte](reports/016-analisis-fgo-arcade/reporte.md). La revisión de videos está cerrada. [017](reports/017-base-fgoa-y-extensiones/reporte.md) integra su alcance en las especificaciones principales, sin mantener una copia paralela dentro del reporte de análisis.
 
 ## Edición
 
@@ -29,7 +40,7 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
-Iteración vigente: [016 — Análisis de FGO Arcade](reports/016-analisis-fgo-arcade/reporte.md), con [continuación documental](reports/016-analisis-fgo-arcade/editor.md). El setup Unreal sigue en [015 — Retirada de Duel](reports/015-retirada-duel/reporte.md) y su [guía](reports/015-retirada-duel/editor.md), con las clases/conexiones de [014](reports/014-copias-nomenclatura-vamps/reporte.md) y la [configuración de personajes y animación](reports/013-recuperacion-blueprints/reporte.md). La IA mantiene [011](reports/011-ia-combate-prueba/reporte.md) y sus [controles F6/R](reports/011-ia-combate-prueba/editor.md).
+Iteración vigente: [019 — Cámara automática sobre lock-on](reports/019-camara-lockon/reporte.md), implementada y configurada por MCP, con seguimiento, pérdida y readquisición comprobados en PIE. Quedan [compilación completa y comprobaciones visuales](reports/019-camara-lockon/editor.md). El componente y HUD están en [018](reports/018-lockon-component/reporte.md), y la reorganización documental en [017](reports/017-base-fgoa-y-extensiones/reporte.md). El setup Unreal anterior sigue en [015 — Retirada de Duel](reports/015-retirada-duel/reporte.md) y su [guía](reports/015-retirada-duel/editor.md), con las clases/conexiones de [014](reports/014-copias-nomenclatura-vamps/reporte.md) y la [configuración de personajes y animación](reports/013-recuperacion-blueprints/reporte.md). La IA mantiene [011](reports/011-ia-combate-prueba/reporte.md) y sus [controles F6/R](reports/011-ia-combate-prueba/editor.md).
 
 | Tema | Cambios y verificaciones | Pasos del editor |
 |---|---|---|
@@ -49,3 +60,6 @@ Iteración vigente: [016 — Análisis de FGO Arcade](reports/016-analisis-fgo-a
 | 014 — Copias con nomenclatura Vamps | [Reporte](reports/014-copias-nomenclatura-vamps/reporte.md) | [Guía](reports/014-copias-nomenclatura-vamps/editor.md) |
 | 015 — Retirada de Duel | [Reporte](reports/015-retirada-duel/reporte.md) | [Guía](reports/015-retirada-duel/editor.md) |
 | 016 — Análisis de cuatro videos de FGO Arcade | [Reporte](reports/016-analisis-fgo-arcade/reporte.md) | [Guía](reports/016-analisis-fgo-arcade/editor.md) |
+| 017 — Base FGOA y extensiones Vamps | [Reporte](reports/017-base-fgoa-y-extensiones/reporte.md) | [Guía](reports/017-base-fgoa-y-extensiones/editor.md) |
+| 018 — Componente de lock-on y HUD de debug | [Reporte](reports/018-lockon-component/reporte.md) | [Guía](reports/018-lockon-component/editor.md) |
+| 019 — Cámara automática sobre lock-on | [Reporte](reports/019-camara-lockon/reporte.md) | [Guía](reports/019-camara-lockon/editor.md) |

@@ -4,7 +4,7 @@ La base vigente es [004 — Un ataque y una guardia](../004-hit-y-guard/reporte.
 
 Queda para el usuario compilar en frío, equipar arma con sockets, colocar ventanas en montages y comprobar el duelo. **No hubo operaciones de editor realizadas por Codex en esta iteración.** Se implementó C++ y documentación; los assets anteriores permanecen intactos.
 
-[Reporte](reporte.md) · [Reglas de combate](../../combat/functional.md) · [Implementación](../../combat/technical.md).
+[Reporte](reporte.md) · [Reglas de combate](../../prototype/functional.md) · [Implementación](../../prototype/technical.md).
 
 ## 1. Compilar y reabrir
 

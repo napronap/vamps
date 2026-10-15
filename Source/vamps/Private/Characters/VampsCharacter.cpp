@@ -1,4 +1,5 @@
 #include "Characters/VampsCharacter.h"
+#include "Characters/VampsLockOnComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Combat/Abilities/GA_Attack.h"
 #include "Combat/Abilities/GA_Guard.h"
@@ -30,6 +31,7 @@ AVampsCharacter::AVampsCharacter()
 	Attributes = CreateDefaultSubobject<UVampsAttributeSet>(TEXT("Attributes"));
 	FistHitbox = CreateDefaultSubobject<UFistHitboxComponent>(TEXT("FistHitbox"));
 	FistHitbox->SetupAttachment(GetMesh(), FistHitbox->SocketName);
+	LockOn = CreateDefaultSubobject<UVampsLockOnComponent>(TEXT("LockOn"));
 }
 
 void AVampsCharacter::BeginPlay()
@@ -103,7 +105,7 @@ bool AVampsCharacter::IsGuarding() const
 	return AbilitySystem->HasMatchingGameplayTag(VampsTags::Guard);
 }
 
-void AVampsCharacter::ReceiveHit(AVampsCharacter* Attacker)
+void AVampsCharacter::ReceiveCombatHit(AVampsCharacter* Attacker)
 {
 	check(Attacker && Attacker != this);
 	if (!HasAuthority())
@@ -113,6 +115,7 @@ void AVampsCharacter::ReceiveHit(AVampsCharacter* Attacker)
 
 	if (IsGuarding())
 	{
+		LockOn->SelectTarget(Attacker);
 		Attacker->AbilitySystem->CancelAbilityHandle(Attacker->AttackHandle);
 		return;
 	}

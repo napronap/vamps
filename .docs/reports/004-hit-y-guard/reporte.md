@@ -55,7 +55,7 @@ Los .uasset permanecen intactos. La revisión corresponde a la [guía](editor.md
 
 ## Documentación
 
-Combate funcional/técnico, juego funcional/técnico, roadmap, convenciones y el índice reflejan esta base. Los reportes anteriores se conservan como historial en sus carpetas y enlazan a 004. La explicación para empezar a leer está en [Cómo leer el código](../../combat/technical.md#cómo-leer-el-código).
+Combate funcional/técnico, juego funcional/técnico, roadmap, convenciones y el índice se ajustaron a esta base en 004. Los reportes anteriores se conservan como historial en sus carpetas. La explicación actual para empezar a leer está en [Cómo leer el código del prototipo](../../prototype/technical.md#cómo-leer-el-código). [017](../017-base-fgoa-y-extensiones/reporte.md) separa ese prototipo de las especificaciones objetivo.
 
 ## Verificación
 

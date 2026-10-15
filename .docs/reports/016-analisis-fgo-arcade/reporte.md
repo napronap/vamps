@@ -1,5 +1,7 @@
 # 016 — Análisis de cuatro videos de FGO Arcade
 
+Continuación vigente: [017 — Base FGOA y extensiones Vamps](../017-base-fgoa-y-extensiones/reporte.md). Integra el alcance de esta investigación en las especificaciones principales y reemplaza la copia `alcance/` por documentos de juego, combate y jugador. Este reporte conserva los resultados de 016; su comparación documental es histórica.
+
 ## Alcance y resultado
 
 Se analizaron `full demo.mp4`, `newdemo1.mp4`, `newdemo2.mp4` y `newdemo3.mp4`, aportados por el usuario en `D:\OBS recordings`, junto con controles y aclaraciones. Se contrastó la referencia con documentos/fuentes activas y se incorporaron R01–R07, comprobando las escenas indicadas. Revisión consolidada el 15 de octubre de 2026.
@@ -16,8 +18,8 @@ No hubo cambios de código, assets ni configuración del juego. Las especificaci
 | [escenas.md](escenas.md) | Nuevo índice de secuencias, ampliaciones y tiempos para localizar cada conclusión |
 | [comparacion.md](comparacion.md) | Contraste actualizado con documentación/código; conserva los desajustes de nombres y capacidades identificados |
 | [preguntas.md](preguntas.md) | Respuestas R01–R07/P01 integradas y tres grupos restantes P02–P04 |
-| [alcance/functional.md](alcance/functional.md) | Comportamientos y límites elegidos para Vamps, separados de la referencia y del prototipo actual |
-| [alcance/technical.md](alcance/technical.md) | Responsabilidades, flujo y orden de trabajo futuro sobre la base verificada, sin fingir implementación |
+| Alcance funcional, integrado por 017 en [juego](../../game/functional.md), [combate](../../combat/functional.md) y [jugador](../../player/functional.md) | Comportamientos y límites elegidos para Vamps, separados de la referencia y del prototipo actual |
+| Base técnica, integrada por 017 en [juego](../../game/technical.md), [combate](../../combat/technical.md) y [jugador](../../player/technical.md) | Responsabilidades y flujo futuro sobre la base verificada, sin fingir implementación |
 | [editor.md](editor.md) | Aportes del usuario, cierre de revisión y continuación documental; sin setup Unreal nuevo |
 | `evidencia/E01…E14.jpg` | Catorce capturas conservadas del primer video |
 | `evidencia/N01…N18.jpg` | Dieciocho láminas nuevas; N07 renombrada para corregir la atribución anterior de amenaza no seleccionada |
@@ -41,7 +43,7 @@ Los MP4 permanecen en su ubicación original. Scripts de decodificación, detect
 
 ## Relaciones de código y assets
 
-Se leyeron `VampsCharacter`, `VampsCharacter_Player`, controllers normal/de prueba, `GA_Attack`, `GA_Guard`, `FistHitboxComponent`, `ANS_AttackTrace`, `VampsAnimInstance`, AttributeSet, HUD y GameMode de prueba. Se volvió a contrastar recepción/exclusión de habilidades, input, cámara, trazas, atributos y escena de observación para el par de alcance. [comparacion.md](comparacion.md#relaciones-actuales-que-afectan-el-rediseño) explica diferencias; [alcance/technical.md](alcance/technical.md) conecta las decisiones sin agregar clases futuras innecesarias.
+Se leyeron `VampsCharacter`, `VampsCharacter_Player`, controllers normal/de prueba, `GA_Attack`, `GA_Guard`, `FistHitboxComponent`, `ANS_AttackTrace`, `VampsAnimInstance`, AttributeSet, HUD y GameMode de prueba. Se volvió a contrastar recepción/exclusión de habilidades, input, cámara, trazas, atributos y escena de observación para el par de alcance. [comparacion.md](comparacion.md#relaciones-actuales-que-afectan-el-rediseño) explica diferencias; [base técnica vigente](../../game/technical.md) conecta las decisiones sin agregar clases futuras innecesarias.
 
 Los Blueprints y recursos `/Game/Vamps` se referencian según 013–015; no se abrieron, compilaron ni verificaron sus defaults. No se modificaron conexiones entre clases, Blueprints o animación. Observar FGO no valida la ejecución de Vamps.
 
@@ -62,4 +64,4 @@ Los fotogramas no revelan fórmulas, fase exacta de tracing, mecanismos de movim
 
 ## Continuación
 
-Revisar [el alcance consolidado](alcance/functional.md) y resolver [P02–P04](preguntas.md#reglas-que-requieren-respuesta) para completar el documento final. El desempate se elige después de diseñar la resolución; valores de balance/cámara se calibran con prototipo. [editor.md](editor.md) identifica los aportes y continuación. No se implementó código ni se prepararon assets.
+La integración documental se realizó en [017](../017-base-fgoa-y-extensiones/reporte.md). [P02–P04](preguntas.md#reglas-que-requieren-respuesta) enlazan las preguntas vigentes de cada funcionalidad. El desempate se elige al diseñar la resolución; valores de balance/cámara se calibran con prototipo. [editor.md](editor.md) identifica los aportes y la continuación. No se implementó código ni se prepararon assets.

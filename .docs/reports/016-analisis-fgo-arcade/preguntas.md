@@ -1,6 +1,6 @@
 # Decisiones del diálogo y precisiones restantes
 
-R01–R07 se integran en [el análisis original](analisis.md) y en [el alcance de Vamps](alcance/functional.md), con [base técnica](alcance/technical.md). No se requieren nuevas grabaciones. Las particularidades de cartas se documentan como referencia y no se trasladan a la implementación.
+R01–R07 se integran en [el análisis original](analisis.md). [017](../017-base-fgoa-y-extensiones/reporte.md) traslada el alcance a las especificaciones principales y separa las extensiones propias. No se requieren nuevas grabaciones. Las particularidades de cartas se documentan como referencia y no se trasladan a la implementación.
 
 ## Respuestas integradas
 
@@ -20,14 +20,14 @@ Los tiempos aproximados aportados se localizaron en los archivos: Da Vinci prepa
 
 ### P02. Recurso de guardia y crítico
 
-Definir cómo se consume/recupera guardia y qué restricciones produce el guard break, y si crítico modifica también el daño residual. Probabilidad, reducción, bonus, tiempos y cantidades de recurso se calibrarán después; no se requieren números exactos para cerrar el análisis.
+Las preguntas vigentes sobre solicitud defensiva, consumo/recuperación, break, reacción, residual y crítico están en [combate](../../combat/functional.md#preguntas). Los valores se calibran después de elegir sus reglas.
 
 ### P03. Partida y portador de recompensa
 
-Fijar tamaño de equipos y condiciones de final/empate; momento de aparición del portador, criterio de asignación y transferencia tras morir. La hipótesis kill leader del equipo ganador no está comprobada como regla original. La curación observada al adquirir el Grial se conserva como evidencia, sin decidir todavía que el portador de Vamps cure o añada otros efectos.
+Las preguntas vigentes sobre equipos, final/empate, portador y respawn están en [partida](../../game/functional.md#preguntas). La hipótesis de kill leader y la curación observada del Grial permanecen en el análisis, sin convertirlas en decisiones para Vamps.
 
 ### P04. Pérdida del target y arbitraje técnico
 
-Definir selección al morir/perderse el target o no quedar enemigos elegibles. Elegir después el sistema de fases/contactos y su criterio de desempate, como indicó R03; no imponer ahora stats, reloj o IDs. Los parámetros de encuadre, fade y movilidad se calibrarán con el prototipo conservando los comportamientos elegidos.
+La selección inicial/pérdida/ausencia de target se resuelve en [jugador](../../player/functional.md#preguntas). Fases/contactos y desempate se eligen al diseñar la [resolución de combate](../../combat/technical.md#preguntas-de-implementación), como indicó R03. Los parámetros de encuadre, fade y movilidad se calibran con el prototipo.
 
-Estas precisiones completan el documento de alcance; no reabren la revisión de videos. SUPPORT no requiere diseño porque quedó excluido, y la ultimate se define cuando llegue su etapa.
+Estas precisiones se resuelven por funcionalidad según el [roadmap](../../roadmap.md); no reabren la revisión de videos. SUPPORT quedó excluido. Las preguntas propias de parry, ultimate y personajes están en [extensiones](../../extensions/functional.md#preguntas-para-esta-etapa), sin bloquear la base.

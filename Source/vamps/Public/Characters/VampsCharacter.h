@@ -8,6 +8,7 @@
 class UAbilitySystemComponent;
 class UVampsAttributeSet;
 class UFistHitboxComponent;
+class UVampsLockOnComponent;
 class UAnimMontage;
 
 UCLASS(Abstract)
@@ -33,6 +34,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UFistHitboxComponent> FistHitbox;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lock On")
+	TObjectPtr<UVampsLockOnComponent> LockOn;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UAnimMontage> AttackMontage;
 
@@ -45,7 +49,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestGuard(bool bPressed);
 
-	void ReceiveHit(AVampsCharacter* Attacker);
+	void ReceiveCombatHit(AVampsCharacter* Attacker);
 
 	UFUNCTION(BlueprintPure, Category = "Combat")
 	bool IsAttacking() const;

@@ -6,7 +6,7 @@
 
 **Pendiente para el usuario:** compilar en frío, revisar Blueprints, asignar arma y un montage de un solo ataque. No hubo operaciones de editor realizadas por Codex en esta iteración. Los assets anteriores no fueron editados.
 
-[Reporte](reporte.md) · [Flujo del código](../../combat/technical.md#cómo-leer-el-código).
+[Reporte](reporte.md) · [Flujo actual del prototipo](../../prototype/technical.md#cómo-leer-el-código).
 
 ## 1. Compilar y limpiar referencias
 

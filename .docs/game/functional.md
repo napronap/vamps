@@ -1,37 +1,38 @@
-# Juego y partida
+# Juego y partida de la base FGOA adaptada
 
-El prototipo actual permite observar [un ataque y una guardia](../combat/functional.md). El formato de equipos y los perfiles de personajes pertenecen a etapas posteriores.
+La primera prioridad es reproducir el intercambio, movilidad, lock-on y presentación de FGO Arcade con un único personaje melee jugable. La [referencia analizada](../reports/016-analisis-fgo-arcade/analisis.md) conserva los comportamientos originales; esta especificación aplica las decisiones elegidas para Vamps. [Combate](../combat/functional.md) y [jugador](../player/functional.md) detallan sus reglas. Implementación: [technical.md](technical.md).
 
-## Duelo local de prueba
+## Alcance de la base
 
-El escenario contiene al jugador y un rival con IA básica para observar distintas situaciones. Los dos usan las mismas reglas de ataque y guardia.
-
-| Control | Acción |
+| Área | Regla para Vamps |
 |---|---|
-| WASD | Movimiento |
-| Mouse | Cámara libre cuando no hay lock-on |
-| LMB | Un ataque |
-| RMB mantenido | Guardia |
-| Tab | Activar o liberar lock-on |
-| R | Restaurar posiciones y vida; cancelar acciones |
-| F1 | Cambiar el modo del rival |
+| Intercambio | Botón ataque/defensa compartido, hasta tres pasos, guardia 360°, residual letal, crítico, guard break/stun y recuperación NA |
+| Cartas | Sin mano, selección Q/A/B, bonificaciones, Extra Attack ni disponibilidad causada por estados de cartas; cadena/NA directas |
+| Personaje | Un melee jugable; reaparece el mismo personaje, sin reservas ni sustitución al morir |
+| Movilidad y presentación | Evasión/sprint, lock-on continuo, selección manual/por guardia, cámara de acciones, HUD de amenaza y desvanecimiento de oclusores |
+| Shift sin dirección | Evasión hacia atrás como adaptación explícita |
+| Partida | Equipos, puntos por bajas y portador de recompensa sin temática Grial |
+| Fuera del primer alcance | Ranged y SUPPORT; atacar al mismo enemigo que otro aliado sigue permitido |
+| Después de la base | [Parry, skills, identidades propias y ultimate de Vamps](../extensions/functional.md) |
 
-El HUD conserva vida y estado de ambos personajes: IDLE, ATTACK o GUARD. También muestra el modo del rival. No hay mensajes de victoria/derrota.
+Estas simplificaciones y adaptaciones son parte del primer alcance; reproducir la base no exige implementar antes los sistemas originales excluidos ni prepararlos para después. Los parámetros se calibran para Vamps; no se copian valores del HUD de FGO como balance obligatorio.
 
-## Modos del rival
+## Equipos, muerte y respawn
 
-F1 recorre estos modos y vuelve al primero:
+La partida enfrenta equipos. Morir concede puntos al equipo adversario según la regla de baja y provoca respawn del mismo personaje mientras la partida continúa. No agota reservas ni cambia el repertorio por sustitución de personaje. La derrota individual se distingue del resultado de equipo.
 
-| Modo | Comportamiento |
-|---|---|
-| Passive | Quieto, sin atacar ni cubrirse; modo inicial |
-| Attack | Se acerca y repite el único ataque, esperando a terminarlo y al intervalo entre intentos |
-| Guard | Quieto, mantiene guardia; permite comprobar la cancelación del atacante |
-| Sidestep | Se desplaza lateralmente alrededor del jugador, sin atacar ni cubrirse |
-| Mixed | Alterna Attack, Guard y Sidestep, cuatro segundos cada uno |
+## Portador de recompensa
 
-Cambiar de modo cancela la acción y el movimiento anteriores. Después de cambiar o reiniciar, el rival espera 0,75 segundos antes de actuar. R conserva el modo seleccionado y reinicia su secuencia. La IA no se detiene por vida cero: todavía no hay muerte ni fin de partida.
+Un portador visible concede más puntos al morir que una baja normal. No usa temática Grial. Asignación, aparición y transferencia requieren reglas expresas; la hipótesis de kill leader del equipo ganador no se convierte en requisito.
 
-El acercamiento es en línea recta, sin buscar rutas alrededor de obstáculos. La distancia inicial para intentar atacar es 100 cm entre personajes; la hitbox del puño debe alcanzar de verdad al receptor para producir un contacto. Los intentos se separan al menos un segundo.
+La curación al adquirir el Grial pertenece a la evidencia del original; no establece curación ni otro bonus para este portador.
 
-La [guía del golpe de puño](../reports/006-golpe-de-puno/editor.md) reúne la configuración vigente y enlaza las comprobaciones de IA.
+## Duración y cierre
+
+Se busca una partida más larga mediante la relación entre valor de baja y objetivo de victoria. Bajar puntos por baja conservando el objetivo exige más bajas; reducir ambos proporcionalmente conserva esa relación. Los valores y tiempos se ajustan después de fijar las condiciones de partida.
+
+## Preguntas
+
+1. ¿Qué tamaño tienen los equipos y cuáles son las condiciones de victoria, límite de tiempo y empate?
+2. ¿Cuándo aparece el portador, cómo se asigna y cómo se transfiere tras morir? ¿Tiene efectos adicionales a la recompensa mayor por baja?
+3. ¿Cuánto tarda el respawn y dónde reaparece cada jugador?

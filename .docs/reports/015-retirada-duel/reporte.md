@@ -1,5 +1,7 @@
 # 015 — Retirada de Duel
 
+Documentación vigente: [017 — Base FGOA y extensiones Vamps](../017-base-fgoa-y-extensiones/reporte.md). No cambia ni confirma los pendientes operativos de esta limpieza.
+
 ## Alcance y estado
 
 El usuario confirmó compilación completa y funcionamiento de PIE después de 014 y autorizó eliminar el grupo histórico Duel. Se retiran sus fuentes y los assets que el MCP pudo borrar. Vamps conserva personajes, IA, GameModes, animación, HUD, efecto y tags nuevos.

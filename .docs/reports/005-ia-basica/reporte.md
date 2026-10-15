@@ -17,7 +17,7 @@ Las rutas de código son relativas a `Source/vamps/`, con headers en Public e im
 | `Player/DuelPlayerController.h/.cpp` | Crea la Input Action de F1 en memoria y llama CycleAI. Conserva ataque/guardia separados y los demás controles |
 | `UI/DuelHUD.cpp` | Agrega el modo de IA y la ayuda de F1. Mantiene vida y estado IDLE/ATTACK/GUARD |
 
-El comportamiento y los controles están en [juego funcional](../../game/functional.md); el timer, movimiento y responsabilidades en [juego técnico](../../game/technical.md). El enum solo selecciona modos de prueba, sin duplicar el estado GAS.
+El comportamiento y los controles actuales están en [prototipo funcional](../../prototype/functional.md); el timer, movimiento y responsabilidades en [prototipo técnico](../../prototype/technical.md). Este reporte conserva los nombres/teclas históricos de 005. El enum solo selecciona modos de prueba, sin duplicar el estado GAS.
 
 Los modos anteriores Combo y Reactive se reemplazan por Attack y Guard: golpe único repetido y defensa mantenida. Mixed alterna comportamientos de forma fija, sin anticipar inputs del jugador. Los timers regulan decisiones de la IA; los contactos siguen dependiendo del arma y del notify de la animación.
 

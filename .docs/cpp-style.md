@@ -35,7 +35,7 @@ El nombre de carpeta organiza archivos; no cambia el identificador de clase `/Sc
 - Comentarios para explicar responsabilidad, restricciones y motivos; no narrar cada sentencia.
 
 ```cpp
-void AVampsDuelCharacter::RequestAttack()
+void AVampsCharacter::RequestAttack()
 {
 	if (HasAuthority())
 	{
@@ -44,8 +44,16 @@ void AVampsDuelCharacter::RequestAttack()
 }
 ```
 
+## Nombres y miembros heredados
+
+No ocultar tipos, atributos ni métodos de Unreal con variables locales, parámetros, atributos o métodos propios. Antes de introducir un nombre, revisar la jerarquía completa de clases base y las interfaces implementadas en los headers del motor instalado. No limitar la búsqueda a la clase base inmediata ni a las funciones virtuales.
+
+Declarar un método con el mismo nombre y otra firma también oculta sobrecargas heredadas: que compile no garantiza que el nombre sea correcto. Para lógica distinta, elegir un nombre que describa su responsabilidad. Por ejemplo, `AVampsCharacter::ReceiveCombatHit` resuelve contactos de combate; `AActor::ReceiveHit` ya pertenece a la notificación de colisiones físicas y no debe ocultarse con una firma propia. Dentro de un PlayerController, usar `ControlledPawn` para una variable local porque `AController` ya declara el miembro `Character`.
+
+Reutilizar un nombre de función virtual heredada únicamente al implementar deliberadamente ese contrato, con firma compatible y `override`. No agregar wrappers, aliases ni declaraciones `using` para conservar un nombre propio que oculta una API del motor: renombrar la función y actualizar sus consumidores.
+
 ## Formato y revisión
 
 Aplicar `clang-format --style=file -i <archivos>` únicamente a los archivos propios que se editan. La configuración se comprobó con clang-format 19.1.5; Rider puede usarla al habilitar su integración con ClangFormat. `.editorconfig` fija la indentación básica para editores compatibles.
 
-El formateador mantiene la presentación; la agrupación por responsabilidad y la claridad de nombres se revisan al editar. Comprobar includes y compilar por MCP cuando esté disponible. No agregar ni ejecutar tests automatizados, según [AGENTS.md](../AGENTS.md#sin-tests-automatizados).
+El formateador mantiene la presentación; la agrupación por responsabilidad y la claridad de nombres se revisan al editar. Revisar nombres de métodos, atributos, parámetros y variables contra las clases base e interfaces, además de comprobar includes y compilar por MCP cuando esté disponible. No agregar ni ejecutar tests automatizados, según [AGENTS.md](../AGENTS.md#sin-tests-automatizados).

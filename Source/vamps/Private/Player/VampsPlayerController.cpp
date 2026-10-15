@@ -1,10 +1,17 @@
 #include "Player/VampsPlayerController.h"
+#include "Player/VampsPlayerCameraManager.h"
 #include "Characters/VampsCharacter.h"
+#include "Characters/VampsLockOnComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+
+AVampsPlayerController::AVampsPlayerController()
+{
+	PlayerCameraManagerClass = AVampsPlayerCameraManager::StaticClass();
+}
 
 void AVampsPlayerController::BeginPlay()
 {
@@ -39,18 +46,19 @@ void AVampsPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(InputComponent);
-	checkf(MoveAction && LookAction && AttackAction && GuardAction, TEXT("All four input actions must be assigned."));
+	checkf(MoveAction && AttackAction && GuardAction && CycleTargetAction,
+	       TEXT("All four input actions must be assigned."));
 	check(MoveAction->ValueType == EInputActionValueType::Axis2D);
-	check(LookAction->ValueType == EInputActionValueType::Axis2D);
 	check(AttackAction->ValueType == EInputActionValueType::Boolean);
 	check(GuardAction->ValueType == EInputActionValueType::Boolean);
+	check(CycleTargetAction->ValueType == EInputActionValueType::Boolean);
 
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVampsPlayerController::Move);
-	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AVampsPlayerController::Look);
 	Input->BindAction(AttackAction, ETriggerEvent::Started, this, &AVampsPlayerController::Attack);
 	Input->BindAction(GuardAction, ETriggerEvent::Started, this, &AVampsPlayerController::Guard, true);
 	Input->BindAction(GuardAction, ETriggerEvent::Completed, this, &AVampsPlayerController::Guard, false);
 	Input->BindAction(GuardAction, ETriggerEvent::Canceled, this, &AVampsPlayerController::Guard, false);
+	Input->BindAction(CycleTargetAction, ETriggerEvent::Started, this, &AVampsPlayerController::CycleTarget);
 }
 
 void AVampsPlayerController::Move(const FInputActionValue& Value)
@@ -62,17 +70,6 @@ void AVampsPlayerController::Move(const FInputActionValue& Value)
 		ControlledPawn->AddMovementInput(Yaw.Vector(), Movement.Y);
 		ControlledPawn->AddMovementInput(FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y), Movement.X);
 	}
-}
-
-void AVampsPlayerController::Look(const FInputActionValue& Value)
-{
-	if (!GetPawn())
-	{
-		return;
-	}
-	const FVector2D LookInput = Value.Get<FVector2D>();
-	AddYawInput(LookInput.X);
-	AddPitchInput(LookInput.Y);
 }
 
 void AVampsPlayerController::Attack()
@@ -88,5 +85,13 @@ void AVampsPlayerController::Guard(bool bPressed)
 	if (APawn* ControlledPawn = GetPawn())
 	{
 		CastChecked<AVampsCharacter>(ControlledPawn)->RequestGuard(bPressed);
+	}
+}
+
+void AVampsPlayerController::CycleTarget()
+{
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		CastChecked<AVampsCharacter>(ControlledPawn)->LockOn->CycleTarget();
 	}
 }

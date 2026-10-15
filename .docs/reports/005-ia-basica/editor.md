@@ -4,7 +4,7 @@
 
 **Pendiente para el usuario:** compilar con el editor cerrado, completar los assets del combate mínimo si todavía faltan y comprobar los modos con F1. Codex modificó código y documentación; no ejecutó operaciones de editor ni modificó assets. No hay pasos manuales confirmados como hechos por el usuario.
 
-[Reporte](reporte.md) · [Controles y modos](../../game/functional.md).
+[Reporte](reporte.md) · [Controles y modos actuales del prototipo](../../prototype/functional.md).
 
 ## 1. Compilar
 

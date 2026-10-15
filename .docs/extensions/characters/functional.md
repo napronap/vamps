@@ -2,7 +2,7 @@
 
 ## Alcance
 
-La diferenciación de personajes se desarrolla después de validar la demo de combate local y online del [roadmap](../roadmap.md). La demo conserva dos combatientes con las mismas reglas y valores según el [núcleo de combate](../combat/functional.md#primera-versión).
+La diferenciación propia de Vamps se desarrolla después de reproducir la base FGOA adaptada según el [roadmap](../../roadmap.md). La base utiliza un único personaje melee jugable con las [reglas de combate compartidas](../../combat/functional.md). Estos perfiles se agregan sobre ese núcleo y no son comportamientos deducidos de FGO Arcade.
 
 ## Criterios de identidad
 
@@ -17,7 +17,7 @@ Cada personaje busca crear una situación favorable mediante herramientas propia
 | Defensa | Aprovechar una salida, una interrupción, un cambio de distancia o un parry. |
 | Aporte al equipo | Perseguir, separar enemigos, proteger aliados o preparar oportunidades para otro personaje. |
 
-Los controles y las ventanas básicas de defensa se mantienen comunes durante las primeras pruebas de diferenciación. Las reglas compartidas se describen en [combate](../combat/functional.md).
+Los controles y las ventanas básicas de defensa se mantienen comunes durante las primeras pruebas de diferenciación. Las reglas compartidas se describen en [combate](../../combat/functional.md). Las posibilidades que dependen de parry se desarrollan en la etapa de [extensiones](../functional.md), sin incorporarlo como condición de la base.
 
 ## Perfiles para explorar
 
@@ -37,7 +37,7 @@ Las dos skills refuerzan la identidad del personaje sin eliminar todas sus debil
 
 Por ejemplo, un pesado puede facilitar su entrada a cambio de recurso o recuperación, y aumentar con otra skill la recompensa de un golpe bien colocado. Una salida segura y frecuente reduciría el compromiso que define ese perfil.
 
-## Evaluación después de la demo
+## Evaluación después de la base de referencia
 
 El primer contraste de perfiles enfrenta al duelista de presión, al pesado y al especialista en alcance. Cada diseño responde:
 

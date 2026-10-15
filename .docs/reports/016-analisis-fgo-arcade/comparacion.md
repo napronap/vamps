@@ -1,12 +1,12 @@
 # Contraste con la documentación y la base de Vamps
 
-Fuente principal: [análisis de las cuatro grabaciones y el diálogo R01–R07](analisis.md). Las reglas elegidas para Vamps están en [alcance/functional.md](alcance/functional.md) y su [base técnica](alcance/technical.md), separados de las especificaciones instaladas. No hubo cambios de código. Ranged y SUPPORT quedan fuera; crítico queda incluido.
+Fuente principal: [análisis de las cuatro grabaciones y el diálogo R01–R07](analisis.md). Este contraste registra el estado anterior a [017](../017-base-fgoa-y-extensiones/reporte.md), que integra las decisiones en [juego](../../game/functional.md), [combate](../../combat/functional.md) y [jugador](../../player/functional.md), con sus técnicos. No hubo cambios de código. Ranged y SUPPORT quedan fuera; crítico queda incluido.
 
 ## Qué representa cada fuente
 
-Los documentos actuales de [combate funcional](../../combat/functional.md), [combate técnico](../../combat/technical.md), [juego funcional](../../game/functional.md), [juego técnico](../../game/technical.md) y [roadmap](../../roadmap.md) describen un prototipo deliberadamente reducido. Una diferencia con el video no convierte esa reducción en un bug: sí impide usarla como descripción fiel de FGO.
+Al realizar 016, los documentos principales describían un prototipo deliberadamente reducido. Desde 017, esa descripción se consulta en [prototipo funcional](../../prototype/functional.md) y [técnico](../../prototype/technical.md); el [roadmap](../../roadmap.md) prioriza la reproducción de referencia. La columna del prototipo de este contraste conserva el contenido anterior, incluidos sus desajustes con fuentes. Una diferencia con el video no convierte esa reducción en un bug: sí impide usarla como descripción fiel de FGO.
 
-Los documentos de [identidad](../../characters/functional.md) y su [técnico](../../characters/technical.md) contienen criterios para etapas posteriores, no reglas demostradas de esta referencia. Los reportes [002](../002-mvp-duelo/reporte.md) y [003](../003-combate-animado/reporte.md) registran modelos retirados; no son la especificación vigente. Los reportes [009](../009-personajes-base/reporte.md), [011](../011-ia-combate-prueba/reporte.md), [014](../014-copias-nomenclatura-vamps/reporte.md) y [015](../015-retirada-duel/reporte.md) explican la base Vamps posterior.
+Los documentos de [identidad](../../extensions/characters/functional.md) y su [técnico](../../extensions/characters/technical.md) contienen criterios para etapas posteriores, no reglas demostradas de esta referencia. Los reportes [002](../002-mvp-duelo/reporte.md) y [003](../003-combate-animado/reporte.md) registran modelos retirados; no son la especificación vigente. Los reportes [009](../009-personajes-base/reporte.md), [011](../011-ia-combate-prueba/reporte.md), [014](../014-copias-nomenclatura-vamps/reporte.md) y [015](../015-retirada-duel/reporte.md) explican la base Vamps posterior.
 
 ## Diferencias de comportamiento
 
@@ -35,14 +35,14 @@ La vida 100, daño 12, radio del puño 12 cm y distancia de ataque 100 cm son pa
 
 ## Desajustes entre los documentos y el código actual
 
-La lectura de fuentes confirma además diferencias documentales ajenas al video. Se registran aquí sin editar los documentos originales:
+La lectura de fuentes confirmó además diferencias documentales ajenas al video. Este registro histórico conserva los hallazgos que 017 corrige al separar prototipo y especificación:
 
 - Los técnicos todavía nombran `AVampsDuelCharacter`, `ADuelPlayerController`, `ADuelGameMode`, `ADuelHUD`, `UDuelAnimInstance`, `UGE_DuelDamage` y assets `/Game/Duel`. El grupo activo utiliza Vamps; 014/015 explican el cambio y la retirada histórica.
 - El juego funcional menciona F1 para IA y Tab para lock-on. El controller de prueba actual incorpora `CycleAIModeAction` y `ResetCombatAction`; 011 y el HUD vigente identifican **F6/R**. El controller normal inspeccionado enlaza Move, Look, Attack y Guard; no tiene un binding nativo de lock-on.
 - El técnico de combate describe Tick para orientación hacia lock-on. La base `AVampsCharacter` actual desactiva Tick y orienta locomoción mediante CharacterMovement. `AVampsCharacter_Player` añade el brazo y la cámara, sin lógica de seguimiento de objetivo.
 - La resolución vigente sí coincide con la simplificación funcional: `ReceiveHit` cancela la habilidad del agresor y retorna si el receptor está en guardia; si no, aplica `UGE_VampsDamage`. No incorpora reacción ni muerte.
 
-Estas diferencias documentales deben corregirse al redactar el documento final para no diseñar sobre tipos retirados o capacidades que ya no están en la base. La grabación no valida los assets del proyecto y no se consultaron defaults actuales del editor.
+017 corrige estas diferencias en el [prototipo documentado](../../prototype/technical.md). La grabación no valida los assets del proyecto y no se consultaron defaults actuales del editor.
 
 ## Relaciones actuales que afectan el rediseño
 
@@ -76,4 +76,4 @@ El análisis permite reemplazar ambigüedades por separaciones concretas:
 
 No se recupera automáticamente el modelo de 002: buffer, reloj común, NA pausado, cobertura consumible, parry y prioridades por identificador no quedan demostrados. Tampoco se decide entre timers, notifies, secciones de montage, root motion o nuevas clases por las imágenes. Rango/adaptación son reglas de comportamiento; el mecanismo se elige después. El cierre por fallo permite una ofensiva fuera de alcance: no introducir rechazo previo por distancia como copia de esa escena.
 
-El [alcance consolidado](alcance/functional.md) incorpora R01–R07 y la continuación tras contacto defendido; la [base técnica](alcance/technical.md) conecta esas decisiones con responsabilidades actuales. [P02–P04](preguntas.md#reglas-que-requieren-respuesta) contienen solo precisiones restantes. La revisión de videos permanece cerrada, sin cambiar roadmap, código o setup Unreal.
+La especificación vigente integra R01–R07 y la continuación tras contacto defendido en [combate](../../combat/functional.md), junto con [jugador](../../player/functional.md) y [partida](../../game/functional.md). [P02–P04](preguntas.md#reglas-que-requieren-respuesta) enlazan las preguntas de cada área. La revisión de videos permanece cerrada; 017 cambia documentación y roadmap, sin cambiar código ni setup Unreal.

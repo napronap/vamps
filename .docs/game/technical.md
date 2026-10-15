@@ -1,29 +1,31 @@
 # Base técnica del juego
 
-Se usa Unreal Engine 5.8 y GAS. Comportamiento: [juego y partida](functional.md). Núcleo: [combate](../combat/technical.md).
+Se usa Unreal Engine 5.8 y GAS. Reglas: [juego y partida](functional.md). Dependencias: [combate](../combat/technical.md), [jugador](../player/technical.md) y [base existente](../prototype/technical.md).
 
 ## Código y recursos
 
-Las clases y Blueprints propios heredan de clases nativas de Unreal. No se copia ni hereda lógica del ejemplo Third Person ni de sus variantes; solo se pueden reutilizar recursos visuales.
+Las clases y Blueprints propios heredan de clases nativas de Unreal. No se copia ni hereda lógica del ejemplo Third Person ni de sus variantes; solo se reutilizan sus recursos visuales. Los archivos propios se organizan por responsabilidad en `Source/vamps/Public/` y `Source/vamps/Private/`.
 
-`AVampsDuelCharacter` contiene AbilitySystemComponent, AttributeSet, hitbox del puño y cámara. `ADuelPlayerController` conserva input, lock-on y reinicio. `ADuelGameMode` crea un segundo personaje, le asigna `ADuelAIController` mediante SpawnDefaultController y restaura ambas posiciones/vidas. AutoPossessAI permanece Disabled en el personaje: solo el rival recibe el controlador explícitamente. No hay Data Asset de combate.
+`AVampsCharacter` aloja GAS y combate; `AVampsCharacter_Player` añade cámara; `AVampsPlayerController` interpreta entrada. `AVampsAIController` solicita acciones compartidas. `AVampsCombatTestGameMode`, su controller y HUD forman la escena local de observación, no la partida por equipos. Sus [relaciones y assets actuales](../prototype/technical.md) son el punto de partida.
 
-`ADuelHUD` muestra vida, estado calculado desde GAS y modo del controlador de IA. `UDuelAnimInstance` expone Speed, Direction, bInAir y bIsGuarding al AnimBP.
+## Partida, baja y respawn
 
-El controller mantiene las cuatro Input Actions existentes para Move, Look, Lock y Reset. Crea Attack, Guard y AIMode y su Mapping Context en memoria: Started solicita la acción; Completed/Canceled de Guard la termina. F1 llama CycleAI y cambia el modo del rival. No necesita un asset IA_DuelAIMode ni input contextual.
+La autoridad de partida registra equipos, bajas, puntuación, portador y condiciones de fin. La derrota individual termina acciones y participación del personaje antes de reaparecer con el mismo tipo; no consume una reserva de clases o personajes. La presentación recibe el resultado de partida y la condición de portador.
 
-Los assets anteriores requieren migración después de compilar. El [reporte 004](../reports/004-hit-y-guard/reporte.md) identifica la simplificación del combate; la [guía 006](../reports/006-golpe-de-puno/editor.md) prepara el golpe de puño y enlaza la configuración de IA.
+El portador modifica el valor de una baja. Su selección, transferencia y posibles efectos dependen de las [decisiones de partida](functional.md#preguntas). No se agrega curación por analogía con el Grial ni se crean datos de reservas.
 
-## IA para observar el combate
+`AVampsCombatTestGameMode::ResetCombat` restaura vida/posición para observar el prototipo; no implementa muerte ni respawn. Se conserva esa responsabilidad separada de las reglas de partida que se incorporen, sin duplicar la resolución del combate dentro del GameMode.
 
-`ADuelAIController` solo solicita acciones a su personaje: RequestAttack, RequestGuard y RequestMove. Nunca aplica daño ni decide si un contacto fue bloqueado. `EDuelAIMode` selecciona un comportamiento de prueba; no representa fases del combate.
+## Autoridad y red
 
-Un timer llama Decide cada 0,1 segundos. Decide selecciona entre ApproachAndAttack, HoldGuard y Sidestep; cada método tiene sus condiciones. Mixed selecciona esos tres comportamientos en orden cada cuatro segundos. AttackDistance = 100 cm y AttackInterval = 1 segundo son los valores iniciales del controlador nativo.
+La base existente ejecuta habilidades `ServerOnly` y solicitudes con autoridad. Replicar atributos no equivale a tener combate online completo. La reproducción de la referencia requiere diseñar entrega de solicitudes, estado autoritativo y presentación para varios participantes cuando llegue la integración de red.
 
-Tick únicamente entrega el vector de movimiento a CharacterMovement mientras hay desplazamiento. AddMovementInput se consume cada frame; por eso esa entrega continua no usa el timer de decisiones. No hay lógica de ataque ni guardia en Tick. La orientación sigue usando el lock-on del personaje.
+Los videos no determinan predicción, compensación de latencia ni arbitraje. La elección de esos mecanismos no recupera automáticamente modelos retirados de reportes anteriores. No se agrega infraestructura de red o compatibilidad con cartas por anticipación.
 
-ResetBehavior cancela las acciones anteriores, limpia movimiento y vuelve a programar el timer con una espera de 0,75 segundos. Lo llaman la posesión, F1 y el reinicio del duelo. OnUnPossess y EndPlay limpian el timer y las acciones. No se agregan Behavior Trees, State Trees, NavMesh ni un subsystem propio.
+## Dependencias de implementación
 
-## Alcance posterior
+El [roadmap](../roadmap.md) prioriza núcleo, movilidad/presentación y partida antes de [extensiones Vamps](../extensions/technical.md). Equipos y portador dependen de daño/muerte resueltos y de una selección coherente de enemigos para cámara y HUD. Las comprobaciones de cada implementación se hacen mediante revisión de código, compilación por MCP directo cuando corresponda y observación manual del editor.
 
-Multijugador, IA más elaborada y reglas adicionales se diseñarán después de entender y observar esta base. No hay coordinación temporal de combate, historial, compensación de latencia ni simulación de combate propia en esta iteración.
+## Preguntas
+
+1. Con las condiciones funcionales de partida elegidas, ¿qué estado autoritativo y qué presentación necesitan compartir los participantes?

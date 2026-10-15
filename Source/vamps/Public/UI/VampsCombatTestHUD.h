@@ -16,5 +16,5 @@ public:
 
 private:
 
-	void DrawFighter(AVampsCharacter* Fighter, const FString& Label, float X, float Y, float Width);
+	void DrawFighter(AVampsCharacter* Fighter, const FString& Label, float X, float Y, float Width, bool bSelected);
 };

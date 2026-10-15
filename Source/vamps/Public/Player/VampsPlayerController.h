@@ -12,6 +12,10 @@ class VAMPS_API AVampsPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+
+	AVampsPlayerController();
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -25,18 +29,18 @@ protected:
 	TObjectPtr<UInputAction> MoveAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	TObjectPtr<UInputAction> LookAction;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> AttackAction;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> GuardAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> CycleTargetAction;
+
 private:
 
 	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
 	void Attack();
 	void Guard(bool bPressed);
+	void CycleTarget();
 };

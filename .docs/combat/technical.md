@@ -1,58 +1,48 @@
-# Implementación del combate
+# Implementación del combate de referencia
 
-Reglas: [combate](functional.md). Configuración: [guía de la iteración 006](../reports/006-golpe-de-puno/editor.md).
+Reglas: [functional.md](functional.md). Punto de partida comprobado en fuentes: [prototipo](../prototype/technical.md). Este documento define los cambios de arquitectura necesarios para implementar la base.
 
-## Arquitectura de la primera versión
+## Responsabilidades
 
-Solo hay dos habilidades, ambas heredan directamente de `UGameplayAbility`:
-
-| Pieza | Para qué sirve |
+| Pieza existente | Cambio necesario |
 |---|---|
-| `UGA_Attack` | Reproduce un único montage mediante la tarea nativa `UAbilityTask_PlayMontageAndWait`. Al finalizar o cancelarse, termina la habilidad y detiene las trazas |
-| `UGA_Guard` | Permanece activa desde que se presiona guardia hasta que se suelta |
-| `AVampsDuelCharacter` | Aloja GAS, recibe input y resuelve `ReceiveHit`: cancelar ataque o aplicar daño |
-| `UANS_AttackTrace` | Un Notify State que enciende y apaga las trazas en el tramo del golpe |
-| `UFistHitboxComponent` | Es una esfera sobre el socket del puño; barre su movimiento y evita aplicar el mismo golpe varias veces al mismo personaje |
-| `UVampsAttributeSet` | Guarda Health y MaxHealth; limita la vida a su rango |
-| `UGE_DuelDamage` | Efecto instantáneo que resta vida |
+| `AVampsCharacter` | Conservar GAS y recepción de contactos; distinguir cadena/fase, disponibilidad, resultado defendido/abierto y reacción |
+| `UGA_Attack` / `UGA_Guard` | Reemplazar montage único y guardia mantenida mutuamente excluyentes por acciones y defensa contextual conforme al funcional |
+| `UFistHitboxComponent` / `UANS_AttackTrace` | Conservar detección espacial y ventanas; identificar acción/evento de impacto y comunicar contacto habilitante |
+| `UVampsAttributeSet` / `UGE_VampsDamage` | Conservar atributos y aplicación de daño; incorporar guardia, residual y crítico cuando se elijan sus reglas |
+| `UVampsAnimInstance` | Presentar locomoción y resultados de combate sin convertirse en autoridad de disponibilidad |
 
-No hay base de habilidades propia, Data Asset de combate, enums de fase/resultado, dispatcher de ventanas ni subsystem de combate. La [IA básica](../game/technical.md#ia-para-observar-el-combate) usa las mismas solicitudes del personaje, sin añadir reglas a las habilidades.
+La [entrada compartida y selección](../player/technical.md) entrega solicitudes al núcleo; la IA utiliza las mismas reglas. Ningún controlador aplica daño ni decide por su cuenta si hubo bloqueo.
 
-## Cómo leer el código
+## Entrada, acción y disponibilidad
 
-1. `RequestAttack` pide al AbilitySystemComponent que active la habilidad concedida en BeginPlay.
-2. `UGA_Attack::ActivateAbility` reproduce el montage. GAS agrega el tag Attack mientras la habilidad está activa.
-3. El notify `Attack Trace` habilita el componente de trazas.
-4. El componente detecta al receptor y llama a `ReceiveHit`.
-5. `ReceiveHit` consulta si el receptor tiene el tag Guard. Si lo tiene, llama a `CancelAttack` del agresor y retorna. Si no, aplica `UGE_DuelDamage` a su vida.
-6. Soltar RMB cancela `UGA_Guard`; GAS retira su tag.
+Se comprueba por separado inicio de acción, ventana de continuación y posibilidad defensiva. El estado necesario distingue paso, fase, contacto habilitante, continuación aceptada, recuperación, NA, reacción y stun. La continuación aceptada corresponde al paso actual; no requiere una cola general de inputs futuros.
 
-Los tags Attack y Guard son la fuente del estado, no una máquina de estados adicional. Ambos bloquean la activación de la otra habilidad. Damage identifica el valor que se pasa al Gameplay Effect. Los handles solo permiten pedir activación/cancelación a GAS.
+Disponibilidad de entrada, comienzo efectivo de acción y presentación son responsabilidades distintas. La recuperación tras bloqueo no impone un candado global al botón ni un timer adicional universal. Los tags actuales que excluyen toda guardia durante Attack deben cambiar: la defensa válida cubre toda la acción, no solo el tramo previo a encender las trazas.
 
-## Animación y contactos
+El tiempo de la acción determina sus ventanas; los contactos espaciales determinan qué receptor fue alcanzado. Se elegirá la combinación concreta de notifies, tiempo/montage y resolución autoritativa junto con el arbitraje de simultaneidad. No se adopta reloj común, prioridad por ID ni desempate por stats sin esa decisión.
 
-`AttackMontage` y `AttackDamage` se configuran directamente en BP_DuelCharacter. El montage contiene **un clip y un golpe**, a velocidad normal, sin navegación de secciones ni duración calculada en C++.
+## Contacto y resolución
 
-`UANS_AttackTrace` va en el montage. Usa branching points y comprueba la instancia de reproducción para que una señal de un montage cancelado no afecte a otro. No almacena datos por personaje.
+El detector entrega agresor, receptor, acción y evento de impacto. La selección dirige movimiento/cámara; no filtra todos los contactos válidos. Al incorporar equipos, la elegibilidad distingue enemigos de aliados.
 
-FistHitbox hereda de USphereComponent y se adjunta al skeletal mesh del personaje, en SocketName = FistHit. Sphere Radius = 12 cm inicialmente. El usuario coloca ese socket en el puño del skeleton. No se necesita una mesh adicional ni dos sockets.
+La deduplicación cubre un evento de impacto, permitiendo impactos posteriores definidos para la misma acción. El resultado comunica contacto habilitante, daño defendido/abierto y consecuencias de reacción. La guardia efectiva informa además el agresor para retarget; un acierto ofensivo a otro rival no emite ese cambio de selección.
 
-Durante el tramo activo, hace un sphere sweep desde la posición anterior del socket hasta la actual, usando GetScaledSphereRadius. La primera muestra consulta la posición actual sin barrer desde una pose anterior al notify. Tick del componente corre después del skeletal mesh; fuera del ataque está desactivado. No genera overlaps ni bloquea físicamente: la esfera define el volumen consultado por las trazas. Un conjunto de receptores evita repetir daño dentro del mismo ataque. Una consulta Visibility impide golpear a un receptor oculto por una pared.
+`ReceiveHit` debe dejar de cancelar por defecto la habilidad completa del agresor al bloquear. El contacto defendido habilita continuación para el atacante. El defensor conserva contexto de cadena y solicitudes disponibles; no programa NA por bloquear. Fallo, cierre voluntario y fin del tercer paso conducen al cierre y recuperación descritos en el funcional.
 
-UGA_Attack comprueba que exista el socket antes de reproducir el montage. Si falta, el componente deja un aviso en Output Log al comenzar la partida. El radio se ajusta en el componente; el centro se ajusta moviendo el socket. BeginPlay alinea la esfera al socket, sin offsets adicionales del componente.
+No se representan mano, cartas listas/usadas, draw, Q/A/B, Extra Attack ni hooks para incorporarlos después.
 
-Cancelar el ataque cierra sus trazas inmediatamente y la tarea GAS detiene el montage con su blend-out. La guardia no necesita montage ni notify: el HUD la muestra y `UDuelAnimInstance::bIsGuarding` permite añadir una pose visual sin cambiar sus reglas.
+## Acciones, desplazamiento y animación
 
-El muestreo sigue siendo una aproximación entre poses; no reconstruye frames ni ventanas completas perdidas durante un hitch.
+Cada paso necesita tiempos/ventanas, contactos permitidos, máximo de avance y recuperación. El avance respeta acción y geometría y puede quedar corto. No se introduce rechazo general por distancia inicial para evitar el caso de fallo observado.
 
-## Movimiento y presentación
+Se elegirá un mecanismo de movimiento con las animaciones disponibles. Root motion escalado, motion warping y desplazamiento dirigido son opciones de diseño, no mecanismos demostrados por los videos ni fallbacks para mantener simultáneamente. Fin de paso, continuación y cierre por evasión deben usar la misma frontera temporal.
 
-Move aplica `AddMovementInput` desde el callback de input, sin almacenamiento ni restricciones de combate. El Tick del personaje solo mantiene orientación hacia el lock-on; PlayerTick solo sigue el objetivo con la cámara.
+Los stats se agregan cuando tengan una fórmula y un uso. Health conserva su responsabilidad; guardia necesita consumo/regeneración y transición a break/stun; crítico necesita probabilidad, bonificación e interacción con daño defendido. La pose y el HUD presentan el resultado resuelto, sin deducirlo visualmente ni duplicar autoridad.
 
-El HUD consulta Health, MaxHealth e IsAttacking/IsGuarding. No mantiene fases, resultados ni contadores propios. La copia bIsGuarding del AnimInstance es exclusivamente de presentación.
+## Preguntas de implementación
 
-## Alcance de GAS
+1. ¿Cómo se representan y sincronizan fase, contactos y fronteras de paso para resolver la [vigencia defensiva y simultaneidad](functional.md#preguntas)?
+2. ¿Qué mecanismo de avance se adapta a los clips elegidos y limita el desplazamiento por acción y colisión?
 
-El AbilitySystemComponent concede dos habilidades. El AttributeSet conserva la vida y el Gameplay Effect aplica daño. Esos son los conceptos usados en esta base.
-
-La ejecución continúa siendo local y con autoridad, con habilidades ServerOnly. Se usa ahora la tarea estándar de montage de GAS, pero no se agregó envío de input por red ni predicción. La replicación básica de atributos no equivale a un duelo online terminado. No se incorpora infraestructura adicional hasta necesitarla.
+El [roadmap](../roadmap.md) ordena la implementación y sus comprobaciones. Las extensiones propias no justifican infraestructura anticipada.

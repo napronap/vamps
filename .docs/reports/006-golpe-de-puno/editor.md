@@ -2,7 +2,7 @@
 
 **Pendiente para el usuario:** compilar con el editor cerrado, crear el socket FistHit y asignar un montage de un solo puñetazo. Codex solo modificó código/documentación; no realizó operaciones de editor ni verificó assets. Esta guía reemplaza los pasos de arma de 004 y 005.
 
-[Reporte](reporte.md) · [Flujo del código](../../combat/technical.md#cómo-leer-el-código).
+[Reporte](reporte.md) · [Flujo actual del prototipo](../../prototype/technical.md#cómo-leer-el-código).
 
 ## 1. Compilar y revisar el personaje
 

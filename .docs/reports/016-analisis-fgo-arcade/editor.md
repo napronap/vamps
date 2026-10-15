@@ -1,6 +1,6 @@
 # 016 — Cierre de videos y continuación documental
 
-**No quedan grabaciones ni operaciones Unreal pendientes.** El siguiente paso es revisar [el alcance funcional](alcance/functional.md), su [base técnica](alcance/technical.md) y las precisiones P02–P04 de [preguntas.md](preguntas.md). No se requieren compilación, PIE, assets ni configuración en esta iteración.
+**No quedan grabaciones ni operaciones Unreal pendientes de este análisis.** La integración documental continúa en [017](../017-base-fgoa-y-extensiones/editor.md); [preguntas.md](preguntas.md) enlaza las precisiones por funcionalidad. No se requieren compilación, PIE, assets ni configuración en esta iteración.
 
 ## 1. Preparar y aportar las referencias
 
@@ -27,6 +27,6 @@ Para revisar una conclusión, abrir el MP4 indicado en un reproductor y buscar e
 
 ## 4. Seleccionar alcance y redactar el documento final
 
-**Realizado — Codex, documentación.** Se consolidó el alcance elegido en [functional.md](alcance/functional.md) y [technical.md](alcance/technical.md), separados de las especificaciones actuales. No se implementaron cartas ni preparación para ellas.
+**Realizado — Codex, documentación.** En 016 se consolidó un par de alcance separado. [017](../017-base-fgoa-y-extensiones/reporte.md) lo integra en las especificaciones de [juego](../../game/functional.md), [combate](../../combat/functional.md) y [jugador](../../player/functional.md), con sus técnicos, y separa las [extensiones Vamps](../../extensions/functional.md). No se implementaron cartas ni preparación para ellas.
 
-El par se completará con las precisiones restantes para cerrar el documento final. Las operaciones futuras del editor se definirán por implementación; esta guía conserva el setup y verificaciones de [015](../015-retirada-duel/editor.md).
+Las precisiones restantes se resuelven en cada funcionalidad al implementarla. Las operaciones futuras del editor se definirán por implementación; el setup y verificaciones de [015](../015-retirada-duel/editor.md) conservan sus propios pendientes.
