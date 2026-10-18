@@ -1,0 +1,38 @@
+Using bundled DotNet SDK version: 10.0 win-x64
+Running UnrealBuildTool: dotnet "..\..\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" vampsEditor Win64 Development "C:\dev\vamps\vamps.uproject" -waitMutex -NoHotReload
+Log file: C:\Users\franc\AppData\Local\UnrealBuildTool\Log.txt
+Determining max actions to execute in parallel (8 physical cores, 16 logical cores)
+  Executing up to 8 processes, one per physical core
+  Requested 1.5 GB memory per action, 8.76 GB available: limiting max parallel actions to 5
+Using 'git status' to determine working set for adaptive non-unity build (C:\dev\vamps).
+UbaServer - Listening on 0.0.0.0:1345
+UHT compiled-in object format Default
+UHT processed vampsEditor in 7.6195329 seconds (2 generated files written)
+Building vampsEditor...
+===== Toolchain Information =====
+Using ISPC compiler (C:\Program Files\Epic Games\UE_5.8\Engine\Source\ThirdParty\Intel\ISPC\bin\Windows\ispc.exe)
+  Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20250404, LLVM 18.1.2) 
+Using Visual Studio 14.44.35223 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+[Adaptive Build] Excluded from vamps unity file: VampsAIController.cpp, VampsAnimInstance.cpp, VampsCharacter.cpp, VampsCombatMovementComponent.cpp, VampsCombatResolver.cpp, GA_Attack.cpp, VampsAttributeSet.cpp, VampsCombatSettings.cpp, VampsCombatTestHUD.cpp
+=================================
+Using Unreal Build Accelerator local executor to run 10 action(s)
+  CPU 8 physical cores, 16 logical cores
+  Memory 31.29 GB physical, 37.27 GB/47.23 GB committed
+  UBA Storage capacity 40 GB
+[1/10] Compile [x64] GA_Attack.cpp
+[2/10] Compile [x64] Module.vamps.cpp
+[3/10] Compile [x64] VampsAIController.cpp
+[4/10] Compile [x64] VampsCombatMovementComponent.cpp
+[5/10] Compile [x64] VampsCombatResolver.cpp
+[6/10] Compile [x64] VampsCombatSettings.cpp
+[7/10] Compile [x64] VampsCharacter.cpp
+[8/10] Link [x64] UnrealEditor-vamps.lib
+[9/10] Link [x64] UnrealEditor-vamps.dll
+[10/10] WriteMetadata vampsEditor.target [NoUba]
+
+Total time in Unreal Build Accelerator local executor: 43.14 seconds
+Output binary: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe
+
+Result: Succeeded
+Total execution time: 52.30 seconds
+Trace written to file C:\Users\franc\AppData\Local\UnrealBuildTool\Trace.uba with size 11.5kb

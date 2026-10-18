@@ -20,6 +20,22 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "Health")
 	FGameplayAttributeData MaxHealth;
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_GuardLoad, Category = "Guard")
+	FGameplayAttributeData GuardLoad;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxGuardLoad, Category = "Guard")
+	FGameplayAttributeData MaxGuardLoad;
+
+	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UVampsAttributeSet, GuardLoad)
+	GAMEPLAYATTRIBUTE_VALUE_GETTER(GuardLoad)
+	GAMEPLAYATTRIBUTE_VALUE_SETTER(GuardLoad)
+	GAMEPLAYATTRIBUTE_VALUE_INITTER(GuardLoad)
+
+	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UVampsAttributeSet, MaxGuardLoad)
+	GAMEPLAYATTRIBUTE_VALUE_GETTER(MaxGuardLoad)
+	GAMEPLAYATTRIBUTE_VALUE_SETTER(MaxGuardLoad)
+	GAMEPLAYATTRIBUTE_VALUE_INITTER(MaxGuardLoad)
+
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UVampsAttributeSet, Health)
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(Health)
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(Health)
@@ -41,4 +57,10 @@ private:
 
 	UFUNCTION()
 	void OnRep_MaxHealth(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_GuardLoad(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_MaxGuardLoad(const FGameplayAttributeData& OldValue);
 };

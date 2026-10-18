@@ -23,10 +23,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 [Roadmap hacia la emulación FGOA](roadmap.md): consolidar contacto/cámara → botón compartido y fases → cadena/NA → daño/guardia → movilidad → presentación → equipos → red → calibración → extensiones propias. Incluye estado actual, decisiones previas y criterios de cierre; distingue combate local y base completa.
 
-**Avance:** etapa 0 completada por confirmación del usuario el 2026-10-15; [registro](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0). Etapa 1 completada por confirmación del usuario el 2026-10-16, con un único ANS y defensa hasta AttackEnd; [cierre 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). La etapa 2, cadena y NA, queda pendiente. El estado se controla en el roadmap.
+**Avance:** etapas 0 y 1 cerradas por el usuario en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) y [021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). Etapa 2, cadena y NA, completada por confirmación del usuario el 2026-10-18; [cierre 031 y reglas del paso 3](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md). El estado se controla en el roadmap; la siguiente etapa es 3.
 
 1. Leer el [alcance y exclusiones](game/functional.md#alcance-de-la-base), seguido de combate y jugador.
-2. Consultar la [revisión actual del código](reports/028-contraste-fgoa/analisis.md#10-evaluación-concreta-del-código-actual-de-vamps) para ubicar el punto de partida; el flujo del prototipo conserva contexto histórico.
+2. Consultar la [implementación actual del paso 3](reports/033-resultados-combate/reporte.md) y sus límites de verificación; la [revisión 028](reports/028-contraste-fgoa/analisis.md#10-evaluación-concreta-del-código-actual-de-vamps) y el prototipo conservan el punto de partida histórico.
 3. Resolver las preguntas al final de la funcionalidad que se implemente; las preguntas de extensiones no bloquean la base.
 
 ## Análisis de referencia
@@ -44,9 +44,13 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
-Última iteración documental: [029 — Revisión del paso 2](reports/029-revision-paso-2/reporte.md). Contrasta la investigación 028 con el alcance de cadena/NA: recomienda completar varios impactos por paso conservando independencia por arma y resolver Guard en 3. [Guía del editor](reports/029-revision-paso-2/editor.md). Sin cambios de código o assets; no cierra etapas. La referencia y evidencia siguen en [028](reports/028-contraste-fgoa/analisis.md).
+Corrección vigente de presentación: [034 — Montages independientes de Guard y Hit](reports/034-montage-guardia/reporte.md). Agrega GuardReactionMontage separado de HitReactionMontage y rechaza referencias iguales; conserva el resto del paso 3. [Configuración y comprobación](reports/034-montage-guardia/editor.md).
 
-Última iteración de gameplay: [030 — Reinicio opcional de impactos por arma](reports/030-reinicio-impactos/reporte.md). Agrega AN_ResetWeaponHits con índices del array Weapons del DA, mantiene un AttackTrace por sección y registros independientes. Sin AN conserva el comportamiento anterior. Compilado y aplicado por Live Coding; clase, defaults y conservación del DA verificados por MCP. Colocación opcional y observación de impactos en la [guía](reports/030-reinicio-impactos/editor.md). No cierra la etapa 2. La configuración y restauración de DA de la iteración anterior permanecen en [027](reports/027-delay-por-golpe/reporte.md).
+Última iteración de implementación y documentación: [033 — Resultados de daño y defensa](reports/033-resultados-combate/reporte.md). Agrega Guard/Hit, memoria defensiva, residual, carga/ruptura/stun y crítico; conserva cadena, NA y armas independientes. Build completo y parche final aplicados, DA preservado/configurado y arranque PIE verificados. Intercambios reales y poses/transiciones pendientes en la [guía](reports/033-resultados-combate/editor.md); 3 permanece abierta. El cierre de 2 y las decisiones previas siguen en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md).
+
+Comprobación previa de scripts: [032 — Build y arranque del editor](reports/032-comprobacion-build-editor/reporte.md). Conserva la primera validación del ciclo autorizado; el cierre/reinicio y la verificación de los cambios actuales están en 033. [Guía 032](reports/032-comprobacion-build-editor/editor.md).
+
+Base de impactos conservada: [030 — Reinicio opcional de impactos por arma](reports/030-reinicio-impactos/reporte.md). Agrega AN_ResetWeaponHits con índices del array Weapons del DA, mantiene un AttackTrace por sección y registros independientes. Colocación opcional en la [guía](reports/030-reinicio-impactos/editor.md). Las capturas de configuración previas permanecen en 027/030; la captura vigente antes y después del cambio estructural está en 033.
 
 La [026 — Diagnósticos y cancelación controlada del paso 2](reports/026-diagnosticos-paso-2/reporte.md) reemplaza asserts/casteos fatales del código propio por validaciones explícitas y diagnósticos en LogVampsCombat. Incluye armas, movimiento, resolver y conexiones de inicio/input/IA/HUD/reset. Compilado y aplicado por Live Coding; arranque y limpieza de armas en PIE verificados sin errores nuevos. Pasos de observación en la [guía](reports/026-diagnosticos-paso-2/editor.md).
 
@@ -86,3 +90,7 @@ La [024 — Continuación al cerrar la ventana de combo](reports/024-cierre-vent
 | 028 — Contraste FGOA y Vamps | [Reporte](reports/028-contraste-fgoa/reporte.md) | [Guía](reports/028-contraste-fgoa/editor.md) |
 | 029 — Revisión del paso 2 | [Reporte](reports/029-revision-paso-2/reporte.md) | [Guía](reports/029-revision-paso-2/editor.md) |
 | 030 — Reinicio opcional de impactos por arma | [Reporte](reports/030-reinicio-impactos/reporte.md) | [Guía](reports/030-reinicio-impactos/editor.md) |
+| 031 — Cierre del paso 2 y reglas del paso 3 | [Reporte](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) | [Guía](reports/031-cierre-paso-2-y-reglas-paso-3/editor.md) |
+| 032 — Comprobación de build y arranque | [Reporte](reports/032-comprobacion-build-editor/reporte.md) | [Guía](reports/032-comprobacion-build-editor/editor.md) |
+| 033 — Resultados de daño y defensa | [Reporte](reports/033-resultados-combate/reporte.md) | [Guía](reports/033-resultados-combate/editor.md) |
+| 034 — Montages independientes de Guard y Hit | [Reporte](reports/034-montage-guardia/reporte.md) | [Guía](reports/034-montage-guardia/editor.md) |

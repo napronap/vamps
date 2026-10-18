@@ -1,48 +1,42 @@
 # Implementación del combate de referencia
 
-Reglas: [functional.md](functional.md). Punto de partida comprobado en fuentes: [prototipo](../prototype/technical.md). Este documento define los cambios de arquitectura necesarios para implementar la base.
+Reglas: [functional.md](functional.md). La implementación de cadena/NA y los resultados del paso 3 usan clases propias sobre Unreal/GAS. [033](../reports/033-resultados-combate/reporte.md) distingue código, configuración, compilación y observaciones pendientes.
 
 ## Responsabilidades
 
-| Pieza existente | Cambio necesario |
+| Pieza | Responsabilidad |
 |---|---|
-| `AVampsCharacter` | Conservar GAS y recepción de contactos; distinguir cadena/fase, disponibilidad, resultado defendido/abierto y reacción |
-| `UGA_Attack` / `UGA_Guard` | Reemplazar montage único y guardia mantenida mutuamente excluyentes por acciones y defensa contextual conforme al funcional |
-| `UFistHitboxComponent` / `UANS_AttackTrace` | Conservar detección espacial y ventanas; identificar acción/evento de impacto y comunicar contacto habilitante |
-| `UVampsAttributeSet` / `UGE_VampsDamage` | Conservar atributos y aplicación de daño; incorporar guardia, residual y crítico cuando se elijan sus reglas |
-| `UVampsAnimInstance` | Presentar locomoción y resultados de combate sin convertirse en autoridad de disponibilidad |
+| `AVampsCharacter` / `FVampsCombatState` | Fase ofensiva y NA, reacción separada, memoria defensiva, solicitud con vencimiento y permisos derivados. Tick autoritativo finaliza reacción y recupera guardia. |
+| `UGA_Attack` | Un montage por cadena y secciones ordenadas. El cierre normal conserva NA; CancelCombatOffense invalida la reproducción antes de cancelar la habilidad para que su callback no programe NA. |
+| `AVampsWeapon` / `UANS_AttackTrace` / `UAN_ResetWeaponHits` | Un ANS por sección, trazas y víctimas independientes por arma, con reinicios opcionales. Interrumpir desactiva trazas; un reinicio no cambia identidad ofensiva. |
+| `UVampsCombatResolver` / `FVampsPendingContact` | Captura datos del contacto, clasifica el lote antes de consecuencias, registra contacto habilitante y aplica daño/reacción antes de continuación y locomoción. |
+| `UVampsCombatSettings` / `FVampsCombatStepSettings` | Duración total por paso y parámetros de crítico, bloqueo, acumulación, recuperación, stun y vigencia de solicitud. HasValidReactionSettings diagnostica configuración inválida sin cerrar el editor. |
+| `UVampsAttributeSet` / `UGE_VampsDamage` | Health/MaxHealth y GuardLoad/MaxGuardLoad replicados. Daño instantáneo vía GameplayEffect; acumulación/recuperación por el ASC. |
+| `UVampsCombatMovementComponent` | Movimiento impuesto y root motion con colisión; elimina root motion de reacción y orienta hacia la fuente del desplazamiento. |
+| `UVampsAnimInstance` / `AVampsCombatTestHUD` | Exponen reacción efectiva, duración, permisos, guardia, daño y crítico sin decidir disponibilidad. |
 
-La [entrada compartida y selección](../player/technical.md) entrega solicitudes al núcleo; la IA utiliza las mismas reglas. Ningún controlador aplica daño ni decide por su cuenta si hubo bloqueo.
+Jugador e IA usan RequestCombatAction y AddMovementInput del personaje. No se añadió otra ruta de input, daño o validación ni infraestructura de red, cartas o extensiones posteriores.
 
-## Entrada, acción y disponibilidad
+## Reacción, permisos y animación
 
-Se comprueba por separado inicio de acción, ventana de continuación y posibilidad defensiva. El estado necesario distingue paso, fase, contacto habilitante, continuación aceptada, recuperación, NA, reacción y stun. La continuación aceptada corresponde al paso actual; no requiere una cola general de inputs futuros.
+Reaction y ReactionEndsAt son el único plazo de la reacción; bOffenseRestricted deriva de ese estado. Guard/Hit detienen locomoción voluntaria y ataque. Stun y NA tienen sus restricciones funcionales. La solicitud defensiva usa su propio vencimiento porque representa intención, no tiempo de bloqueo.
 
-Disponibilidad de entrada, comienzo efectivo de acción y presentación son responsabilidades distintas. La recuperación tras bloqueo no impone un candado global al botón ni un timer adicional universal. Los tags actuales que excluyen toda guardia durante Attack deben cambiar: la defensa válida cubre toda la acción, no solo el tramo previo a encender las trazas.
+CancelCombatOffense cierra trazas, reproducción y continuación sin borrar la cola de contactos. Si existía NA, conserva su plazo; recibir un golpe no la crea ni la cancela. Reset incrementa CombatGeneration, limpia cola, habilidades, montages, movimiento, memoria y guardia. La recepción letal detiene la ofensiva y movimiento, sin implementar respawn.
 
-El tiempo de la acción determina sus ventanas; los contactos espaciales determinan qué receptor fue alcanzado. Se elegirá la combinación concreta de notifies, tiempo/montage y resolución autoritativa junto con el arbitraje de simultaneidad. No se adopta reloj común, prioridad por ID ni desempate por stats sin esa decisión.
+HitReactionMontage y GuardReactionMontage son referencias independientes en la categoría Reaction del DA. Hit elige el primero y Guard el segundo; no pueden apuntar al mismo asset. Su asignación es opcional y ninguno se usa como sustituto del otro. Cuando están asignados se reproducen desde el personaje, con velocidad ajustada a la duración configurada y compensación de RateScale. Se validan animación, longitud, velocidad constante positiva, Auto Blend Out y separación de AttackMontage. Sustituir reacción detiene su reproducción anterior; su root motion no añade desplazamiento. [Corrección y configuración 034](../reports/034-montage-guardia/reporte.md).
 
-## Contacto y resolución
+AnimInstance publica bIsGuarding, bIsHitReacting, bIsStunned y CombatReactionRemaining. bIsGuarding ya no equivale a bCanDefend. El HUD de observación muestra el estado incluso sin clips de reacción autorados. Las poses y transiciones visuales del AnimBP que carezcan de MCP directo quedan como pasos manuales en la guía 033.
 
-El detector entrega agresor, receptor, acción y evento de impacto. La selección dirige movimiento/cámara; no filtra todos los contactos válidos. Al incorporar equipos, la elegibilidad distingue enemigos de aliados.
+## Contexto y resolución del contacto
 
-La deduplicación cubre un evento de impacto, permitiendo impactos posteriores definidos para la misma acción. El resultado comunica contacto habilitante, daño defendido/abierto y consecuencias de reacción. La guardia efectiva informa además el agresor para retarget; un acierto ofensivo a otro rival no emite ese cambio de selección.
+La cola captura emisor, receptor, ActionNumber, generaciones, tiempo, daño normal/crítico elegido, reducción del defensor, carga de guardia y settings completos del paso, además de origen/dirección. El crítico se decide con autoridad una vez por contacto deduplicado, no por muestra del barrido. La recepción no vuelve a leer daño de una acción posterior.
 
-`ReceiveHit` debe dejar de cancelar por defecto la habilidad completa del agresor al bloquear. El contacto defendido habilita continuación para el atacante. El defensor conserva contexto de cadena y solicitudes disponibles; no programa NA por bloquear. Fallo, cierre voluntario y fin del tercer paso conducen al cierre y recuperación descritos en el funcional.
+La memoria defensiva usa emisor, ActionNumber y generación. ActionNumber cambia por paso: otro paso requiere nueva admisión; armas y reinicios del mismo paso conservan identidad. La memoria se limpia con la salida de Guard, daño abierto, stun o reset. La [política funcional del lote](functional.md#guardia-daño-y-reacción) define orden, una admisión nueva por pulsación y prioridades de reacción; no usa el valor del ID para elegir ganador.
 
-No se representan mano, cartas listas/usadas, draw, Q/A/B, Extra Attack ni hooks para incorporarlos después.
+Los contactos capturados sobreviven a una interrupción ordinaria y pueden producir intercambio letal del mismo frame. Reset invalida generaciones; destrucción y receptor ya eliminado impiden aplicación. El registro habilitante se realiza antes de materializar interrupciones y solo corresponde al paso capturado. Una única reacción/desplazamiento por receptor evita sumar empujes por orden accidental de barridos.
 
-## Acciones, desplazamiento y animación
+## Datos y configuración
 
-Cada paso necesita tiempos/ventanas, contactos permitidos, máximo de avance y recuperación. El avance respeta acción y geometría y puede quedar corto. No se introduce rechazo general por distancia inicial para evitar el caso de fallo observado.
+ContactReactionDuration sustituye a AdditionalOffensiveRestrictionDuration. Es duración total, sin cálculo por longitud de sección ni mínimo del clip. No se conserva la propiedad retirada ni se agrega compatibilidad. La configuración anterior se captura antes de cambiar el struct y se restaura por MCP tras el arranque limpio, incorporando explícitamente los valores nuevos; [captura y comparación 033](../reports/033-resultados-combate/reporte.md).
 
-Se elegirá un mecanismo de movimiento con las animaciones disponibles. Root motion escalado, motion warping y desplazamiento dirigido son opciones de diseño, no mecanismos demostrados por los videos ni fallbacks para mantener simultáneamente. Fin de paso, continuación y cierre por evasión deben usar la misma frontera temporal.
-
-Los stats se agregan cuando tengan una fórmula y un uso. Health conserva su responsabilidad; guardia necesita consumo/regeneración y transición a break/stun; crítico necesita probabilidad, bonificación e interacción con daño defendido. La pose y el HUD presentan el resultado resuelto, sin deducirlo visualmente ni duplicar autoridad.
-
-## Preguntas de implementación
-
-1. ¿Cómo se representan y sincronizan fase, contactos y fronteras de paso para resolver la [vigencia defensiva y simultaneidad](functional.md#preguntas)?
-2. ¿Qué mecanismo de avance se adapta a los clips elegidos y limita el desplazamiento por acción y colisión?
-
-El [roadmap](../roadmap.md) ordena la implementación y sus comprobaciones. Las extensiones propias no justifican infraestructura anticipada.
+AttackDamage sigue en el personaje. CriticalDamage, CriticalChancePercent y los parámetros de guardia están en el DA; crítico y daño normal usan la misma resta plana del defensor. GuardLoadPerHit pertenece al atacante; capacidad, recuperación y StunDuration al defensor. No se suman stats sin función ni fórmulas de escalado. Los valores iniciales elegidos y los límites de verificación se conservan en el reporte.

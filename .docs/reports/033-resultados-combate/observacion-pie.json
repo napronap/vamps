@@ -1,0 +1,145 @@
+{
+  "scope": "Startup only; no combat input simulated.",
+  "fighters": [
+    {
+      "actor": "playerPIE033",
+      "combatState": {
+        "phase": "Idle",
+        "bIsAlive": true,
+        "bCanRequestCombat": true,
+        "bCanStartAction": true,
+        "bCanDealDamage": false,
+        "bCanDefend": false,
+        "bIsRecovering": false,
+        "comboStep": 0,
+        "bComboWindowOpen": false,
+        "bContinuationRequested": false,
+        "bRecoveryVisualReleased": false,
+        "bOffenseRestricted": false,
+        "reactionEndsAt": 0,
+        "reaction": "None",
+        "bCanMove": true,
+        "bDefenseRequestArmed": false,
+        "defenseRequestEndsAt": 0,
+        "defendedAttacker": "None",
+        "defendedActionNumber": -1,
+        "reactionSource": "None",
+        "bLastIncomingCritical": false,
+        "lastDamageReceived": 0,
+        "nARecoveryEndsAt": 0,
+        "montageInstanceId": -1,
+        "lastRequest": "None",
+        "lastOutgoingContact": "None",
+        "lastIncomingContact": "None",
+        "requestCount": 0,
+        "actionNumber": 0,
+        "bActionConnected": false,
+        "lastOutgoingContactFrame": 0,
+        "lastIncomingContactFrame": 0
+      },
+      "attributes": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0.Attributes"
+      },
+      "combatSettings": {
+        "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+      },
+      "weapons": [
+        {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsGreatSword_C_0"
+        }
+      ],
+      "attackDamage": 12,
+      "mesh": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0.CharacterMesh0"
+      },
+      "attributesValues": {
+        "health": {
+          "baseValue": 100,
+          "currentValue": 100
+        },
+        "maxHealth": {
+          "baseValue": 100,
+          "currentValue": 100
+        },
+        "guardLoad": {
+          "baseValue": 0,
+          "currentValue": 0
+        },
+        "maxGuardLoad": {
+          "baseValue": 100,
+          "currentValue": 100
+        }
+      }
+    },
+    {
+      "actor": "opponentPIE033",
+      "combatState": {
+        "phase": "Idle",
+        "bIsAlive": true,
+        "bCanRequestCombat": true,
+        "bCanStartAction": true,
+        "bCanDealDamage": false,
+        "bCanDefend": false,
+        "bIsRecovering": false,
+        "comboStep": 0,
+        "bComboWindowOpen": false,
+        "bContinuationRequested": false,
+        "bRecoveryVisualReleased": false,
+        "bOffenseRestricted": false,
+        "reactionEndsAt": 0,
+        "reaction": "None",
+        "bCanMove": true,
+        "bDefenseRequestArmed": false,
+        "defenseRequestEndsAt": 0,
+        "defendedAttacker": "None",
+        "defendedActionNumber": -1,
+        "reactionSource": "None",
+        "bLastIncomingCritical": false,
+        "lastDamageReceived": 0,
+        "nARecoveryEndsAt": 0,
+        "montageInstanceId": -1,
+        "lastRequest": "None",
+        "lastOutgoingContact": "None",
+        "lastIncomingContact": "None",
+        "requestCount": 0,
+        "actionNumber": 0,
+        "bActionConnected": false,
+        "lastOutgoingContactFrame": 0,
+        "lastIncomingContactFrame": 0
+      },
+      "attributes": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0.Attributes"
+      },
+      "combatSettings": {
+        "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+      },
+      "weapons": [
+        {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsGreatSword_C_1"
+        }
+      ],
+      "attackDamage": 12,
+      "mesh": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0.CharacterMesh0"
+      },
+      "attributesValues": {
+        "health": {
+          "baseValue": 100,
+          "currentValue": 100
+        },
+        "maxHealth": {
+          "baseValue": 100,
+          "currentValue": 100
+        },
+        "guardLoad": {
+          "baseValue": 0,
+          "currentValue": 0
+        },
+        "maxGuardLoad": {
+          "baseValue": 100,
+          "currentValue": 100
+        }
+      }
+    }
+  ]
+}

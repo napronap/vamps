@@ -1,0 +1,17 @@
+{
+  "LauncherExitCode": 0,
+  "StartedAt": "2026-10-18T14:15:03.5058469+09:00",
+  "Readiness": "VerifiedByMCPAndLog",
+  "ReadinessDeadline": "2026-10-18T14:20:03.5058469+09:00",
+  "LauncherExited": true,
+  "EditorProcesses": [
+    {
+      "ProcessId": 64744,
+      "CommandLine": "\"C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Binaries\\Win64\\UnrealEditor.exe\"  \"C:\\dev\\vamps\\vamps.uproject\" "
+    }
+  ],
+  "EngineInitializationSeconds": 13.96,
+  "ReadinessVerifiedAt": "2026-10-18T14:15:30+09:00",
+  "FinalPIERunning": false,
+  "EvidenceCapturedAt": "2026-10-18T14:19:11.9811047+09:00"
+}

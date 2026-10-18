@@ -23,4 +23,13 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	bool bIsGuarding = false;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Animation")
+	bool bIsHitReacting = false;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Animation")
+	bool bIsStunned = false;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Animation")
+	float CombatReactionRemaining = 0.f;
 };

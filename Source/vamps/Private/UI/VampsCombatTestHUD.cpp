@@ -31,10 +31,10 @@ void AVampsCombatTestHUD::DrawFighter(
 	const float Health = Fighter->Attributes->GetHealth();
 	const float MaxHealth = Fighter->Attributes->GetMaxHealth();
 	const FVampsCombatState& FighterState = Fighter->CombatState;
-	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), X, Y, Width, 288);
+	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), X, Y, Width, 380);
 	if (bSelected)
 	{
-		DrawRect(FLinearColor(1.f, 0.75f, 0.15f), X, Y, 4, 288);
+		DrawRect(FLinearColor(1.f, 0.75f, 0.15f), X, Y, 4, 380);
 	}
 	DrawText(FString::Printf(TEXT("%s   %.0f / %.0f"), *Label, Health, MaxHealth), FLinearColor::White, X + 12, Y + 9);
 	DrawRect(FLinearColor(0.15f, 0.15f, 0.18f), X + 12, Y + 32, Width - 24, 10);
@@ -84,8 +84,8 @@ void AVampsCombatTestHUD::DrawFighter(
 	    X + 12,
 	    Y + 206);
 	const double Now = GetWorld()->GetTimeSeconds();
-	DrawText(FString::Printf(TEXT("OFFENSE LOCK: %.2f | NA: %.2f"),
-	                         FMath::Max(0.0, FighterState.OffensiveRestrictionEndsAt - Now),
+	DrawText(FString::Printf(TEXT("REACTION TIME: %.2f | NA: %.2f"),
+	                         FMath::Max(0.0, FighterState.ReactionEndsAt - Now),
 	                         FMath::Max(0.0, FighterState.NARecoveryEndsAt - Now)),
 	         FLinearColor::White,
 	         X + 12,
@@ -99,6 +99,37 @@ void AVampsCombatTestHUD::DrawFighter(
 	         FLinearColor::White,
 	         X + 12,
 	         Y + 250);
+	const FString ReactionName = StaticEnum<EVampsCombatReaction>()->GetNameStringByValue(int64(FighterState.Reaction));
+	DrawText(FString::Printf(
+	             TEXT("REACTION: %s | MOVE: %s"), *ReactionName, FighterState.bCanMove ? TEXT("YES") : TEXT("NO")),
+	         FLinearColor::White,
+	         X + 12,
+	         Y + 272);
+	DrawText(FString::Printf(TEXT("GUARD LOAD: %.0f / %.0f"),
+	                         Fighter->Attributes->GetGuardLoad(),
+	                         Fighter->Attributes->GetMaxGuardLoad()),
+	         FLinearColor::White,
+	         X + 12,
+	         Y + 294);
+	DrawRect(FLinearColor(0.15f, 0.15f, 0.18f), X + 12, Y + 316, Width - 24, 8);
+	DrawRect(FighterState.Reaction == EVampsCombatReaction::Stun ? FLinearColor::Red : FLinearColor(0.3f, 0.6f, 1.f),
+	         X + 12,
+	         Y + 316,
+	         (Width - 24) *
+	             FMath::Clamp(Fighter->Attributes->GetGuardLoad() / Fighter->Attributes->GetMaxGuardLoad(), 0.f, 1.f),
+	         8);
+	DrawText(FString::Printf(TEXT("DAMAGE: %.1f | CRITICAL: %s"),
+	                         FighterState.LastDamageReceived,
+	                         FighterState.bLastIncomingCritical ? TEXT("YES") : TEXT("NO")),
+	         FighterState.bLastIncomingCritical ? FLinearColor::Yellow : FLinearColor::White,
+	         X + 12,
+	         Y + 332);
+	DrawText(FString::Printf(TEXT("DEFENSE: %s #%d"),
+	                         *GetNameSafe(FighterState.DefendedAttacker.Get()),
+	                         FighterState.DefendedActionNumber),
+	         FLinearColor::White,
+	         X + 12,
+	         Y + 354);
 }
 
 void AVampsCombatTestHUD::DrawHUD()
@@ -132,7 +163,7 @@ void AVampsCombatTestHUD::DrawHUD()
 			            TargetY,
 			            Width,
 			            Fighter == PlayerCharacter->LockOn->GetCurrentTarget());
-			TargetY += 308;
+			TargetY += 400;
 		}
 	}
 	const AVampsCombatTestGameMode* TestGameMode = Cast<AVampsCombatTestGameMode>(GetWorld()->GetAuthGameMode());

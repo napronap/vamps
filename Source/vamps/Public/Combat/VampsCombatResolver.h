@@ -11,11 +11,18 @@ struct FVampsPendingContact
 	TWeakObjectPtr<AVampsCharacter> Attacker;
 	TWeakObjectPtr<AVampsCharacter> Recipient;
 	int32 ActionNumber = 0;
-	float OffensiveRestrictionDuration = 0.f;
+	uint32 AttackerGeneration = 0;
+	uint32 RecipientGeneration = 0;
+	double ContactTime = 0;
+	float ContactDamage = 0.f;
+	float BlockReduction = 0.f;
+	float GuardLoad = 0.f;
 	FVector AttackOrigin = FVector::ZeroVector;
 	FVector AttackDirection = FVector::ForwardVector;
 	FVampsCombatStepSettings StepSettings;
 	bool bBlocked = false;
+	bool bCritical = false;
+	bool bGuardBreak = false;
 };
 
 UCLASS()

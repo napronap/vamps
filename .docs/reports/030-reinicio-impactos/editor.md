@@ -1,5 +1,7 @@
 # Editor — Reinicio opcional de impactos
 
+La etapa 2 ya fue cerrada por el usuario en [031](../031-cierre-paso-2-y-reglas-paso-3/reporte.md). Los estados siguientes conservan lo comprobado durante 030; la configuración opcional de otros montages no bloquea ese cierre.
+
 **Para las animaciones de un solo impacto no hay que cambiar nada.** Solo las secciones que deban volver a habilitar impactos de un arma necesitan el nuevo AN. La compilación y el registro de clase quedaron verificados por MCP; la colocación de notifies en el montage queda al usuario porque no hay una herramienta MCP directa dedicada a esa edición.
 
 ## 1. Compilación y disponibilidad

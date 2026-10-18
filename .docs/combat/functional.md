@@ -6,6 +6,10 @@ Este núcleo reproduce el intercambio de FGO Arcade con las [adaptaciones de alc
 
 Cada pulsación individual de RMB solicita ataque/defensa según la situación. Mantenerlo no repite solicitudes ni concede guardia permanente. Una solicitud ofensiva aceptada inicia la animación antes del contacto ofensivo. Cada acción tiene preparación, contactos/impactos, ventana de continuación y recuperación; comienzo ofensivo, duración y desplazamiento dependen de la acción del personaje.
 
+Una pulsación defensiva válida puede iniciar una interacción de guardia. Después de bloquear, los siguientes impactos de la misma instancia ofensiva se defienden sin exigir una pulsación por impacto, mientras siga vigente esa interacción y el receptor pueda defender. Esto no equivale a bloquear automáticamente nuevas instancias ni a mantener guardia sosteniendo RMB.
+
+La pulsación defensiva vence tras el tiempo configurado del personaje si no se usa. Cada paso de la cadena es una instancia nueva para defensa; los subimpactos y armas de ese paso comparten la identidad. La interacción recordada termina al vencer Guard, recibir daño abierto, entrar en stun o reiniciar el combate. Recovery ofensiva y NA conservan sus restricciones: un click en Recovery no rearma defensa.
+
 La posibilidad defensiva se conserva durante toda la acción propia mientras el personaje puede defender, incluso después de comenzar sus contactos ofensivos. Requiere una solicitud defensiva válida y un contacto entrante. La pose o la reproducción de una animación no bastan para bloquear.
 
 Un golpe entrante puede resolver defensa aunque haya intención ofensiva o acción propia en curso. No gana necesariamente quien pulsó antes: importan momento de contacto, distancia y acción. Los contactos simultáneos requieren un criterio explícito, independiente del orden accidental de procesamiento.
@@ -24,27 +28,34 @@ La cadena termina tras el tercer paso, al fallar uno o voluntariamente al final 
 
 NA es la recuperación que impide atacar y defender después del cierre ofensivo. Permite locomoción y es distinta de reacción al daño, stun y muerte. No hay draw real ni cartas ocultas que simulen esa indisponibilidad.
 
-Bloquear no inicia NA, no deshabilita el botón compartido ni obliga a cerrar la cadena del defensor. Este conserva su contexto y puede seguir solicitando ataque o defensa. La salida ofensiva puede demorarse por recuperación y timings aunque la entrada esté habilitada. Si ya ejecutó una acción ofensiva, su progresión y cierre conservan sus reglas; el bloqueo no borra ese compromiso.
-
-Puede mostrarse un inicio de ataque que termine resuelto como defensa al llegar otro golpe. Esa presentación no garantiza salida ofensiva inmediata ni introduce una restricción de input. La continuación conserva su ventana y el rechazo de clicks tempranos. No se agrega un cooldown universal por bloqueo.
+Bloquear cancela la ofensiva propia en curso, incluida su continuación pendiente, y pasa al defensor a la reacción de guardia. Puede verse un comienzo de ataque que termina sustituido por Guard. La interrupción no inicia NA ni conserva una continuación ofensiva para ejecutarla automáticamente después. Durante la reacción se siguen evaluando solicitudes defensivas, pero no se permite atacar.
 
 Perder HP tampoco crea automáticamente NA. No se calculan excepciones a partir de cartas preparadas, consumidas o recolección.
 
 ## Guardia, daño y reacción
 
-La guardia cubre 360°. Una guardia efectiva selecciona al agresor como nuevo target y la cámara sigue ese cambio; el defensor puede continuar su cadena contra él. Recibir daño abierto no impone esa selección. El ataque defendido puede mantener presión: no se cancela incondicionalmente toda la ofensiva del agresor.
+La guardia cubre 360°. Una guardia efectiva selecciona al agresor como nuevo target y la cámara sigue ese cambio. Recibir daño abierto no impone esa selección. El ataque defendido puede mantener presión: bloquear cancela la ofensiva del defensor, no la del agresor.
 
-El daño residual depende de stats y puede matar. Defender consume un recurso de guardia; al agotarse se produce guard break con stun y se impide seguir defendiendo. El HUD distingue recurso, bloqueo, reacción, stun y NA.
+Solo se recuerda la instancia ofensiva de la interacción defensiva actual. Si A está siendo defendido y llega B, bloquear a B requiere una nueva pulsación válida; esa guardia cambia el lock-on y reemplaza la interacción recordada con A. Los ataques de A no desaparecen: si vuelve a conectar un impacto de su multihit, se necesita otra pulsación válida para bloquearlo. Seleccionar un rival con F no constituye por sí solo una guardia.
 
-El daño abierto puede producir reacción y desplazamiento. Crítico pertenece a la resolución del ataque y tiene señal visible. Ni reacción ni stun se explican mediante cartas. Los contactos contra un enemigo que combate con otro aliado siguen las reglas normales; no hay sistema SUPPORT.
+El bloqueo y el daño abierto deshabilitan temporalmente movimiento voluntario y ataque. Ambos usan la misma duración configurada en el atacante para el paso que conecta, sin calcularla a partir de la longitud de su sección o de un mínimo de animación. El desplazamiento impuesto por el contacto sigue siendo posible y respeta colisión. Las solicitudes defensivas se evalúan durante la reacción cuando el receptor puede defender; stun y NA impiden defensa.
+
+Cada contacto aceptado instala de nuevo esa duración desde el contacto, reemplazando el plazo anterior. Los impactos de un mismo paso comparten la configuración. Las animaciones multihit se ajustan para que el intervalo entre sus contactos no supere esta duración; mientras conecten, mantienen la restricción y el último contacto fija su vencimiento final. Un impacto que falla no renueva el plazo ni el reposicionamiento garantiza los impactos siguientes.
+
+El daño residual puede matar. La barra de guardia acumula carga al bloquear; al llenarse se produce guard break con stun y se impide seguir defendiendo. Reacción ordinaria y stun son estados distintos. El HUD distingue acumulación de guardia, bloqueo, reacción, stun y NA.
+
+Cada contacto bloqueado agrega la carga configurada en el atacante, incluso los contactos independientes de dos armas. El contacto que llena la barra todavía aplica residual y provoca stun; los siguientes contactos se reciben abiertos. La capacidad, recuperación y duración de stun pertenecen al defensor. La barra disminuye a una tasa por segundo después del retraso desde el último bloqueo y solo fuera de reacción. Durante stun no se recupera; al terminar queda en cero. Recibir más golpes durante stun no renueva su duración, aunque aplica daño y desplazamiento.
+
+El daño normal y el daño crítico son cantidades planas configurables, sin fórmula de escalado por atributos. La probabilidad de crítico es un porcentaje configurado en el Data Asset del atacante. Se realiza una tirada autoritativa por contacto de arma contra receptor, después de deduplicarlo; cada arma o subimpacto legítimo puede tener su propio resultado. Crítico tiene señal visible. Si se bloquea, se usa la misma reducción que para daño normal: daño recibido = máximo entre cero y daño del contacto menos coeficiente de bloqueo del defensor, configurado en su DA. El coeficiente es una reducción plana; un crítico solo cambia el daño de entrada, sin reglas especiales de ruptura ni reacción. Ni reacción ni stun se explican mediante cartas. Los contactos contra un enemigo que combate con otro aliado siguen las reglas normales; no hay sistema SUPPORT.
+
+La interrupción de una ofensiva impide generar nuevos contactos, pero no descarta los contactos válidos ya capturados: estos terminan de resolverse una sola vez con el contexto original. No reabren ventanas, no reanudan la ofensiva interrumpida ni modifican una acción nueva como si fueran contactos de ella. Su tratamiento ante baja, destrucción o reinicio se distingue de la interrupción ordinaria.
+
+Los contactos del frame se clasifican antes de aplicar sus consecuencias. Una pulsación admite una sola instancia entrante nueva; si hay memoria defensiva, se prioriza una instancia distinta. Entre candidatas se usa el target actual, después el orden de rivales y, para un empate restante, el nombre estable del actor. Los impactos de otras instancias necesitan otra pulsación. La carga proyectada determina qué contacto rompe guardia y cuáles quedan abiertos en ese lote.
+
+Se aplica todo el daño válido del lote y se elige una sola reacción y desplazamiento por receptor: ruptura antes que daño abierto, y daño abierto antes que bloqueo; dentro de la misma prioridad se conserva el orden anterior. En ese lote simultáneo se usa el plazo del contacto que determina la reacción. Los contactos capturados por dos participantes vivos pueden intercambiarse aunque uno muera al procesar el lote. No se aplica daño adicional a un receptor ya eliminado. Destrucción o cambio de generación por reset invalida el contexto correspondiente.
 
 ## Acercamiento ofensivo
 
 El ataque intenta cerrar distancia hasta el límite propio de la acción. Puede comenzar contra un target lejano, quedar corto y ejecutar igualmente el golpe. Alcance de desplazamiento y alcance de contacto son distintos. No se garantiza acierto ni se teletransporta sin límite al target. La geometría conserva sus restricciones.
 
-## Preguntas
-
-1. ¿Cuánto dura una solicitud defensiva válida, cómo se renueva y cuándo se consume?
-2. ¿Cómo se consume y recupera guardia, y qué restricciones temporales producen reacción y guard break? ¿Qué protecciones o posibilidades de defensa existen entre impactos?
-3. ¿Cómo se calcula el daño residual y cuál es la regla de crítico, incluida su interacción con guardia? Las cantidades y tiempos se calibrarán después de elegir las reglas.
-4. Al diseñar la resolución, ¿qué criterio resuelve contactos simultáneos? El mecanismo interno de FGO no es un requisito.
+Los parámetros y el estado de comprobación del paso 3 se registran en [033](../reports/033-resultados-combate/reporte.md). La calibración se realiza sobre estas reglas, sin atribuir los valores iniciales a mediciones de FGOA.

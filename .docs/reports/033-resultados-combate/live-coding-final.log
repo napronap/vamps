@@ -1,0 +1,11 @@
+Result: Success
+
+Compile Output:
+Starting Live Coding compile.
+UbaCli v5.8.1-Uba_v1.0.0-56050371 (Rootdir: "C:\ProgramData\Epic\UbaCli", StoreCapacity: 0Gb)
+
+---- Starting trace: Debugeaba7397-b290-4f8c-b6c5-3a29a5a90a68 ----
+Running C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe @C:\Users\franc\AppData\Local\Temp\BD93.tmp
+   Creating library C:\dev\vamps\Binaries\Win64\UnrealEditor-vamps.patch_1.lib and object C:\dev\vamps\Binaries\Win64\UnrealEditor-vamps.patch_1.exp
+Detoured run took 888ms
+Live coding succeeded

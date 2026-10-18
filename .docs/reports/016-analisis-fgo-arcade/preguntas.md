@@ -20,7 +20,7 @@ Los tiempos aproximados aportados se localizaron en los archivos: Da Vinci prepa
 
 ### P02. Recurso de guardia y crítico
 
-Las preguntas vigentes sobre solicitud defensiva, consumo/recuperación, break, reacción, residual y crítico están en [combate](../../combat/functional.md#preguntas). Los valores se calibran después de elegir sus reglas.
+Las reglas vigentes de solicitud defensiva, acumulación/recuperación, break, reacción, residual y crítico están en [combate](../../combat/functional.md#guardia-daño-y-reacción). Las decisiones posteriores y la implementación se registran en [033](../033-resultados-combate/reporte.md); los valores se calibran por observación.
 
 ### P03. Partida y portador de recompensa
 
@@ -28,6 +28,6 @@ Las preguntas vigentes sobre equipos, final/empate, portador y respawn están en
 
 ### P04. Pérdida del target y arbitraje técnico
 
-La selección inicial/pérdida/ausencia de target se resuelve en [jugador](../../player/functional.md#preguntas). Fases/contactos y desempate se eligen al diseñar la [resolución de combate](../../combat/technical.md#preguntas-de-implementación), como indicó R03. Los parámetros de encuadre, fade y movilidad se calibran con el prototipo.
+La selección inicial/pérdida/ausencia de target se resuelve en [jugador](../../player/functional.md#preguntas). Las decisiones posteriores sobre fases/contactos y desempate están en la [resolución de combate](../../combat/technical.md#contexto-y-resolución-del-contacto); esta sección conserva el contexto de R03. Los parámetros de encuadre, fade y movilidad se calibran con el prototipo.
 
 Estas precisiones se resuelven por funcionalidad según el [roadmap](../../roadmap.md); no reabren la revisión de videos. SUPPORT quedó excluido. Las preguntas propias de parry, ultimate y personajes están en [extensiones](../../extensions/functional.md#preguntas-para-esta-etapa), sin bloquear la base.

@@ -1,0 +1,10 @@
+{
+  "CloseRequested": true,
+  "Exited": true,
+  "StartedAt": "2026-10-18T14:13:33.2765206+09:00",
+  "Forced": false,
+  "ProcessId": 58916,
+  "FinishedAt": "2026-10-18T14:13:36.2939613+09:00",
+  "DirtyAudit": "35 Vamps/open assets checked by MCP; no dirty assets. Global query encountered an invalid external asset.",
+  "CommandLine": "\"C:\\Program Files\\Epic Games\\UE_5.8\\Engine\\Binaries\\Win64\\UnrealEditor.exe\"  \"C:\\dev\\vamps\\vamps.uproject\" "
+}

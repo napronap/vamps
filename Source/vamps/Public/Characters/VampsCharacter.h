@@ -14,6 +14,7 @@ class UVampsLockOnComponent;
 class UVampsCombatSettings;
 struct FBranchingPointNotifyPayload;
 struct FOnAttributeChangeData;
+struct FVampsPendingContact;
 
 UCLASS(Abstract)
 class VAMPS_API AVampsCharacter : public ACharacter, public IAbilitySystemInterface
@@ -24,6 +25,7 @@ public:
 
 	AVampsCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
@@ -54,6 +56,8 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	FVampsCombatState CombatState;
 
+	uint32 CombatGeneration = 0;
+
 	bool BeginCombatAction(int32 PlaybackInstanceID);
 	void FinishCombatAction();
 	void SetCombatContacts(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
@@ -62,10 +66,11 @@ public:
 	void ResolveCombatContinuation();
 	void ResolveCombatLocomotion();
 	bool TryCalculateCombatSectionDuration(float& SectionDuration) const;
-	void ApplyOffensiveRestriction(float RestrictionDuration);
-	void ConsumeDefenseRequest();
+	bool MatchesDefendedContact(const FVampsPendingContact& Contact) const;
+	void RememberDefendedContact(const FVampsPendingContact& Contact);
 	void RegisterCombatContact(bool bBlocked);
-	void ReceiveCombatHit(AVampsCharacter* Attacker, bool bBlocked);
+	bool ReceiveCombatHit(const FVampsPendingContact& Contact);
+	void ApplyCombatReaction(const FVampsPendingContact& Contact);
 	void ResetCombatState();
 
 private:
@@ -73,8 +78,10 @@ private:
 	FGameplayAbilitySpecHandle AttackHandle;
 	FTimerHandle NARecoveryTimer;
 	FTimerHandle ActionRecoveryTimer;
-	FTimerHandle OffensiveRestrictionTimer;
 	double CombatStepEndsAt = 0;
+	double GuardRecoveryStartsAt = 0;
+	uint32 DefendedGeneration = 0;
+	int32 ReactionPlaybackInstanceID = INDEX_NONE;
 
 	bool InitializeCombatWeapons();
 	void DestroyCombatWeapons();
@@ -82,7 +89,9 @@ private:
 	bool IsCurrentCombatNotify(const FBranchingPointNotifyPayload& Payload) const;
 	void FinishNARecovery();
 	void BeginNARecovery();
-	void FinishOffensiveRestriction();
+	void CancelCombatOffense();
+	void FinishCombatReaction();
+	void ArmDefenseRequest();
 	void SetCombatPhase(EVampsActionPhase NewPhase);
 	void HandleCombatHealthChanged(const FOnAttributeChangeData& AttributeChange);
 };

@@ -53,7 +53,6 @@ private:
 	double CombatMotionStartedAt = 0;
 	float CombatMotionDuration = 0.f;
 	float PendingKnockbackDistance = 0.f;
-	int32 ReactionMontageInstanceID = INDEX_NONE;
 
 	void BeginCombatMotion(EVampsCombatMotion NewMotion, const FVector& Destination, float Duration);
 	void BeginCombatKnockback();

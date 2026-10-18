@@ -32,13 +32,8 @@ struct VAMPS_API FVampsCombatStepSettings
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (Units = "cm"))
 	float KnockbackDistance = 60.f;
 
-	UPROPERTY(EditDefaultsOnly,
-	          BlueprintReadOnly,
-	          Category = "Combat",
-	          meta = (ClampMin = "0.0",
-	                  Units = "s",
-	                  ToolTip = "Extra seconds added to the attack section duration after a blocked hit."))
-	float AdditionalOffensiveRestrictionDuration = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0.001", Units = "s"))
+	float ContactReactionDuration = 0.5f;
 };
 
 UCLASS(BlueprintType)
@@ -60,6 +55,38 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	TArray<FVampsCombatStepSettings> ComboSteps = {{100.f, 60.f}, {100.f, 60.f}, {100.f, 180.f}};
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Reaction")
 	TObjectPtr<UAnimMontage> HitReactionMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Reaction")
+	TObjectPtr<UAnimMontage> GuardReactionMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage", meta = (ClampMin = "0"))
+	float CriticalDamage = 24.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage", meta = (ClampMin = "0", ClampMax = "100"))
+	float CriticalChancePercent = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guard", meta = (ClampMin = "0"))
+	float BlockDamageReduction = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guard", meta = (ClampMin = "0.001"))
+	float GuardCapacity = 100.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guard", meta = (ClampMin = "0"))
+	float GuardLoadPerHit = 25.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guard", meta = (ClampMin = "0", Units = "s"))
+	float GuardRecoveryDelay = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guard", meta = (ClampMin = "0"))
+	float GuardRecoveryPerSecond = 20.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guard", meta = (ClampMin = "0.001", Units = "s"))
+	float StunDuration = 2.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Guard", meta = (ClampMin = "0.001", Units = "s"))
+	float DefenseRequestDuration = 0.5f;
+
+	bool HasValidReactionSettings() const;
 };

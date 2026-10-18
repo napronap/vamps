@@ -14,7 +14,8 @@
 static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 {
 	const UVampsCombatSettings* Settings = Fighter.CombatSettings;
-	if (!Settings || !FMath::IsFinite(Settings->NARecoveryDuration) || !(Settings->NARecoveryDuration > 0.f))
+	if (!Settings || !Settings->HasValidReactionSettings() || !FMath::IsFinite(Settings->NARecoveryDuration) ||
+	    !(Settings->NARecoveryDuration > 0.f))
 	{
 		return TEXT("CombatSettings must define a positive NA recovery duration.");
 	}
@@ -69,13 +70,11 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 		                                               SectionStart,
 		                                               SectionEnd);
 		const FVampsCombatStepSettings& StepSettings = Settings->ComboSteps[SectionIndex];
-		if (!FMath::IsFinite(StepSettings.AdditionalOffensiveRestrictionDuration) ||
-		    StepSettings.AdditionalOffensiveRestrictionDuration < 0.f)
+		if (!FMath::IsFinite(StepSettings.ContactReactionDuration) || StepSettings.ContactReactionDuration <= 0.f)
 		{
-			return FString::Printf(
-			    TEXT("%s: AdditionalOffensiveRestrictionDuration must be finite and nonnegative; got %f seconds."),
-			    *SectionContext,
-			    StepSettings.AdditionalOffensiveRestrictionDuration);
+			return FString::Printf(TEXT("%s: ContactReactionDuration must be finite and positive; got %f seconds."),
+			                       *SectionContext,
+			                       StepSettings.ContactReactionDuration);
 		}
 		if (!FMath::IsFinite(StepSettings.TargetAlignmentDistance) ||
 		    !FMath::IsFinite(StepSettings.KnockbackDistance) ||

@@ -8,8 +8,8 @@ Las reglas viven en [combate](combat/functional.md), [jugador](player/functional
 
 | Área | Disponible | Brecha hacia la referencia |
 |---|---|---|
-| Personaje y GAS | Clases propias, atributos de vida, montage y trazas del puño; fases de una acción delimitadas por un único ANS | No hay cadena ni NA |
-| Ataque y defensa | RMB compartido, defensa consumible hasta AttackEnd, resolución por frame y retarget al bloquear; cierre de 1 confirmado por el usuario | Incorporar cadena en 2 y resultados de guardia/daño en 3; el bloqueo actual evita todo daño |
+| Personaje y GAS | Clases propias, vida/guardia, cadena de hasta tres secciones, ventanas, NA, armas independientes y reacciones del paso 3 | Cierre manual de intercambios y presentación de 3 |
+| Ataque y defensa | RMB compartido, memoria defensiva por paso, Guard que cancela ofensiva propia, residual, acumulación/ruptura/stun y crítico; implementación compilada en 033 | Observar contactos/reacciones reales y calibrar parámetros; solo arranque y configuración verificados por MCP |
 | Lock-on y HUD | Componente compartido, F según lista, selección inicial, reemplazo al perder elegibilidad y retarget por bloqueo; debug de fases y resultados | Incorporar equipos y respawn cuando existan |
 | Cámara | Manager local, seguimiento automático suave, tolerancia lateral y retorno detrás del jugador sin target ([019](reports/019-camara-lockon/reporte.md)); observación visual aprobada al cerrar 0 | Pitch fijo, sin variación de distancia por acción ni fade |
 | Escenario e IA | Mapa local, rival con modos de observación y solicitud compartida, F6/R y HUD de debug | R no representa muerte ni respawn |
@@ -21,14 +21,16 @@ Las reglas viven en [combate](combat/functional.md), [jugador](player/functional
 
 Este archivo lleva el estado del plan; los reportes conservan la evidencia y quién confirmó cada cierre. Al completar una etapa se actualizan aquí su estado, fecha y referencia al reporte. No se mantiene otro archivo con una copia del avance.
 
-**Estado al 16 de octubre de 2026:** etapas 0 y 1 completadas por confirmación del usuario. La etapa 1 usa un único ANS: defensa desde el inicio hasta AttackEnd, contactos entre AttackStart y AttackEnd y recuperación hasta MontageEnd. RMB espera al final del montage; Recovery permite locomoción y no es NA. Próxima etapa: 2, cadena y NA. [Cierre 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1).
+**Estado al 18 de octubre de 2026:** etapas 0, 1 y 2 completadas por confirmación del usuario. Cadena por secciones, continuación, NA y reinicios opcionales de impactos constituyen la base cerrada de 2. Próxima etapa: 3, resultados de daño y defensa, con las reglas actualizadas de reacción, memoria defensiva y acumulación de guardia. [Cierre y decisiones 031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md).
+
+**Implementación de 3:** código compilado, DA preservado/configurado y arranque PIE verificados en [033](reports/033-resultados-combate/reporte.md). La etapa permanece abierta hasta observar intercambios y presentación según su [guía](reports/033-resultados-combate/editor.md); no se inicia 4 por la sola compilación.
 
 | Etapa | Estado | Entrega | Dependencia y salida |
 |---|---|---|---|
 | 0 | Completada | Consolidar el escenario actual | Cierre manual confirmado el 2026-10-15; [registro](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) |
 | 1 | Completada | Botón compartido y fases de una acción | Cierre confirmado por el usuario el 2026-10-16; [registro 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1) |
-| 2 | Pendiente | Cadena de hasta tres pasos y NA | Fronteras y contactos de 1; agregar ventanas y distinguir continuidad, fallo y NA |
-| 3 | Pendiente | Guardia, residual, reacción, stun y crítico | Decidir fórmulas y restricciones; resultados de combate completos y visibles |
+| 2 | Completada | Cadena de hasta tres pasos y NA | Cierre confirmado por el usuario el 2026-10-18; [registro 031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) |
+| 3 | Pendiente de cierre manual | Guardia, residual, reacción, stun y crítico | Implementación y configuración verificadas en [033](reports/033-resultados-combate/reporte.md); pendientes observación de intercambios, presentación y calibración |
 | 4 | Pendiente | Acercamiento, evasión y sprint | Fronteras de 2 y restricciones de 3; movilidad integrada sin acierto garantizado |
 | 5 | Pendiente | Cámara de acciones, oclusión y HUD de combate | Estados y movimiento de 1–4; presentación coherente con la referencia |
 | 6 | Pendiente | Equipos, baja, respawn, puntuación y portador | Decidir reglas de partida; ciclo local de partida completo |
@@ -59,19 +61,21 @@ Las [reglas acordadas](reports/021-solicitud-compartida/reporte.md#reglas-acorda
 
 ### 2. Cadena y recuperación NA
 
-Sobre las fases de 1, incorporar hasta tres pasos con ventana y contacto habilitante. Distinguir paso de cadena y evento de impacto: la deduplicación actual por ataque debe permitir los impactos definidos para una misma acción. Elegir los clips y sus tiempos sin introducir cartas.
+**Completada — usuario, 2026-10-18.** El usuario confirmó «Marca paso 2 como completado porque lo esta». El cierre se registra en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md), sin atribuir una nueva compilación, ejecución de PIE o edición de assets a Codex. La implementación y comprobaciones anteriores permanecen en 022–030.
 
-Implementar continuación por pulsación dentro de ventana; cierre por fallo, por no continuar y después del tercer paso; entrada a NA y salida de recuperación. La frontera de fin de paso será también la que use evasión en 4. La IA debe poder ejercer presión con estas mismas reglas, sin saltarse ventanas.
+Se incorporaron hasta tres pasos por secciones de un montage, ventana y contacto habilitante, cierre por fallo, por no continuar y después del tercer paso, y recuperación NA. Un ANS_AttackTrace por sección y AN_ResetWeaponHits opcionales permiten varios impactos con registros independientes por arma. La frontera de fin de paso será también la que use evasión en 4. La IA usa las mismas solicitudes y ventanas.
 
-**Cierre:** un click temprano se descarta; un contacto abierto, bloqueado o contra otro rival permite encadenar sin forzar retarget ofensivo. Un paso fallido corta aunque haya pulsaciones. NA impide atacar/defender y permite locomoción; bloquear por sí solo no inicia NA ni borra el contexto de cadena del defensor. La demora de salida ofensiva tras bloqueo se distingue de entrada deshabilitada.
+**Cierre aceptado:** un click temprano se descarta; un contacto abierto, bloqueado o contra otro rival permite encadenar sin forzar retarget ofensivo. Un paso fallido corta aunque haya pulsaciones. NA impide atacar/defender y permite locomoción. El paso 3 reemplaza la conservación de la ofensiva propia al bloquear por una reacción Guard que la cancela sin crear NA; esa revisión de comportamiento no reabre el cierre de 2.
 
 ### 3. Resultados de daño y defensa
 
-Resolver antes las [reglas de guardia, residual, reacción y crítico](combat/functional.md#preguntas): consumo/regeneración, restricciones entre impactos, break/stun, fórmula residual e interacción del crítico con guardia. Después calibrar cantidades y tiempos, sin tratarlos como valores deducidos del video.
+**Implementada y compilada; pendiente de cierre manual.** [033](reports/033-resultados-combate/reporte.md) registra código, decisiones menores, preservación del DA y límites de la observación. Las [reglas de combate](combat/functional.md#guardia-daño-y-reacción) definen Guard que cancela la ofensiva propia, reacción común de bloqueo/daño, memoria A→B→A, contactos capturados, carga/ruptura/stun y daño normal/crítico plano.
 
-Agregar los atributos y estados necesarios a la resolución existente de GAS. Incorporar residual letal, guard break, reacción/desplazamiento y crítico. Animación y HUD presentan el resultado resuelto; no generan otro estado de disponibilidad. Las solicitudes de IA respetan las mismas restricciones.
+La barra y las reacciones ya tienen atributos/estados y parámetros configurados. La identidad defensiva cambia por paso; el crítico se tira por contacto deduplicado; el coeficiente plano pertenece al DA del defensor. Las decisiones de simultaneidad están incorporadas en el funcional. Calibrar cantidades y tiempos mediante observación, sin tratarlos como valores deducidos del video.
 
-**Cierre:** distinguir daño abierto, daño defendido, guard break, reacción, stun y NA. Comprobar guardia 360°, residual que puede llevar HP a cero, gasto/recuperación de guardia y señal de crítico. Recibir daño no crea NA automáticamente; no se introduce un cooldown universal por bloquear. La baja y reaparición completas se integran en 6.
+El HUD presenta el resultado resuelto y AnimInstance expone las señales de reacción. No se eligieron clips ni se autoraron poses/transiciones nuevas. La IA usa los mismos permisos. El cierre requiere los intercambios y la presentación de la guía 033, no solamente los dos personajes en Idle observados en PIE.
+
+**Cierre:** distinguir daño abierto, daño defendido, guard break, reacción, stun y NA. Comprobar guardia 360°, residual que puede llevar HP a cero, acumulación/recuperación de guardia, memoria A→B→A y señal de crítico. Bloquear cancela la ofensiva propia; las reacciones vencen según el último contacto y no por la longitud del montage. Bloquear o recibir daño no crea NA automáticamente. La baja y reaparición completas se integran en 6.
 
 ### 4. Movimiento integrado al combate
 

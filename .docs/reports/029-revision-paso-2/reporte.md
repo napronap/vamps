@@ -1,5 +1,7 @@
 # 029 — Revisión del paso 2 frente al contraste FGOA
 
+El cierre posterior de 2 y las reglas elegidas para 3 se registran en [031](../031-cierre-paso-2-y-reglas-paso-3/reporte.md). Esta revisión conserva sus resultados históricos; las decisiones vigentes están incorporadas en las especificaciones de combate.
+
 La implementación elegida continúa en [030 — Reinicio opcional de impactos por arma](../030-reinicio-impactos/reporte.md): un solo AttackTrace y AN con índices explícitos del DA. Esta revisión conserva la comparación anterior; sus alternativas no son un estado pendiente de esa implementación.
 
 18 de octubre de 2026. Revisión de [028 — Contraste FGOA y Vamps](../028-contraste-fgoa/analisis.md) contra los fuentes actuales y los límites de las etapas 2–4 del [roadmap](../../roadmap.md). Se aplicó la skill [game-feature-docs](../../../.agents/skills/game-feature-docs/SKILL.md) para distinguir reglas vigentes, implementación y propuestas de la investigación.

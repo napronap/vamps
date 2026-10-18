@@ -3,6 +3,17 @@
 #include "CoreMinimal.h"
 #include "VampsCombatState.generated.h"
 
+class AVampsCharacter;
+
+UENUM(BlueprintType)
+enum class EVampsCombatReaction : uint8
+{
+	None,
+	Guard,
+	Hit,
+	Stun
+};
+
 UENUM(BlueprintType)
 enum class EVampsActionPhase : uint8
 {
@@ -31,6 +42,7 @@ enum class EVampsContactResult : uint8
 	Miss,
 	OpenHit,
 	Blocked,
+	GuardBreak,
 	Mixed
 };
 
@@ -76,7 +88,34 @@ struct VAMPS_API FVampsCombatState
 	bool bOffenseRestricted = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	double OffensiveRestrictionEndsAt = 0;
+	double ReactionEndsAt = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	EVampsCombatReaction Reaction = EVampsCombatReaction::None;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bCanMove = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bDefenseRequestArmed = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	double DefenseRequestEndsAt = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	TWeakObjectPtr<AVampsCharacter> DefendedAttacker;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	int32 DefendedActionNumber = INDEX_NONE;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	TWeakObjectPtr<AVampsCharacter> ReactionSource;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
+	bool bLastIncomingCritical = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
+	float LastDamageReceived = 0.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	double NARecoveryEndsAt = 0;

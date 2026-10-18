@@ -178,7 +178,8 @@ void AVampsAIController::Decide()
 		}
 		return;
 	case EVampsAIMode::Guard:
-		if (ControlledCharacter->CombatState.bCanRequestCombat && !ControlledCharacter->CombatState.bCanDefend)
+		if (ControlledCharacter->CombatState.bCanRequestCombat &&
+		    !ControlledCharacter->CombatState.bDefenseRequestArmed)
 		{
 			ControlledCharacter->RequestCombatAction();
 		}

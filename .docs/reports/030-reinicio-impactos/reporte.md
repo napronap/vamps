@@ -1,5 +1,7 @@
 # 030 — Reinicio opcional de impactos por arma
 
+La etapa 2 fue cerrada posteriormente por confirmación del usuario; véase [031 — Cierre del paso 2 y reglas del paso 3](../031-cierre-paso-2-y-reglas-paso-3/reporte.md). Las comprobaciones de esta iteración se conservan sin atribuirles observaciones posteriores.
+
 ## Resultado — 2026-10-18
 
 Se implementó AN_ResetWeaponHits con WeaponIndices editables por aparición del notify. Los índices corresponden al orden de Weapons en el DA del atacante y comienzan en 0. El valor inicial del AN es [0]; [0, 1] selecciona explícitamente ambas armas. Un array vacío es configuración inválida y no significa todas las armas.

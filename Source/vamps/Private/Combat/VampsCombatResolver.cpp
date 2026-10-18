@@ -3,6 +3,7 @@
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/VampsCombatMovementComponent.h"
 #include "Combat/VampsCombatLog.h"
+#include "Combat/Attributes/VampsAttributeSet.h"
 #include "Engine/World.h"
 
 void UVampsCombatResolver::Initialize(FSubsystemCollectionBase& Collection)
@@ -56,35 +57,41 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker, AVampsC
 		       *Recipient->GetPathName());
 		return;
 	}
-	float SectionDuration;
-	if (!Attacker->TryCalculateCombatSectionDuration(SectionDuration))
-	{
-		return;
-	}
-	const FVampsCombatStepSettings& StepSettings =
-	    Attacker->CombatSettings->ComboSteps[Attacker->CombatState.ComboStep - 1];
-	const float RestrictionDuration = SectionDuration + StepSettings.AdditionalOffensiveRestrictionDuration;
-	if (!FMath::IsFinite(StepSettings.AdditionalOffensiveRestrictionDuration) ||
-	    StepSettings.AdditionalOffensiveRestrictionDuration < 0.f || !FMath::IsFinite(RestrictionDuration))
+	const UVampsCombatSettings* AttackSettings = Attacker->CombatSettings;
+	const UVampsCombatSettings* DefenseSettings = Recipient->CombatSettings;
+	const FVampsCombatStepSettings& StepSettings = AttackSettings->ComboSteps[Attacker->CombatState.ComboStep - 1];
+	if (!DefenseSettings || !AttackSettings->HasValidReactionSettings() ||
+	    !DefenseSettings->HasValidReactionSettings() || !Recipient->Attributes ||
+	    !FMath::IsFinite(Attacker->AttackDamage) || Attacker->AttackDamage < 0.f ||
+	    !FMath::IsFinite(StepSettings.ContactReactionDuration) || StepSettings.ContactReactionDuration <= 0.f)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: contact rejected for '%s', CombatSettings '%s', step %d: "
-		            "AdditionalOffensiveRestrictionDuration=%f must be finite and nonnegative; section=%f, total=%f."),
+		       TEXT("%hs: contact rejected: attacker='%s', settings='%s', damage=%f, "
+		            "reaction=%f, recipient='%s', settings='%s'. Required finite nonnegative damage and positive "
+		            "reaction duration."),
 		       __FUNCTION__,
 		       *Attacker->GetPathName(),
-		       *Attacker->CombatSettings->GetPathName(),
-		       Attacker->CombatState.ComboStep,
-		       StepSettings.AdditionalOffensiveRestrictionDuration,
-		       SectionDuration,
-		       RestrictionDuration);
+		       *GetPathNameSafe(AttackSettings),
+		       Attacker->AttackDamage,
+		       StepSettings.ContactReactionDuration,
+		       *Recipient->GetPathName(),
+		       *GetPathNameSafe(DefenseSettings));
 		return;
 	}
 	FVampsPendingContact& Contact = PendingContacts.AddDefaulted_GetRef();
 	Contact.Attacker = Attacker;
 	Contact.Recipient = Recipient;
 	Contact.ActionNumber = Attacker->CombatState.ActionNumber;
-	Contact.OffensiveRestrictionDuration = RestrictionDuration;
+	Contact.AttackerGeneration = Attacker->CombatGeneration;
+	Contact.RecipientGeneration = Recipient->CombatGeneration;
+	Contact.ContactTime = GetWorld()->GetTimeSeconds();
+	Contact.bCritical =
+	    AttackSettings->CriticalChancePercent >= 100.f ||
+	    (AttackSettings->CriticalChancePercent > 0.f && FMath::FRand() * 100.f < AttackSettings->CriticalChancePercent);
+	Contact.ContactDamage = Contact.bCritical ? AttackSettings->CriticalDamage : Attacker->AttackDamage;
+	Contact.BlockReduction = DefenseSettings->BlockDamageReduction;
+	Contact.GuardLoad = AttackSettings->GuardLoadPerHit;
 	Contact.AttackOrigin = Attacker->GetActorLocation();
 	Contact.AttackDirection = Attacker->GetActorForwardVector().GetSafeNormal2D();
 	Contact.StepSettings = StepSettings;
@@ -152,114 +159,131 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 	    {
 		    return !Contact.Attacker.IsValid() || !Contact.Recipient.IsValid() ||
 		           Contact.Attacker->IsActorBeingDestroyed() || Contact.Recipient->IsActorBeingDestroyed() ||
-		           !Contact.Attacker->CombatState.bIsAlive || !Contact.Recipient->CombatState.bIsAlive;
+		           !Contact.Attacker->CombatState.bIsAlive || !Contact.Recipient->CombatState.bIsAlive ||
+		           Contact.Attacker->CombatGeneration != Contact.AttackerGeneration ||
+		           Contact.Recipient->CombatGeneration != Contact.RecipientGeneration;
+	    });
+	const auto ContactRank = [](const FVampsPendingContact& Contact)
+	{
+		const UVampsLockOnComponent* Selection = Contact.Recipient->LockOn;
+		if (Selection->GetCurrentTarget() == Contact.Attacker.Get())
+		{
+			return -1;
+		}
+		const int32 CandidateIndex = Selection->GetCandidates().IndexOfByPredicate(
+		    [&Contact](const TWeakObjectPtr<AVampsCharacter>& Candidate)
+		    {
+			    return Candidate == Contact.Attacker;
+		    });
+		return CandidateIndex == INDEX_NONE ? MAX_int32 : CandidateIndex;
+	};
+	Contacts.StableSort(
+	    [&ContactRank](const FVampsPendingContact& Left, const FVampsPendingContact& Right)
+	    {
+		    if (Left.Recipient != Right.Recipient)
+		    {
+			    return Left.Recipient->GetPathName() < Right.Recipient->GetPathName();
+		    }
+		    const int32 LeftRank = ContactRank(Left);
+		    const int32 RightRank = ContactRank(Right);
+		    return LeftRank != RightRank ? LeftRank < RightRank
+		                                 : Left.Attacker->GetPathName() < Right.Attacker->GetPathName();
 	    });
 
-	TMap<AVampsCharacter*, TArray<AVampsCharacter*>> BlockedAttackers;
-	for (FVampsPendingContact& Contact : Contacts)
+	for (int32 GroupStart = 0; GroupStart < Contacts.Num();)
 	{
-		Contact.bBlocked = Contact.Recipient->CombatState.bCanDefend;
-		if (Contact.bBlocked)
+		AVampsCharacter* Recipient = Contacts[GroupStart].Recipient.Get();
+		int32 GroupEnd = GroupStart + 1;
+		while (GroupEnd < Contacts.Num() && Contacts[GroupEnd].Recipient.Get() == Recipient)
 		{
-			BlockedAttackers.FindOrAdd(Contact.Recipient.Get()).AddUnique(Contact.Attacker.Get());
+			++GroupEnd;
 		}
-	}
-
-	TSet<AVampsCharacter*> InvalidRecipients;
-	for (const auto& BlockedEntry : BlockedAttackers)
-	{
-		AVampsCharacter* Defender = BlockedEntry.Key;
-		AVampsCharacter* SelectedAttacker = Defender->LockOn->GetCurrentTarget();
-		if (!BlockedEntry.Value.Contains(SelectedAttacker))
+		FVampsPendingContact* RequestedDefense = nullptr;
+		if (Recipient->CombatState.bCanDefend && Recipient->CombatState.bDefenseRequestArmed &&
+		    GetWorld()->GetTimeSeconds() < Recipient->CombatState.DefenseRequestEndsAt)
 		{
-			SelectedAttacker = nullptr;
-			for (const TWeakObjectPtr<AVampsCharacter>& Candidate : Defender->LockOn->GetCandidates())
+			for (int32 ContactIndex = GroupStart; ContactIndex < GroupEnd; ++ContactIndex)
 			{
-				if (BlockedEntry.Value.Contains(Candidate.Get()))
+				FVampsPendingContact& Candidate = Contacts[ContactIndex];
+				if (!RequestedDefense || (Recipient->MatchesDefendedContact(*RequestedDefense) &&
+				                          !Recipient->MatchesDefendedContact(Candidate)))
 				{
-					SelectedAttacker = Candidate.Get();
-					break;
+					RequestedDefense = &Candidate;
 				}
 			}
 		}
-		if (!SelectedAttacker)
+		float ProjectedLoad = Recipient->Attributes->GetGuardLoad();
+		bool bGuardBroken = false;
+		for (int32 ContactIndex = GroupStart; ContactIndex < GroupEnd; ++ContactIndex)
 		{
-			UE_LOG(LogVampsCombat,
-			       Error,
-			       TEXT("%hs: contacts for '%s' rejected; no blocked attacker is registered in its LockOn candidates. "
-			            "Defense has not been consumed."),
-			       __FUNCTION__,
-			       *Defender->GetPathName());
-			InvalidRecipients.Add(Defender);
-			continue;
+			FVampsPendingContact& Contact = Contacts[ContactIndex];
+			const bool bMatchesRequest = RequestedDefense && Contact.Attacker == RequestedDefense->Attacker &&
+			                             Contact.ActionNumber == RequestedDefense->ActionNumber;
+			Contact.bBlocked = Recipient->CombatState.bCanDefend && !bGuardBroken &&
+			                   (RequestedDefense ? bMatchesRequest : Recipient->MatchesDefendedContact(Contact));
+			if (Contact.bBlocked)
+			{
+				ProjectedLoad += Contact.GuardLoad;
+				Contact.bGuardBreak = ProjectedLoad >= Recipient->Attributes->GetMaxGuardLoad();
+				bGuardBroken |= Contact.bGuardBreak;
+			}
 		}
-		Defender->ConsumeDefenseRequest();
-		Defender->LockOn->SelectTarget(SelectedAttacker);
+		if (RequestedDefense && RequestedDefense->bBlocked)
+		{
+			Recipient->RememberDefendedContact(*RequestedDefense);
+		}
+		GroupStart = GroupEnd;
 	}
-	Contacts.RemoveAll(
-	    [&InvalidRecipients](const FVampsPendingContact& Contact)
-	    {
-		    return InvalidRecipients.Contains(Contact.Recipient.Get());
-	    });
 
 	for (const FVampsPendingContact& Contact : Contacts)
 	{
-		if (Contact.bBlocked)
-		{
-			Contact.Recipient->ApplyOffensiveRestriction(Contact.OffensiveRestrictionDuration);
-		}
-		if (Contact.Attacker->CombatState.ActionNumber == Contact.ActionNumber)
+		if (Contact.Attacker->CombatState.ActionNumber == Contact.ActionNumber &&
+		    Contact.Attacker->CombatState.MontageInstanceID != INDEX_NONE)
 		{
 			Contact.Attacker->RegisterCombatContact(Contact.bBlocked);
 		}
-		Contact.Recipient->ReceiveCombatHit(Contact.Attacker.Get(), Contact.bBlocked);
 	}
-
-	TMap<AVampsCharacter*, const FVampsPendingContact*> MotionContacts;
-	for (const FVampsPendingContact& Contact : Contacts)
+	for (int32 GroupStart = 0; GroupStart < Contacts.Num();)
 	{
-		AVampsCharacter* Recipient = Contact.Recipient.Get();
-		const FVampsPendingContact*& ChosenContact = MotionContacts.FindOrAdd(Recipient);
-		const auto ContactRank = [Recipient](const FVampsPendingContact& Candidate)
+		AVampsCharacter* Recipient = Contacts[GroupStart].Recipient.Get();
+		int32 GroupEnd = GroupStart;
+		const FVampsPendingContact* ReactionContact = nullptr;
+		while (GroupEnd < Contacts.Num() && Contacts[GroupEnd].Recipient.Get() == Recipient)
 		{
-			if (Candidate.Attacker.Get() == Recipient->LockOn->GetCurrentTarget())
+			const FVampsPendingContact& Contact = Contacts[GroupEnd++];
+			if (Recipient->ReceiveCombatHit(Contact))
 			{
-				return -1;
+				const int32 Severity = Contact.bGuardBreak ? 2 : (Contact.bBlocked ? 0 : 1);
+				const int32 PreviousSeverity =
+				    ReactionContact ? (ReactionContact->bGuardBreak ? 2 : (ReactionContact->bBlocked ? 0 : 1)) : -1;
+				if (Severity > PreviousSeverity)
+				{
+					ReactionContact = &Contact;
+				}
 			}
-			return Recipient->LockOn->GetCandidates().IndexOfByPredicate(
-			    [&Candidate](const TWeakObjectPtr<AVampsCharacter>& Fighter)
-			    {
-				    return Fighter == Candidate.Attacker;
-			    });
-		};
-		if (!ChosenContact || (ChosenContact->bBlocked && !Contact.bBlocked) ||
-		    (ChosenContact->bBlocked == Contact.bBlocked && ContactRank(Contact) < ContactRank(*ChosenContact)))
-		{
-			ChosenContact = &Contact;
 		}
-	}
-	for (const auto& MotionEntry : MotionContacts)
-	{
-		AVampsCharacter* Recipient = MotionEntry.Key;
-		if (Recipient->CombatState.bIsAlive)
+		if (ReactionContact && Recipient->CombatState.bIsAlive)
 		{
-			const FVampsPendingContact& Contact = *MotionEntry.Value;
+			Recipient->ApplyCombatReaction(*ReactionContact);
 			UVampsCombatMovementComponent* CombatMovement =
 			    Cast<UVampsCombatMovementComponent>(Recipient->GetCharacterMovement());
-			if (!CombatMovement)
+			if (CombatMovement)
+			{
+				CombatMovement->ReceiveCombatDisplacement(ReactionContact->AttackOrigin,
+				                                          ReactionContact->AttackDirection,
+				                                          ReactionContact->StepSettings,
+				                                          ReactionContact->bBlocked);
+			}
+			else
 			{
 				UE_LOG(LogVampsCombat,
 				       Error,
-				       TEXT("%hs: displacement rejected for '%s'; movement component '%s' is not "
-				            "VampsCombatMovementComponent."),
+				       TEXT("%hs: '%s': cannot apply reaction displacement without VampsCombatMovementComponent."),
 				       __FUNCTION__,
-				       *Recipient->GetPathName(),
-				       *GetPathNameSafe(Recipient->GetCharacterMovement()));
-				continue;
+				       *Recipient->GetPathName());
 			}
-			CombatMovement->ReceiveCombatDisplacement(
-			    Contact.AttackOrigin, Contact.AttackDirection, Contact.StepSettings, Contact.bBlocked);
 		}
+		GroupStart = GroupEnd;
 	}
 
 	const TArray<TWeakObjectPtr<AVampsCharacter>> Continuations = MoveTemp(PendingContinuations);
