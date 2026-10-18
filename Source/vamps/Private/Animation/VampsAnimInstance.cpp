@@ -2,6 +2,7 @@
 #include "Characters/VampsCharacter.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Combat/VampsCombatLog.h"
 
 void UVampsAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -13,7 +14,18 @@ void UVampsAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
-	const AVampsCharacter* OwningCharacter = CastChecked<AVampsCharacter>(OwningPawn);
+	const AVampsCharacter* OwningCharacter = Cast<AVampsCharacter>(OwningPawn);
+	if (!OwningCharacter || !OwningCharacter->GetCharacterMovement())
+	{
+		UE_LOG(
+		    LogVampsCombat,
+		    Error,
+		    TEXT("%hs: %s: animation update rejected; pawn '%s' must be a VampsCharacter with a movement component."),
+		    __FUNCTION__,
+		    *GetPathName(),
+		    *GetPathNameSafe(OwningPawn));
+		return;
+	}
 	const FVector Velocity = OwningCharacter->GetVelocity();
 	Speed = Velocity.Size2D();
 	Direction = Speed > 1.f

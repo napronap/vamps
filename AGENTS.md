@@ -15,6 +15,14 @@ Estas reglas se aplican a todas las iteraciones del proyecto.
 
 No reutilizar, copiar ni heredar código, clases, Blueprints o Animation Blueprints del ejemplo Third Person ni de sus variantes. Se pueden usar sus modelos, esqueletos, animaciones, materiales y otros recursos visuales. Crear la lógica y los Blueprints propios sobre clases nativas de Unreal, según la [base técnica del juego](.docs/game/technical.md).
 
+### Preservar la configuración de Data Assets
+
+- Antes de modificar la clase de un Data Asset o una estructura que forme parte de sus propiedades, buscar por MCP los assets existentes de esa clase y sus derivadas. No asumir que solo existen los assets mencionados en la conversación.
+- Leer y guardar una copia durable de sus valores actuales antes de editar o compilar: rutas de assets/clases referenciadas, escalares, arrays completos, structs anidados y transforms. Registrar las rutas de los assets afectados y guardar esos assets por MCP para conservar también su configuración en disco. No reemplazar esta captura por los defaults del código ni por valores recordados de otra iteración.
+- Después de compilar y, si corresponde, reabrir el editor, releer los assets y restaurar los valores anteriores que se hayan perdido o cambiado. Incorporar los campos nuevos con los valores definidos para la tarea. Conservar orden, cantidad de entradas y referencias salvo que el usuario haya pedido cambiarlos.
+- Verificar por MCP los valores finales contra la copia previa, guardar únicamente los assets afectados y confirmar el resultado. No marcar la restauración como hecha sin esa comprobación. No guardar assets con referencias transitorias o durante una recarga estructural inestable de Live Coding; completar primero el arranque limpio necesario.
+- Si alguna propiedad no puede leerse o restaurarse con MCP directo, documentar el dato y el paso manual necesario antes de continuar con el cambio que pueda perderlo. No reconstruir configuraciones por suposición ni usar automatización de interfaz.
+
 ## Convenciones de código
 
 - Escribir todo el código en inglés: identificadores, comentarios, mensajes de log y textos de interfaz incluidos en el código. La documentación interna, reportes y conversación pueden estar en español.
@@ -25,11 +33,18 @@ No reutilizar, copiar ni heredar código, clases, Blueprints o Animation Bluepri
 - Evitar shadowing de tipos y miembros de Unreal, incluidos los heredados: no declarar variables locales, parámetros, atributos ni métodos que oculten esos nombres. Un método con distinta firma también puede ocultar métodos y sobrecargas de las clases base. Revisar toda la jerarquía e interfaces antes de elegir identificadores. Reutilizar un nombre heredado para una función virtual solo cuando se implemente su contrato deliberadamente, con firma compatible y `override`; usar otro nombre para lógica distinta. Por ejemplo, usar `ControlledPawn` en lugar de `Character` dentro de un PlayerController, y `ReceiveCombatHit` en lugar de `ReceiveHit` para resolver contactos propios, porque `AController` y `AActor` ya declaran esos nombres. Ver la [guía C++](.docs/cpp-style.md#nombres-y-miembros-heredados).
 - Aplicar el formateador a los archivos propios modificados. Revisar el resultado: el formateador no reemplaza la organización lógica ni la claridad de los nombres. Ver [convenciones C++](.docs/cpp-style.md).
 - Se valora especialmente robustez, minimizar cantidad de líneas de código, evitar bloat, evitar duplicación.
-- Se deben evitar fallbacks, if-else statements innecesarios (cosas como ramas de else que simplemente describan que algo esta roto, preferir que el codigo falle y tire un error para poder detectarlo y actuar acorde). Los fallbacks tienden a esconder bugs y generar bloat.
 - No agregar compatibilidad con scope o backwards compatibility a menos que el usuario lo pida explicitamente.
 - Asimismo, no hacer futurologia (por ejemplo, getters y setters innecesarios, bindings que "pueden ser usados en el futuro"). Mantener el scope a la tarea que se esta desarrollando actualmente. Si luego se necesitan otros bindings, se haran cuando sean necesarios.
 - No agregar comentarios a menos que el usuario lo pida o pregunte mas aclaracion sobre alguna parte del código.
 - No actualizar documentacion ni ningun .md (excepto reportes, obviamente) a menos que sea pedido por el usuario.
+
+## Validación, errores y fallbacks
+
+- Los `if` y `if/else` son normales y están permitidos. Validar assets, referencias, configuración y precondiciones antes de ejecutar una operación es correcto en Unreal. Rechazar una operación porque falta un dato requerido no es un fallback.
+- No agregar fallbacks que el usuario no haya pedido explícitamente. No sustituir silenciosamente un asset, una clase, un valor o un comportamiento requerido por otro para continuar como si la operación hubiera tenido éxito. Mantener el comportamiento definido del juego, sin inventar rutas alternativas de recuperación.
+- No usar `check`, `checkf` ni variantes de asserts fatales en el código propio. Tampoco reemplazarlos por logs `Fatal` u otros mecanismos que cierren el editor para señalar un error. Usar validaciones explícitas con diagnóstico no fatal.
+- Si falla una precondición requerida, informar mediante un log o mensaje en pantalla qué función falló y por qué. Incluir el objeto o asset afectado y, cuando ayuden al diagnóstico, los valores recibidos y esperados. Después, detener o cancelar de forma controlada la operación afectada, sin ejecutar código que dependa del dato inválido.
+- No esconder errores con retornos silenciosos, ramas vacías, mensajes vagos o resultados que aparenten éxito. Esto no obliga a registrar como error las condiciones normales del flujo de juego: una condición esperada que impide una acción no es por sí sola un fallo de configuración o programación.
 
 ## Sin tests automatizados
 

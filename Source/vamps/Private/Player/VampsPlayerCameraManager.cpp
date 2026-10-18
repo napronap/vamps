@@ -2,17 +2,43 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "Combat/VampsCombatLog.h"
 
 void AVampsPlayerCameraManager::ProcessViewRotation(float DeltaTime, FRotator& OutViewRotation, FRotator& OutDeltaRot)
 {
-	check(PCOwner);
+	if (!PCOwner)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: camera rotation cancelled; PlayerController owner is missing."),
+		       __FUNCTION__,
+		       *GetPathName());
+		return;
+	}
 	AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(PCOwner->GetPawn());
 	if (!PCOwner->IsLocalPlayerController() || !ControlledFighter)
 	{
 		Super::ProcessViewRotation(DeltaTime, OutViewRotation, OutDeltaRot);
 		return;
 	}
-	check(TrackingSpeed > 0.f && HorizontalTolerance >= 0.f && HorizontalTolerance < 180.f);
+	if (!ControlledFighter->LockOn || !FMath::IsFinite(TrackingSpeed) || !FMath::IsFinite(HorizontalTolerance) ||
+	    !FMath::IsFinite(FollowPitch) || TrackingSpeed <= 0.f || HorizontalTolerance < 0.f ||
+	    HorizontalTolerance >= 180.f)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: camera rotation cancelled; fighter='%s', LockOn='%s', TrackingSpeed=%f, "
+		            "HorizontalTolerance=%f, FollowPitch=%f. Expected positive speed, tolerance in [0,180) and finite "
+		            "settings."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *ControlledFighter->GetPathName(),
+		       *GetPathNameSafe(ControlledFighter->LockOn),
+		       TrackingSpeed,
+		       HorizontalTolerance,
+		       FollowPitch);
+		return;
+	}
 
 	AVampsCharacter* LockedFighter = ControlledFighter->LockOn->GetCurrentTarget();
 	FVector FollowDirection = ControlledFighter->GetActorForwardVector();

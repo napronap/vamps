@@ -9,7 +9,8 @@ enum class EVampsActionPhase : uint8
 	Idle,
 	Preparation,
 	Contacts,
-	Recovery
+	Recovery,
+	NARecovery
 };
 
 UENUM(BlueprintType)
@@ -18,6 +19,8 @@ enum class EVampsCombatRequest : uint8
 	None,
 	ActionStarted,
 	DefenseRearmed,
+	ContinuationRequested,
+	ComboAdvanced,
 	Rejected
 };
 
@@ -56,6 +59,27 @@ struct VAMPS_API FVampsCombatState
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bIsRecovering = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	int32 ComboStep = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bComboWindowOpen = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bContinuationRequested = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bRecoveryVisualReleased = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	bool bOffenseRestricted = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	double OffensiveRestrictionEndsAt = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
+	double NARecoveryEndsAt = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	int32 MontageInstanceID = INDEX_NONE;

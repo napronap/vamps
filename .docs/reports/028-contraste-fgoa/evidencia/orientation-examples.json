@@ -1,0 +1,536 @@
+{
+  "source": "D:\\fgo arcade\\fgoac\\research\\combat-20261017\\evidence\\source\\mothead_SVT_0001.json",
+  "examples": [
+    {
+      "motions": [
+        "SVT_0001_S01_ATK_Q01"
+      ],
+      "hits": [
+        {
+          "ordinal": 0,
+          "guard_frame": -1,
+          "just_guard_frame": -1,
+          "start_frame": 43,
+          "end_frame": 46,
+          "kind": "ATK_HIT_OK",
+          "unit": "AU_NO_ATTACK",
+          "point": "AP_HIGH",
+          "damage": 330,
+          "strength_guard": 0,
+          "strength_hit": 0,
+          "guard_change": 0,
+          "efc_type": "E_WEAK",
+          "efc_flag": "",
+          "sub": [
+            {
+              "just_guard_count": -1,
+              "guard_count": 42,
+              "hit_count": 30,
+              "counter_count": -1,
+              "just_guard_freeze_frame": -1,
+              "guard_freeze_frame": -1,
+              "hit_freeze_frame": -1,
+              "counter_freeze_frame": -1
+            }
+          ]
+        },
+        {
+          "ordinal": 1,
+          "guard_frame": -1,
+          "just_guard_frame": -1,
+          "start_frame": 69,
+          "end_frame": 71,
+          "kind": "ATK_HIT_OK",
+          "unit": "AU_NO_ATTACK",
+          "point": "AP_HIGH",
+          "damage": 670,
+          "strength_guard": 0,
+          "strength_hit": 0,
+          "guard_change": 0,
+          "efc_type": "E_WEAK",
+          "efc_flag": "",
+          "sub": [
+            {
+              "just_guard_count": -1,
+              "guard_count": 42,
+              "hit_count": 85,
+              "counter_count": -1,
+              "just_guard_freeze_frame": -1,
+              "guard_freeze_frame": -1,
+              "hit_freeze_frame": -1,
+              "counter_freeze_frame": -1
+            }
+          ]
+        }
+      ],
+      "hit_back_by_result": {
+        "MHR_YARARE": [
+          {
+            "result": "MHR_YARARE",
+            "distance": 0.5,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 1.0,
+            "duration": 60.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.5,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          },
+          {
+            "result": "MHR_YARARE",
+            "distance": 5.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 5.0,
+            "duration": 10.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          }
+        ],
+        "MHR_GUARD": [
+          {
+            "result": "MHR_GUARD",
+            "distance": 2.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 3.0,
+            "duration": 10.0,
+            "duration_1st": 4.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          },
+          {
+            "result": "MHR_GUARD",
+            "distance": 5.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 5.0,
+            "duration": 10.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          }
+        ]
+      },
+      "rotation": [
+        {
+          "cmd": "MHD_ATK_REVISE",
+          "frame": 62.0,
+          "val": {
+            "revise_deg_per_frame": 3.0,
+            "total_revise_deg": 30.0
+          }
+        }
+      ]
+    },
+    {
+      "motions": [
+        "DMY01_SVT_0001_S01_ATK_Q01"
+      ],
+      "hits": [
+        {
+          "ordinal": 0,
+          "guard_frame": -1,
+          "just_guard_frame": -1,
+          "start_frame": 43,
+          "end_frame": 46,
+          "kind": "ATK_HIT_OK",
+          "unit": "AU_NO_ATTACK",
+          "point": "AP_HIGH",
+          "damage": 330,
+          "strength_guard": 0,
+          "strength_hit": 0,
+          "guard_change": 0,
+          "efc_type": "E_WEAK",
+          "efc_flag": "",
+          "sub": [
+            {
+              "just_guard_count": -1,
+              "guard_count": 42,
+              "hit_count": 30,
+              "counter_count": -1,
+              "just_guard_freeze_frame": -1,
+              "guard_freeze_frame": -1,
+              "hit_freeze_frame": -1,
+              "counter_freeze_frame": -1
+            }
+          ]
+        },
+        {
+          "ordinal": 1,
+          "guard_frame": -1,
+          "just_guard_frame": -1,
+          "start_frame": 69,
+          "end_frame": 71,
+          "kind": "ATK_HIT_OK",
+          "unit": "AU_NO_ATTACK",
+          "point": "AP_HIGH",
+          "damage": 670,
+          "strength_guard": 0,
+          "strength_hit": 0,
+          "guard_change": 0,
+          "efc_type": "E_HARD",
+          "efc_flag": "ETF_BLOW_ARTS",
+          "sub": [
+            {
+              "just_guard_count": -1,
+              "guard_count": -1,
+              "hit_count": 85,
+              "counter_count": -1,
+              "just_guard_freeze_frame": -1,
+              "guard_freeze_frame": -1,
+              "hit_freeze_frame": -1,
+              "counter_freeze_frame": -1
+            }
+          ]
+        }
+      ],
+      "hit_back_by_result": {
+        "MHR_YARARE": [
+          {
+            "result": "MHR_YARARE",
+            "distance": 0.5,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 1.0,
+            "duration": 60.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.5,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          },
+          {
+            "result": "MHR_YARARE",
+            "distance": 28.5,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": -1.0,
+            "duration": 80.0,
+            "duration_1st": 28.0,
+            "rate_1st": 0.7,
+            "end_rate": 0.7,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          }
+        ],
+        "MHR_GUARD": [
+          {
+            "result": "MHR_GUARD",
+            "distance": 2.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 3.0,
+            "duration": 10.0,
+            "duration_1st": 4.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          },
+          {
+            "result": "MHR_GUARD",
+            "distance": 15.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 15.0,
+            "duration": 80.0,
+            "duration_1st": 54.0,
+            "rate_1st": 0.7,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          }
+        ]
+      },
+      "rotation": [
+        {
+          "cmd": "MHD_ATK_REVISE",
+          "frame": 62.0,
+          "val": {
+            "revise_deg_per_frame": 3.0,
+            "total_revise_deg": 30.0
+          }
+        }
+      ]
+    },
+    {
+      "motions": [
+        "DMY02_SVT_0001_S01_ATK_Q01"
+      ],
+      "hits": [
+        {
+          "ordinal": 0,
+          "guard_frame": -1,
+          "just_guard_frame": -1,
+          "start_frame": 43,
+          "end_frame": 46,
+          "kind": "ATK_HIT_OK",
+          "unit": "AU_NO_ATTACK",
+          "point": "AP_HIGH",
+          "damage": 330,
+          "strength_guard": 0,
+          "strength_hit": 0,
+          "guard_change": 0,
+          "efc_type": "E_WEAK",
+          "efc_flag": "",
+          "sub": [
+            {
+              "just_guard_count": -1,
+              "guard_count": 42,
+              "hit_count": 30,
+              "counter_count": -1,
+              "just_guard_freeze_frame": -1,
+              "guard_freeze_frame": -1,
+              "hit_freeze_frame": -1,
+              "counter_freeze_frame": -1
+            }
+          ]
+        },
+        {
+          "ordinal": 1,
+          "guard_frame": -1,
+          "just_guard_frame": -1,
+          "start_frame": 69,
+          "end_frame": 71,
+          "kind": "ATK_HIT_OK",
+          "unit": "AU_NO_ATTACK",
+          "point": "AP_HIGH",
+          "damage": 670,
+          "strength_guard": 0,
+          "strength_hit": 0,
+          "guard_change": 0,
+          "efc_type": "E_WEAK",
+          "efc_flag": "",
+          "sub": [
+            {
+              "just_guard_count": -1,
+              "guard_count": 42,
+              "hit_count": 85,
+              "counter_count": -1,
+              "just_guard_freeze_frame": -1,
+              "guard_freeze_frame": -1,
+              "hit_freeze_frame": -1,
+              "counter_freeze_frame": -1
+            }
+          ]
+        }
+      ],
+      "hit_back_by_result": {
+        "MHR_YARARE": [
+          {
+            "result": "MHR_YARARE",
+            "distance": 0.5,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 1.0,
+            "duration": 60.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.5,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          },
+          {
+            "result": "MHR_YARARE",
+            "distance": 5.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 5.0,
+            "duration": 10.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          }
+        ],
+        "MHR_GUARD": [
+          {
+            "result": "MHR_GUARD",
+            "distance": 2.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 3.0,
+            "duration": 10.0,
+            "duration_1st": 4.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          },
+          {
+            "result": "MHR_GUARD",
+            "distance": 5.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 5.0,
+            "duration": 10.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          }
+        ]
+      },
+      "rotation": [
+        {
+          "cmd": "MHD_ATK_REVISE",
+          "frame": 62.0,
+          "val": {
+            "revise_deg_per_frame": 3.0,
+            "total_revise_deg": 30.0
+          }
+        }
+      ]
+    },
+    {
+      "motions": [
+        "SVT_0001_S01_ATK_A01"
+      ],
+      "hits": [
+        {
+          "ordinal": 0,
+          "guard_frame": -1,
+          "just_guard_frame": -1,
+          "start_frame": 32,
+          "end_frame": 34,
+          "kind": "ATK_HIT_OK",
+          "unit": "AU_NO_ATTACK",
+          "point": "AP_HIGH",
+          "damage": 330,
+          "strength_guard": 0,
+          "strength_hit": 0,
+          "guard_change": 0,
+          "efc_type": "E_WEAK_R",
+          "efc_flag": "",
+          "sub": [
+            {
+              "just_guard_count": -1,
+              "guard_count": 42,
+              "hit_count": 45,
+              "counter_count": -1,
+              "just_guard_freeze_frame": -1,
+              "guard_freeze_frame": -1,
+              "hit_freeze_frame": -1,
+              "counter_freeze_frame": -1
+            }
+          ]
+        },
+        {
+          "ordinal": 1,
+          "guard_frame": -1,
+          "just_guard_frame": -1,
+          "start_frame": 75,
+          "end_frame": 77,
+          "kind": "ATK_HIT_OK",
+          "unit": "AU_NO_ATTACK",
+          "point": "AP_HIGH",
+          "damage": 670,
+          "strength_guard": 0,
+          "strength_hit": 0,
+          "guard_change": 0,
+          "efc_type": "E_WEAK",
+          "efc_flag": "",
+          "sub": [
+            {
+              "just_guard_count": -1,
+              "guard_count": 42,
+              "hit_count": 85,
+              "counter_count": -1,
+              "just_guard_freeze_frame": -1,
+              "guard_freeze_frame": -1,
+              "hit_freeze_frame": -1,
+              "counter_freeze_frame": -1
+            }
+          ]
+        }
+      ],
+      "hit_back_by_result": {
+        "MHR_YARARE": [
+          {
+            "result": "MHR_YARARE",
+            "distance": 0.5,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 1.0,
+            "duration": 60.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.5,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          },
+          {
+            "result": "MHR_YARARE",
+            "distance": 5.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 5.0,
+            "duration": 10.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          }
+        ],
+        "MHR_GUARD": [
+          {
+            "result": "MHR_GUARD",
+            "distance": 2.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 3.0,
+            "duration": 10.0,
+            "duration_1st": 4.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          },
+          {
+            "result": "MHR_GUARD",
+            "distance": 5.0,
+            "dir_yang": 0.0,
+            "dist_min": -1.0,
+            "dist_max": 5.0,
+            "duration": 10.0,
+            "duration_1st": 3.0,
+            "rate_1st": 0.0,
+            "end_rate": 1.0,
+            "dist_bias": 0.0,
+            "blow_arts": false,
+            "type": "MH_HIT_BACK_TYPE_NORMAL"
+          }
+        ]
+      },
+      "rotation": []
+    }
+  ]
+}

@@ -7,6 +7,7 @@
 #include "Engine/LocalPlayer.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
+#include "Combat/VampsCombatLog.h"
 
 AVampsPlayerController::AVampsPlayerController()
 {
@@ -21,10 +22,20 @@ void AVampsPlayerController::BeginPlay()
 		return;
 	}
 
-	checkf(DefaultInputMappingContext, TEXT("DefaultInputMappingContext must be assigned."));
 	UEnhancedInputLocalPlayerSubsystem* InputSubsystem =
 	    ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(InputSubsystem);
+	if (!DefaultInputMappingContext || !InputSubsystem)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: input setup requires DefaultInputMappingContext and EnhancedInputLocalPlayerSubsystem; "
+		            "mapping='%s', subsystem='%s'."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(DefaultInputMappingContext),
+		       *GetPathNameSafe(InputSubsystem));
+		return;
+	}
 	InputSubsystem->AddMappingContext(DefaultInputMappingContext, 0);
 	SetInputMode(FInputModeGameOnly());
 	bShowMouseCursor = false;
@@ -36,8 +47,20 @@ void AVampsPlayerController::EndPlay(const EEndPlayReason::Type Reason)
 	{
 		UEnhancedInputLocalPlayerSubsystem* InputSubsystem =
 		    LocalPlayer->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
-		check(InputSubsystem);
-		InputSubsystem->RemoveMappingContext(DefaultInputMappingContext);
+		if (InputSubsystem)
+		{
+			InputSubsystem->RemoveMappingContext(DefaultInputMappingContext);
+		}
+		else
+		{
+			UE_LOG(LogVampsCombat,
+			       Warning,
+			       TEXT("%hs: %s: cannot remove input mapping '%s'; EnhancedInput subsystem is unavailable during "
+			            "shutdown."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       *GetPathNameSafe(DefaultInputMappingContext));
+		}
 	}
 	Super::EndPlay(Reason);
 }
@@ -45,11 +68,39 @@ void AVampsPlayerController::EndPlay(const EEndPlayReason::Type Reason)
 void AVampsPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
-	UEnhancedInputComponent* Input = CastChecked<UEnhancedInputComponent>(InputComponent);
-	checkf(MoveAction && CombatAction && CycleTargetAction, TEXT("All three input actions must be assigned."));
-	check(MoveAction->ValueType == EInputActionValueType::Axis2D);
-	check(CombatAction->ValueType == EInputActionValueType::Boolean);
-	check(CycleTargetAction->ValueType == EInputActionValueType::Boolean);
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent);
+	if (!Input || !MoveAction || !CombatAction || !CycleTargetAction)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: input bindings require EnhancedInputComponent and all actions; component='%s', "
+		            "Move='%s', Combat='%s', CycleTarget='%s'."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(InputComponent),
+		       *GetPathNameSafe(MoveAction),
+		       *GetPathNameSafe(CombatAction),
+		       *GetPathNameSafe(CycleTargetAction));
+		return;
+	}
+	if (MoveAction->ValueType != EInputActionValueType::Axis2D ||
+	    CombatAction->ValueType != EInputActionValueType::Boolean ||
+	    CycleTargetAction->ValueType != EInputActionValueType::Boolean)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: input action types are invalid; '%s'=%d (expected Axis2D), '%s'=%d and '%s'=%d (expected "
+		            "Boolean)."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *MoveAction->GetPathName(),
+		       int32(MoveAction->ValueType),
+		       *CombatAction->GetPathName(),
+		       int32(CombatAction->ValueType),
+		       *CycleTargetAction->GetPathName(),
+		       int32(CycleTargetAction->ValueType));
+		return;
+	}
 
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVampsPlayerController::Move);
 	Input->BindAction(CombatAction, ETriggerEvent::Started, this, &AVampsPlayerController::RequestCombat);
@@ -60,6 +111,16 @@ void AVampsPlayerController::Move(const FInputActionValue& Value)
 {
 	if (APawn* ControlledPawn = GetPawn())
 	{
+		if (Value.GetValueType() != EInputActionValueType::Axis2D)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: %s: movement input has type %d; expected Axis2D."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       int32(Value.GetValueType()));
+			return;
+		}
 		const FVector2D Movement = Value.Get<FVector2D>();
 		const FRotator Yaw(0.f, GetControlRotation().Yaw, 0.f);
 		ControlledPawn->AddMovementInput(Yaw.Vector(), Movement.Y);
@@ -71,7 +132,18 @@ void AVampsPlayerController::RequestCombat()
 {
 	if (APawn* ControlledPawn = GetPawn())
 	{
-		CastChecked<AVampsCharacter>(ControlledPawn)->RequestCombatAction();
+		AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(ControlledPawn);
+		if (!ControlledFighter)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: %s: combat input requires a VampsCharacter pawn; got '%s'."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       *ControlledPawn->GetPathName());
+			return;
+		}
+		ControlledFighter->RequestCombatAction();
 	}
 }
 
@@ -79,6 +151,17 @@ void AVampsPlayerController::CycleTarget()
 {
 	if (APawn* ControlledPawn = GetPawn())
 	{
-		CastChecked<AVampsCharacter>(ControlledPawn)->LockOn->CycleTarget();
+		AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(ControlledPawn);
+		if (!ControlledFighter || !ControlledFighter->LockOn)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: %s: target input requires a VampsCharacter pawn with LockOn; got '%s'."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       *ControlledPawn->GetPathName());
+			return;
+		}
+		ControlledFighter->LockOn->CycleTarget();
 	}
 }

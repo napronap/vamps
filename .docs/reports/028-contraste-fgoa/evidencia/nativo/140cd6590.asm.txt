@@ -1,0 +1,7 @@
+140cd6590 MOVSS XMM0,dword ptr [RDX + 0xc]
+140cd6595 MOV EAX,dword ptr [RDX + 0x8]
+140cd6598 MOVSS dword ptr [RCX + 0x18],XMM0
+140cd659d MOV dword ptr [RCX + 0x14],EAX
+140cd65a0 MOV dword ptr [RCX + 0x1c],0x0
+140cd65a7 MOV byte ptr [RCX + 0x20],0x0
+140cd65ab RET

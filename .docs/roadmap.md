@@ -8,11 +8,11 @@ Las reglas viven en [combate](combat/functional.md), [jugador](player/functional
 
 | Área | Disponible | Brecha hacia la referencia |
 |---|---|---|
-| Personaje y GAS | Clases propias, atributos de vida, montage y trazas del puño; contacto y daño confirmados por el usuario al cerrar 0 | No hay fases ni cadena |
-| Ataque y defensa | LMB ataca; RMB mantiene guardia; bloqueo selecciona al agresor | Siguen excluyéndose entre sí; bloquear cancela al atacante y evita todo daño |
-| Lock-on y HUD | Componente compartido, F según lista, selección inicial y reemplazo al perder elegibilidad ([018](reports/018-lockon-component/reporte.md)); recorrido e inputs confirmados al cerrar 0 | Comprobar retarget con la defensa de 1; incorporar equipos y respawn cuando existan |
+| Personaje y GAS | Clases propias, atributos de vida, montage y trazas del puño; fases de una acción delimitadas por un único ANS | No hay cadena ni NA |
+| Ataque y defensa | RMB compartido, defensa consumible hasta AttackEnd, resolución por frame y retarget al bloquear; cierre de 1 confirmado por el usuario | Incorporar cadena en 2 y resultados de guardia/daño en 3; el bloqueo actual evita todo daño |
+| Lock-on y HUD | Componente compartido, F según lista, selección inicial, reemplazo al perder elegibilidad y retarget por bloqueo; debug de fases y resultados | Incorporar equipos y respawn cuando existan |
 | Cámara | Manager local, seguimiento automático suave, tolerancia lateral y retorno detrás del jugador sin target ([019](reports/019-camara-lockon/reporte.md)); observación visual aprobada al cerrar 0 | Pitch fijo, sin variación de distancia por acción ni fade |
-| Escenario e IA | Mapa local, rival con modos de observación, F6/R y HUD de debug | La IA usa las solicitudes antiguas; R no representa muerte ni respawn |
+| Escenario e IA | Mapa local, rival con modos de observación y solicitud compartida, F6/R y HUD de debug | R no representa muerte ni respawn |
 | Partida y red | Habilidades ServerOnly y atributos replicados | No hay partida por equipos ni entrega completa de solicitudes de clientes |
 
 018–019 y las fuentes actuales prevalecen para lock-on/cámara sobre la descripción anterior del [prototipo](prototype/technical.md). Sus comprobaciones MCP se complementan con el cierre manual de 0 registrado en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0).
@@ -21,13 +21,13 @@ Las reglas viven en [combate](combat/functional.md), [jugador](player/functional
 
 Este archivo lleva el estado del plan; los reportes conservan la evidencia y quién confirmó cada cierre. Al completar una etapa se actualizan aquí su estado, fecha y referencia al reporte. No se mantiene otro archivo con una copia del avance.
 
-**Estado al 15 de octubre de 2026:** etapa 0 completada por confirmación del usuario. Etapa 1 en curso: código compilado/aplicado con `Success`, input configurado y ocho Blueprints compilados/guardados por MCP; pendientes el notify manual y la comprobación en PIE. Las fases no dependen del inicio del blend-out. [Registro 021](reports/021-solicitud-compartida/reporte.md).
+**Estado al 16 de octubre de 2026:** etapas 0 y 1 completadas por confirmación del usuario. La etapa 1 usa un único ANS: defensa desde el inicio hasta AttackEnd, contactos entre AttackStart y AttackEnd y recuperación hasta MontageEnd. RMB espera al final del montage; Recovery permite locomoción y no es NA. Próxima etapa: 2, cadena y NA. [Cierre 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1).
 
 | Etapa | Estado | Entrega | Dependencia y salida |
 |---|---|---|---|
 | 0 | Completada | Consolidar el escenario actual | Cierre manual confirmado el 2026-10-15; [registro](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) |
-| 1 | En curso — notify y PIE pendientes | Botón compartido y fases de una acción | Input/Blueprints configurados; agregar Combat Recovery sin soporte MCP y comprobar el intercambio según [021](reports/021-solicitud-compartida/editor.md) |
-| 2 | Pendiente | Cadena de hasta tres pasos y NA | Ventanas y contactos de 1; continuidad, fallo y recuperación distinguibles |
+| 1 | Completada | Botón compartido y fases de una acción | Cierre confirmado por el usuario el 2026-10-16; [registro 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1) |
+| 2 | Pendiente | Cadena de hasta tres pasos y NA | Fronteras y contactos de 1; agregar ventanas y distinguir continuidad, fallo y NA |
 | 3 | Pendiente | Guardia, residual, reacción, stun y crítico | Decidir fórmulas y restricciones; resultados de combate completos y visibles |
 | 4 | Pendiente | Acercamiento, evasión y sprint | Fronteras de 2 y restricciones de 3; movilidad integrada sin acierto garantizado |
 | 5 | Pendiente | Cámara de acciones, oclusión y HUD de combate | Estados y movimiento de 1–4; presentación coherente con la referencia |
@@ -46,16 +46,16 @@ Conservar selección inicial, recorrido y pérdida implementados en 018, y segui
 
 ### 1. Botón compartido y fases de una acción
 
-**En curso desde el 2026-10-15.** El usuario eligió defensa hasta el final de la acción, rearme por click, consumo por primer contacto y resolución conjunta por frame. Se implementaron solicitud compartida, fases por montage/notifies, resolver, IA y debug. El input y los Blueprints quedaron configurados, compilados y guardados por MCP; la corrección que desacopla las fases del inicio del blend-out compiló/aplicó un parche con `Success`. Falta agregar manualmente Combat Recovery al montage y observar en PIE; [reporte 021](reports/021-solicitud-compartida/reporte.md) y [pasos del editor](reports/021-solicitud-compartida/editor.md).
+**Completada — usuario, 2026-10-16.** El usuario confirmó el cierre después de aclarar las fronteras y revisar la explicación de la resolución ataque/defensa. Solicitud compartida, fases, resolver, IA y debug están presentes; input y ocho Blueprints fueron verificados por MCP. Live Coding devolvió NoChanges en esta revisión. El cierre se atribuye a la confirmación del usuario y no a una nueva ejecución de PIE por Codex; [reporte 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1) y [guía reproducible](reports/021-solicitud-compartida/editor.md).
 
-Las decisiones de vigencia, renovación, consumo y arbitraje se resolvieron al iniciar esta etapa y quedan consolidadas en [021](reports/021-solicitud-compartida/reporte.md#reglas-elegidas-por-el-usuario). Se eligieron fases por montage/notifies y evaluación conjunta al final del frame, sin buffer de continuación ni prioridades por identificador.
+Las [reglas acordadas](reports/021-solicitud-compartida/reporte.md#reglas-acordadas) usan un único ANS_AttackTrace: Preparation desde el inicio hasta AttackStart; Contacts hasta AttackEnd; Recovery hasta MontageEnd. La defensa se arma con el click, se consume por el primer lote de contactos y puede rearmarse antes de AttackEnd. Recovery no admite ataque ni defensa y permite locomoción y mezcla con otras acciones; RMB no inicia otro ataque hasta finalizar el montage. No se necesita AN_CombatRecovery ni una ventana separada en esta etapa. La resolución conjunta usa el estado al final del frame, sin buffer ni prioridades por identificador.
 
-1. Distinguir solicitud, acción aceptada, preparación, contactos, ventana y recuperación. Empezar con un solo paso para comprobar el intercambio.
+1. Distinguir solicitud, acción aceptada, preparación, contactos y recuperación de un único paso. La ventana de cadena se incorpora en 2.
 2. Sustituir Attack/Guard separados por pulsaciones individuales de RMB. Cambiar el mapping acompaña al cambio del núcleo; no lo reemplaza.
-3. Permitir defensa válida durante toda la acción propia. Retirar la exclusión total de los tags actuales y la cancelación incondicional del agresor al bloquear. Conservar el retarget por guardia efectiva.
+3. Permitir defensa válida durante preparación y contactos, hasta AttackEnd, con consumo y rearme por click. Conservar retarget por guardia efectiva y las ofensivas de ambos participantes al bloquear.
 4. Adaptar la IA de observación a las mismas solicitudes y mostrar fase, disponibilidad y resultado necesarios en el debug. Ningún controller decide daño o bloqueo.
 
-**Cierre:** sostener RMB no repite acciones ni mantiene guardia permanente; una solicitud válida puede defender durante la acción, incluido su tramo ofensivo. Bloquear cambia al agresor como target sin borrar indiscriminadamente su ofensiva. Dos contactos simultáneos siguen la regla elegida, sin depender del orden accidental de actualización.
+**Cierre aceptado:** sostener RMB no repite acciones ni mantiene guardia permanente; una solicitud válida puede defender durante preparación y contactos. AttackEnd termina defensa y contactos; Recovery rechaza RMB hasta MontageEnd sin limitar locomoción. Bloquear cambia al agresor como target sin cancelar su ofensiva. Los contactos del mismo frame se evalúan juntos antes de consumir defensa o aplicar daño.
 
 ### 2. Cadena y recuperación NA
 

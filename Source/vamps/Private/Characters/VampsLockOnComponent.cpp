@@ -2,6 +2,7 @@
 #include "Characters/VampsCharacter.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
+#include "Combat/VampsCombatLog.h"
 
 UVampsLockOnComponent::UVampsLockOnComponent()
 {
@@ -11,7 +12,17 @@ UVampsLockOnComponent::UVampsLockOnComponent()
 void UVampsLockOnComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	check(Cast<AVampsCharacter>(GetOwner()));
+	if (!Cast<AVampsCharacter>(GetOwner()))
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: LockOn initialization cancelled; owner '%s' must be a VampsCharacter."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(GetOwner()));
+		SetComponentTickEnabled(false);
+		return;
+	}
 	ActorSpawnedHandle = GetWorld()->AddOnActorSpawnedHandler(
 	    FOnActorSpawned::FDelegate::CreateUObject(this, &UVampsLockOnComponent::RegisterCandidate));
 	for (TActorIterator<AVampsCharacter> FighterIterator(GetWorld()); FighterIterator; ++FighterIterator)

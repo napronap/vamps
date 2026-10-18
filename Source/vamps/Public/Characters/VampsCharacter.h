@@ -4,13 +4,14 @@
 #include "AbilitySystemInterface.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "Combat/VampsCombatState.h"
+#include "TimerManager.h"
 #include "VampsCharacter.generated.h"
 
 class UAbilitySystemComponent;
 class UVampsAttributeSet;
-class UFistHitboxComponent;
+class AVampsWeapon;
 class UVampsLockOnComponent;
-class UAnimMontage;
+class UVampsCombatSettings;
 struct FBranchingPointNotifyPayload;
 struct FOnAttributeChangeData;
 
@@ -21,12 +22,13 @@ class VAMPS_API AVampsCharacter : public ACharacter, public IAbilitySystemInterf
 
 public:
 
-	AVampsCharacter();
+	AVampsCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.f, bool bForce = false) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystem;
@@ -34,14 +36,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UVampsAttributeSet> Attributes;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UFistHitboxComponent> FistHitbox;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Transient, Category = "Combat")
+	TArray<TObjectPtr<AVampsWeapon>> Weapons;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lock On")
 	TObjectPtr<UVampsLockOnComponent> LockOn;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
-	TObjectPtr<UAnimMontage> AttackMontage;
+	TObjectPtr<UVampsCombatSettings> CombatSettings;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0"))
 	float AttackDamage = 12.f;
@@ -52,9 +54,15 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	FVampsCombatState CombatState;
 
-	void BeginCombatAction(int32 PlaybackInstanceID);
+	bool BeginCombatAction(int32 PlaybackInstanceID);
 	void FinishCombatAction();
 	void SetCombatContacts(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
+	void ResetCombatWeaponHits(const FBranchingPointNotifyPayload& Payload, const TArray<int32>& WeaponIndices);
+	void SetCombatComboWindow(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
+	void ResolveCombatContinuation();
+	void ResolveCombatLocomotion();
+	bool TryCalculateCombatSectionDuration(float& SectionDuration) const;
+	void ApplyOffensiveRestriction(float RestrictionDuration);
 	void ConsumeDefenseRequest();
 	void RegisterCombatContact(bool bBlocked);
 	void ReceiveCombatHit(AVampsCharacter* Attacker, bool bBlocked);
@@ -63,7 +71,18 @@ public:
 private:
 
 	FGameplayAbilitySpecHandle AttackHandle;
+	FTimerHandle NARecoveryTimer;
+	FTimerHandle ActionRecoveryTimer;
+	FTimerHandle OffensiveRestrictionTimer;
+	double CombatStepEndsAt = 0;
 
+	bool InitializeCombatWeapons();
+	void DestroyCombatWeapons();
+	bool BeginCombatStep();
+	bool IsCurrentCombatNotify(const FBranchingPointNotifyPayload& Payload) const;
+	void FinishNARecovery();
+	void BeginNARecovery();
+	void FinishOffensiveRestriction();
 	void SetCombatPhase(EVampsActionPhase NewPhase);
 	void HandleCombatHealthChanged(const FOnAttributeChangeData& AttributeChange);
 };

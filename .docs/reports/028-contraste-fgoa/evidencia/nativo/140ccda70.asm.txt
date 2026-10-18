@@ -1,0 +1,3 @@
+140ccda70 MOV EAX,dword ptr [RCX + 0x2418]
+140ccda76 SUB EAX,dword ptr [RCX + 0x2438]
+140ccda7c RET

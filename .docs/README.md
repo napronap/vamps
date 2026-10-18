@@ -23,13 +23,15 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 [Roadmap hacia la emulación FGOA](roadmap.md): consolidar contacto/cámara → botón compartido y fases → cadena/NA → daño/guardia → movilidad → presentación → equipos → red → calibración → extensiones propias. Incluye estado actual, decisiones previas y criterios de cierre; distingue combate local y base completa.
 
-**Avance:** etapa 0 completada por confirmación del usuario el 2026-10-15; [registro](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0). Etapa 1 en curso: input y Blueprints configurados/compilados/guardados por MCP; pendientes el notify manual y PIE. [Registro 021](reports/021-solicitud-compartida/reporte.md). El estado se controla en el roadmap.
+**Avance:** etapa 0 completada por confirmación del usuario el 2026-10-15; [registro](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0). Etapa 1 completada por confirmación del usuario el 2026-10-16, con un único ANS y defensa hasta AttackEnd; [cierre 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). La etapa 2, cadena y NA, queda pendiente. El estado se controla en el roadmap.
 
 1. Leer el [alcance y exclusiones](game/functional.md#alcance-de-la-base), seguido de combate y jugador.
-2. Consultar el [flujo GAS existente](prototype/technical.md#cómo-leer-el-código) para ubicar el punto de partida.
+2. Consultar la [revisión actual del código](reports/028-contraste-fgoa/analisis.md#10-evaluación-concreta-del-código-actual-de-vamps) para ubicar el punto de partida; el flujo del prototipo conserva contexto histórico.
 3. Resolver las preguntas al final de la funcionalidad que se implemente; las preguntas de extensiones no bloquean la base.
 
 ## Análisis de referencia
+
+[028 — Contraste FGOA y Vamps](reports/028-contraste-fgoa/analisis.md): referencia nativa y empírica, [13 recortes de video y trazas](reports/028-contraste-fgoa/evidencia.md), evaluación del C++ actual y correcciones de supuestos sobre defensa, IDs y tiempos. Es la revisión vigente del código; las descripciones de GA_Guard/FistHitbox del prototipo son históricas. [Reporte](reports/028-contraste-fgoa/reporte.md) y [guía del editor](reports/028-contraste-fgoa/editor.md). No cambia gameplay ni cierra etapas.
 
 [016 — Cuatro videos de FGO Arcade](reports/016-analisis-fgo-arcade/analisis.md): [escenas y evidencia](reports/016-analisis-fgo-arcade/escenas.md), [comparación histórica con el prototipo](reports/016-analisis-fgo-arcade/comparacion.md), [decisiones y ubicación de preguntas](reports/016-analisis-fgo-arcade/preguntas.md) y [reporte](reports/016-analisis-fgo-arcade/reporte.md). La revisión de videos está cerrada. [017](reports/017-base-fgoa-y-extensiones/reporte.md) integra su alcance en las especificaciones principales, sin mantener una copia paralela dentro del reporte de análisis.
 
@@ -42,7 +44,15 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
-Iteración vigente: [021 — Solicitud compartida y fases de una acción](reports/021-solicitud-compartida/reporte.md), con input y Blueprints configurados/compilados/guardados por MCP; su [guía del editor](reports/021-solicitud-compartida/editor.md) deja el notify sin soporte MCP y la comprobación en PIE. El plan y el cierre de etapa 0 permanecen en [020](reports/020-roadmap-emulacion-fgoa/reporte.md). La cámara automática de [019](reports/019-camara-lockon/reporte.md) y la selección/HUD de [018](reports/018-lockon-component/reporte.md) se conservan. El setup anterior sigue en [015 — Retirada de Duel](reports/015-retirada-duel/reporte.md) y su [guía](reports/015-retirada-duel/editor.md), con las clases/conexiones de [014](reports/014-copias-nomenclatura-vamps/reporte.md) y la [configuración de personajes y animación](reports/013-recuperacion-blueprints/reporte.md). Los controles de observación de [011](reports/011-ia-combate-prueba/editor.md) se adaptan en 021 a la solicitud compartida.
+Última iteración documental: [029 — Revisión del paso 2](reports/029-revision-paso-2/reporte.md). Contrasta la investigación 028 con el alcance de cadena/NA: recomienda completar varios impactos por paso conservando independencia por arma y resolver Guard en 3. [Guía del editor](reports/029-revision-paso-2/editor.md). Sin cambios de código o assets; no cierra etapas. La referencia y evidencia siguen en [028](reports/028-contraste-fgoa/analisis.md).
+
+Última iteración de gameplay: [030 — Reinicio opcional de impactos por arma](reports/030-reinicio-impactos/reporte.md). Agrega AN_ResetWeaponHits con índices del array Weapons del DA, mantiene un AttackTrace por sección y registros independientes. Sin AN conserva el comportamiento anterior. Compilado y aplicado por Live Coding; clase, defaults y conservación del DA verificados por MCP. Colocación opcional y observación de impactos en la [guía](reports/030-reinicio-impactos/editor.md). No cierra la etapa 2. La configuración y restauración de DA de la iteración anterior permanecen en [027](reports/027-delay-por-golpe/reporte.md).
+
+La [026 — Diagnósticos y cancelación controlada del paso 2](reports/026-diagnosticos-paso-2/reporte.md) reemplaza asserts/casteos fatales del código propio por validaciones explícitas y diagnósticos en LogVampsCombat. Incluye armas, movimiento, resolver y conexiones de inicio/input/IA/HUD/reset. Compilado y aplicado por Live Coding; arranque y limpieza de armas en PIE verificados sin errores nuevos. Pasos de observación en la [guía](reports/026-diagnosticos-paso-2/editor.md).
+
+La [025 — Validación del montage sin cerrar el editor](reports/025-validacion-montage/reporte.md), del 2026-10-17, conserva la evidencia del primer rechazo de configuración sin cierre: faltaba ANS_AttackTrace en Default del montage Executioner. La revisión y categoría de log vigentes están en 026.
+
+La [024 — Continuación al cerrar la ventana de combo](reports/024-cierre-ventana-combo/reporte.md) conserva un montage por cadena y decide el salto al cerrar Combo Window; compilado y aplicado por Live Coding. Restan configurar las animaciones y observar las transiciones según la [guía](reports/024-cierre-ventana-combo/editor.md). Continúa [023 — Armas por Blueprint y trazas independientes](reports/023-armas-y-trazas/reporte.md), con creación/enganche/limpieza de una greatsword por personaje verificados en PIE y calibración/impactos/duales pendientes según su [guía](reports/023-armas-y-trazas/editor.md), y [022 — Cadena, NA y movimiento](reports/022-cadena-y-na/reporte.md). Manny y el AnimBP siguen compartidos. La etapa 1 conserva su [cierre 021](reports/021-solicitud-compartida/reporte.md). El plan y el cierre de etapa 0 permanecen en [020](reports/020-roadmap-emulacion-fgoa/reporte.md). Se conservan cámara [019](reports/019-camara-lockon/reporte.md), selección [018](reports/018-lockon-component/reporte.md) y el setup de assets de [015](reports/015-retirada-duel/reporte.md), [014](reports/014-copias-nomenclatura-vamps/reporte.md) y [013](reports/013-recuperacion-blueprints/reporte.md).
 
 | Tema | Cambios y verificaciones | Pasos del editor |
 |---|---|---|
@@ -67,3 +77,12 @@ Iteración vigente: [021 — Solicitud compartida y fases de una acción](report
 | 019 — Cámara automática sobre lock-on | [Reporte](reports/019-camara-lockon/reporte.md) | [Guía](reports/019-camara-lockon/editor.md) |
 | 020 — Plan de emulación FGOA | [Reporte](reports/020-roadmap-emulacion-fgoa/reporte.md) | [Guía](reports/020-roadmap-emulacion-fgoa/editor.md) |
 | 021 — Solicitud compartida y fases | [Reporte](reports/021-solicitud-compartida/reporte.md) | [Guía](reports/021-solicitud-compartida/editor.md) |
+| 022 — Cadena por secciones y NA | [Reporte](reports/022-cadena-y-na/reporte.md) | [Guía](reports/022-cadena-y-na/editor.md) |
+| 023 — Armas por Blueprint y trazas independientes | [Reporte](reports/023-armas-y-trazas/reporte.md) | [Guía](reports/023-armas-y-trazas/editor.md) |
+| 024 — Continuación al cerrar la ventana de combo | [Reporte](reports/024-cierre-ventana-combo/reporte.md) | [Guía](reports/024-cierre-ventana-combo/editor.md) |
+| 025 — Validación del montage sin cerrar el editor | [Reporte](reports/025-validacion-montage/reporte.md) | [Guía](reports/025-validacion-montage/editor.md) |
+| 026 — Diagnósticos y cancelación controlada del paso 2 | [Reporte](reports/026-diagnosticos-paso-2/reporte.md) | [Guía](reports/026-diagnosticos-paso-2/editor.md) |
+| 027 — Tiempo adicional de restricción por golpe | [Reporte](reports/027-delay-por-golpe/reporte.md) | [Guía](reports/027-delay-por-golpe/editor.md) |
+| 028 — Contraste FGOA y Vamps | [Reporte](reports/028-contraste-fgoa/reporte.md) | [Guía](reports/028-contraste-fgoa/editor.md) |
+| 029 — Revisión del paso 2 | [Reporte](reports/029-revision-paso-2/reporte.md) | [Guía](reports/029-revision-paso-2/editor.md) |
+| 030 — Reinicio opcional de impactos por arma | [Reporte](reports/030-reinicio-impactos/reporte.md) | [Guía](reports/030-reinicio-impactos/editor.md) |

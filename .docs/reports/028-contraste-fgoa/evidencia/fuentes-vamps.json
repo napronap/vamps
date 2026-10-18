@@ -1,0 +1,254 @@
+[
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\AI\\VampsAIController.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\AI\\VampsAIController.h",
+    "SHA256": "67E401A0C19A45CD94DD41849E73111C97E4B506900628CC3F47C4F9C7292ECF",
+    "Lines": 56
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Animation\\ANS_AttackTrace.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Animation\\ANS_AttackTrace.h",
+    "SHA256": "D46EFF75045B044ACC51DFC51E4CDC1DBA446DC9ED3BF8E89FDB7AEB412B9730",
+    "Lines": 21
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Animation\\ANS_ComboWindow.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Animation\\ANS_ComboWindow.h",
+    "SHA256": "72B034EAEB4D330EE37166F56DEBCF6EBCB20EDE5BC558C7D6F6081430EA0F9C",
+    "Lines": 16
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Animation\\VampsAnimInstance.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Animation\\VampsAnimInstance.h",
+    "SHA256": "D8C1AF40602BFF811B13185C47070CCA9580264B9D4BDD0D3D6B9B58B4727E32",
+    "Lines": 26
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Characters\\VampsCharacter_Player.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Characters\\VampsCharacter_Player.h",
+    "SHA256": "45FFEEC11109F492EE3FC223C0351CC4B679B23C2EE58963AA00B4C77BD727DF",
+    "Lines": 23
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Characters\\VampsCharacter.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Characters\\VampsCharacter.h",
+    "SHA256": "1F9A7216DF75F55BCF427FD0AB6C63A1168249FF57FE943DBED11A3B4E28DD97",
+    "Lines": 87
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Characters\\VampsLockOnComponent.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Characters\\VampsLockOnComponent.h",
+    "SHA256": "17093C7AA56CE84A7FAA33CF4B0C8755057607BFD32317D8F37A9AEA61B19F61",
+    "Lines": 40
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\VampsCombatLog.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\VampsCombatLog.h",
+    "SHA256": "835EC63E0EE018E773F688099DFE1E7DA79C647FD9CD9F98E293E4E2C4B45FB6",
+    "Lines": 5
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\VampsCombatMovementComponent.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\VampsCombatMovementComponent.h",
+    "SHA256": "E02360243EEC6B8B0F528B955E569BBC17E935DDB5890999A5D3FBC531373A5C",
+    "Lines": 61
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\VampsCombatResolver.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\VampsCombatResolver.h",
+    "SHA256": "D5006194153AC8101627D88B3ABA68C26E436DECFE57026227F8678F60A31E35",
+    "Lines": 48
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\VampsCombatState.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\VampsCombatState.h",
+    "SHA256": "CE149058EC20BB1A18AA98F80BAB89E2E615C5D5A6A334BDF944BAF82E0DE319",
+    "Lines": 110
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\VampsCombatTags.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\VampsCombatTags.h",
+    "SHA256": "1BF3AD233D48D6C4FAD4FE81846A5867EB8A75716D9CC847985ED4E6D664AE0B",
+    "Lines": 8
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\VampsWeapon.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\VampsWeapon.h",
+    "SHA256": "59A35B004ED2ECF2D6714E3277A57C5A5EFC1C726AC6B1285622F1A01AFE8196",
+    "Lines": 55
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\Abilities\\GA_Attack.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\Abilities\\GA_Attack.h",
+    "SHA256": "1C3299D501C248AEB8A1EAF432DAF81745C84CBB21CC5E84E8C5E57EA94AEE9C",
+    "Lines": 29
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\Attributes\\VampsAttributeSet.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\Attributes\\VampsAttributeSet.h",
+    "SHA256": "C6BD562BF96B21CBD9390D5D5E6BF66C2DEE0336AF9814E5929E1E8BEB2A96E7",
+    "Lines": 44
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\Data\\VampsCombatSettings.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\Data\\VampsCombatSettings.h",
+    "SHA256": "3BB78F03E98C49609B925798306E8D2C9D94EC11CC9291CE39B167629CBEA247",
+    "Lines": 65
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Combat\\Effects\\GE_VampsDamage.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Combat\\Effects\\GE_VampsDamage.h",
+    "SHA256": "3025FCF79AF819127B779AE8CD31B0183B8AD131C64351FB652DB7943A4F7591",
+    "Lines": 14
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\GameModes\\VampsCombatTestGameMode.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\GameModes\\VampsCombatTestGameMode.h",
+    "SHA256": "9675E70D359B97C943B3933934CA33A75E5BAA18D9626CA8DFB0BCF0E806913F",
+    "Lines": 45
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Player\\VampsCombatTestPlayerController.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Player\\VampsCombatTestPlayerController.h",
+    "SHA256": "D6A6B9BBA72E0644B25363EE20212F9B30C694FD3CD958E6C685E451870F7092",
+    "Lines": 25
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Player\\VampsPlayerCameraManager.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Player\\VampsPlayerCameraManager.h",
+    "SHA256": "4D5E53168739698386AC3809A89EB263D2ED45AAC0B81638BB5A66F0C16BBC38",
+    "Lines": 25
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\Player\\VampsPlayerController.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\Player\\VampsPlayerController.h",
+    "SHA256": "895010777AE53BBBBB094B7B8A3F0F596942BFFBDC4E2C36ABC2D9A783CB0439",
+    "Lines": 42
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Public\\UI\\VampsCombatTestHUD.h",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Public\\UI\\VampsCombatTestHUD.h",
+    "SHA256": "6F667C456A0552C03FB350C5DCB669A3B83864601413042A76C115AF35219E69",
+    "Lines": 20
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\AI\\VampsAIController.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\AI\\VampsAIController.cpp",
+    "SHA256": "7C1C4AED71244CE30484A249890C629FBB49E24FD7BBA0F80EC332702464CD16",
+    "Lines": 199
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Animation\\ANS_AttackTrace.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Animation\\ANS_AttackTrace.cpp",
+    "SHA256": "AF429ECFFB529F0939AEAFBAEA982798E86DBABA8B9461E62FFEA4E2B830B8A8",
+    "Lines": 40
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Animation\\ANS_ComboWindow.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Animation\\ANS_ComboWindow.cpp",
+    "SHA256": "5BB564F6134B2BD16E97E7F3FDED3BAD07F1204461FFD85304BD47A7C8F6EF02",
+    "Lines": 47
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Animation\\VampsAnimInstance.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Animation\\VampsAnimInstance.cpp",
+    "SHA256": "3A76FB39E1C99DB2CC89690DC92A061B969190C87E6BC0239619A226C8B5BF94",
+    "Lines": 36
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Characters\\VampsCharacter_Player.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Characters\\VampsCharacter_Player.cpp",
+    "SHA256": "08DD8A06ACF9ABBDAC89747C6AB77ED21B4EF72A220A22401BF00484BAE274AE",
+    "Lines": 16
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Characters\\VampsCharacter.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Characters\\VampsCharacter.cpp",
+    "SHA256": "24BDB8529980F5A3186A305EFC06B4D9298C653E4CD91803F4C672612555E3E2",
+    "Lines": 778
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Characters\\VampsLockOnComponent.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Characters\\VampsLockOnComponent.cpp",
+    "SHA256": "52D9337551CBB6265F1A6E68AE4EF3883A01DAD27540D1D6E9385E0E1F328B1D",
+    "Lines": 110
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Combat\\VampsCombatLog.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Combat\\VampsCombatLog.cpp",
+    "SHA256": "8BE759CE2DF489859D121BD81398799D49671A26D2BEBAEF75AA2CDFAB2E50D0",
+    "Lines": 3
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Combat\\VampsCombatMovementComponent.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Combat\\VampsCombatMovementComponent.cpp",
+    "SHA256": "75E06821AD889CF7F581FEACE681BA22D6BDE43A584433E9A9FC14E564299A32",
+    "Lines": 265
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Combat\\VampsCombatResolver.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Combat\\VampsCombatResolver.cpp",
+    "SHA256": "5A9BF66481B1C27203620288FCB82E615F54A2CBBDBF0B402BA23AD8FA37D3F3",
+    "Lines": 281
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Combat\\VampsCombatTags.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Combat\\VampsCombatTags.cpp",
+    "SHA256": "3B52CE245BCF831127778C692E624D696000748538ECB5000BE320D49D3EC050",
+    "Lines": 6
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Combat\\VampsWeapon.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Combat\\VampsWeapon.cpp",
+    "SHA256": "08FC2C22F939296104976808D76BAEFADE4AC66E2D8B1185D534BE8152816FD9",
+    "Lines": 232
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Combat\\Abilities\\GA_Attack.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Combat\\Abilities\\GA_Attack.cpp",
+    "SHA256": "FBBAAAFC86B6ED50EF4F0DE1034B2EA039DB71FE417BFFA5583F31D51A0EAF5C",
+    "Lines": 267
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Combat\\Attributes\\VampsAttributeSet.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Combat\\Attributes\\VampsAttributeSet.cpp",
+    "SHA256": "431B4D1E8A70949BF6E7A463FA15033F10E7CC4551F230C7D2D971D4D26654F5",
+    "Lines": 48
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Combat\\Effects\\GE_VampsDamage.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Combat\\Effects\\GE_VampsDamage.cpp",
+    "SHA256": "ACD55B769F11120D36A6C993BF2F4E9306EFE06DD816BF4009796863C2D0253F",
+    "Lines": 14
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\GameModes\\VampsCombatTestGameMode.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\GameModes\\VampsCombatTestGameMode.cpp",
+    "SHA256": "7A7ECE7F0B392FCBE2D6539018AA8F16F97B0B237008C822F420543568531CEC",
+    "Lines": 128
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Player\\VampsCombatTestPlayerController.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Player\\VampsCombatTestPlayerController.cpp",
+    "SHA256": "53C23C7303F9E2DC3F5629ABF8BCF6D40A12C7D021D97799BE07ADC3CABF3F1E",
+    "Lines": 73
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Player\\VampsPlayerCameraManager.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Player\\VampsPlayerCameraManager.cpp",
+    "SHA256": "C33A6D29126C20C2D09BEC0866EA314D54A104C67620F27CC01A482F5369B0A3",
+    "Lines": 66
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\Player\\VampsPlayerController.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\Player\\VampsPlayerController.cpp",
+    "SHA256": "47BBB38F2AC94F0049BF9C8FB7EA3C3EB748A72CD7837D50597CD907C697E358",
+    "Lines": 167
+  },
+  {
+    "Path": "C:\\dev\\vamps\\Source\\vamps\\Private\\UI\\VampsCombatTestHUD.cpp",
+    "Snapshot": "D:\\fgo arcade\\fgoac\\research\\vamps-contrast-20261018-0838\\evidence\\code\\Source\\vamps\\Private\\UI\\VampsCombatTestHUD.cpp",
+    "SHA256": "403DB7D13B8CFDA2803E82999D4AB28E17F3E3012D077DD901CE256C792A3037",
+    "Lines": 155
+  }
+]

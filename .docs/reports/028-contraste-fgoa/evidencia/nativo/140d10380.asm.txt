@@ -1,0 +1,3 @@
+140d10380 MOVSD qword ptr [RCX + 0x8],XMM2
+140d10385 MOV qword ptr [RCX],RDX
+140d10388 RET

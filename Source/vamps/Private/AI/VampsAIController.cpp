@@ -1,18 +1,30 @@
 #include "AI/VampsAIController.h"
+#include "Animation/AnimMontage.h"
 #include "Characters/VampsCharacter.h"
+#include "Combat/Data/VampsCombatSettings.h"
+#include "Combat/VampsCombatLog.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 void AVampsAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	AVampsCharacter* ControlledCharacter = CastChecked<AVampsCharacter>(InPawn);
+	AVampsCharacter* ControlledCharacter = Cast<AVampsCharacter>(InPawn);
+	if (!ControlledCharacter || !ControlledCharacter->GetCharacterMovement())
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: cannot initialize AI; pawn '%s' must be a VampsCharacter with a movement component."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(InPawn));
+		return;
+	}
 	UCharacterMovementComponent* Movement = ControlledCharacter->GetCharacterMovement();
 	bPreviousOrientRotationToMovement = Movement->bOrientRotationToMovement;
 	bPreviousUseControllerDesiredRotation = Movement->bUseControllerDesiredRotation;
 	Movement->bOrientRotationToMovement = false;
 	Movement->bUseControllerDesiredRotation = true;
-	check(AttackDistance > 0.f && AttackInterval > 0.f && MixedModeDuration > 0.f);
 	SetMode(Mode);
 }
 
@@ -47,7 +59,24 @@ void AVampsAIController::Tick(float DeltaSeconds)
 
 void AVampsAIController::SetMode(EVampsAIMode NewMode)
 {
-	check(NewMode <= EVampsAIMode::Mixed);
+	if (NewMode > EVampsAIMode::Mixed || !FMath::IsFinite(AttackDistance) || !FMath::IsFinite(AttackInterval) ||
+	    !FMath::IsFinite(MixedModeDuration) || AttackDistance <= 0.f || AttackInterval <= 0.f ||
+	    MixedModeDuration <= 0.f)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: AI mode change rejected; mode=%d, AttackDistance=%f, AttackInterval=%f, "
+		            "MixedModeDuration=%f. Expected mode 0..4 and finite positive settings."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       int32(NewMode),
+		       AttackDistance,
+		       AttackInterval,
+		       MixedModeDuration);
+		GetWorldTimerManager().ClearTimer(DecisionTimer);
+		MoveDirection = FVector::ZeroVector;
+		return;
+	}
 	GetWorldTimerManager().ClearTimer(DecisionTimer);
 	StopActions();
 	Mode = NewMode;
@@ -81,7 +110,18 @@ void AVampsAIController::Decide()
 		return;
 	}
 
-	AVampsCharacter* ControlledCharacter = CastChecked<AVampsCharacter>(GetPawn());
+	AVampsCharacter* ControlledCharacter = Cast<AVampsCharacter>(GetPawn());
+	if (!IsValid(ControlledCharacter))
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: AI decision cancelled; pawn '%s' is not a valid VampsCharacter."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(GetPawn()));
+		GetWorldTimerManager().ClearTimer(DecisionTimer);
+		return;
+	}
 	const double Now = GetWorld()->GetTimeSeconds();
 	EVampsAIMode Behavior = Mode;
 	if (Mode == EVampsAIMode::Mixed)
@@ -100,6 +140,26 @@ void AVampsAIController::Decide()
 	case EVampsAIMode::Passive:
 		return;
 	case EVampsAIMode::Attack:
+		if (!ControlledCharacter->CombatSettings || !ControlledCharacter->CombatSettings->AttackMontage)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: %s: AI attack cancelled; '%s' requires CombatSettings and AttackMontage."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       *ControlledCharacter->GetPathName());
+			GetWorldTimerManager().ClearTimer(DecisionTimer);
+			return;
+		}
+		if (ControlledCharacter->CombatState.bComboWindowOpen && ControlledCharacter->CombatState.bActionConnected &&
+		    !ControlledCharacter->CombatState.bOffenseRestricted &&
+		    !ControlledCharacter->CombatState.bContinuationRequested &&
+		    ControlledCharacter->CombatState.ComboStep <
+		        ControlledCharacter->CombatSettings->AttackMontage->GetNumSections())
+		{
+			ControlledCharacter->RequestCombatAction();
+			return;
+		}
 		if (!ControlledCharacter->CombatState.bCanStartAction)
 		{
 			return;
@@ -118,7 +178,7 @@ void AVampsAIController::Decide()
 		}
 		return;
 	case EVampsAIMode::Guard:
-		if (!ControlledCharacter->CombatState.bCanDefend)
+		if (ControlledCharacter->CombatState.bCanRequestCombat && !ControlledCharacter->CombatState.bCanDefend)
 		{
 			ControlledCharacter->RequestCombatAction();
 		}
@@ -127,6 +187,13 @@ void AVampsAIController::Decide()
 		MoveDirection = FVector::CrossProduct(FVector::UpVector, ToTarget.GetSafeNormal2D());
 		return;
 	default:
-		checkNoEntry();
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: %s: AI decision cancelled; unsupported behavior %d."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       int32(Behavior));
+		GetWorldTimerManager().ClearTimer(DecisionTimer);
+		return;
 	}
 }

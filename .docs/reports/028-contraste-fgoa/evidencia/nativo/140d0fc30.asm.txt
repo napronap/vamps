@@ -1,0 +1,9 @@
+140d0fc30 MOVSS XMM0,dword ptr [RCX + 0x34a4]
+140d0fc38 COMISS XMM0,dword ptr [RCX + 0x2d84]
+140d0fc3f JBE 0x140d0fc4d
+140d0fc41 CMP byte ptr [RCX + 0x2dc8],0x0
+140d0fc48 JNZ 0x140d0fc4d
+140d0fc4a XOR AL,AL
+140d0fc4c RET
+140d0fc4d MOV AL,0x1
+140d0fc4f RET

@@ -3,7 +3,9 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
+#include "Combat/VampsCombatMovementComponent.h"
 #include "Engine/Canvas.h"
+#include "Engine/World.h"
 #include "GameModes/VampsCombatTestGameMode.h"
 
 void AVampsCombatTestHUD::DrawFighter(
@@ -13,14 +15,26 @@ void AVampsCombatTestHUD::DrawFighter(
 	{
 		return;
 	}
+	const UVampsCombatMovementComponent* CombatMovement =
+	    Cast<UVampsCombatMovementComponent>(Fighter->GetCharacterMovement());
+	if (!Fighter->Attributes || !Fighter->LockOn || !CombatMovement || !(Fighter->Attributes->GetMaxHealth() > 0.f))
+	{
+		DrawText(FString::Printf(TEXT("%hs: %s: missing combat attributes, LockOn, movement or positive MaxHealth."),
+		                         __FUNCTION__,
+		                         *Fighter->GetName()),
+		         FLinearColor::Red,
+		         X,
+		         Y);
+		return;
+	}
 
 	const float Health = Fighter->Attributes->GetHealth();
 	const float MaxHealth = Fighter->Attributes->GetMaxHealth();
 	const FVampsCombatState& FighterState = Fighter->CombatState;
-	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), X, Y, Width, 200);
+	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), X, Y, Width, 288);
 	if (bSelected)
 	{
-		DrawRect(FLinearColor(1.f, 0.75f, 0.15f), X, Y, 4, 200);
+		DrawRect(FLinearColor(1.f, 0.75f, 0.15f), X, Y, 4, 288);
 	}
 	DrawText(FString::Printf(TEXT("%s   %.0f / %.0f"), *Label, Health, MaxHealth), FLinearColor::White, X + 12, Y + 9);
 	DrawRect(FLinearColor(0.15f, 0.15f, 0.18f), X + 12, Y + 32, Width - 24, 10);
@@ -57,6 +71,34 @@ void AVampsCombatTestHUD::DrawFighter(
 	         Y + 140);
 	DrawText(
 	    TEXT("LOCK ON: ") + GetNameSafe(Fighter->LockOn->GetCurrentTarget()), FLinearColor::White, X + 12, Y + 162);
+	DrawText(FString::Printf(TEXT("STEP %d | WINDOW: %s | CONTACT: %s"),
+	                         FighterState.ComboStep,
+	                         FighterState.bComboWindowOpen ? TEXT("OPEN") : TEXT("CLOSED"),
+	                         FighterState.bActionConnected ? TEXT("YES") : TEXT("NO")),
+	         FLinearColor::White,
+	         X + 12,
+	         Y + 184);
+	DrawText(
+	    FString::Printf(TEXT("CONTINUATION: %s"), FighterState.bContinuationRequested ? TEXT("PENDING") : TEXT("NONE")),
+	    FLinearColor::White,
+	    X + 12,
+	    Y + 206);
+	const double Now = GetWorld()->GetTimeSeconds();
+	DrawText(FString::Printf(TEXT("OFFENSE LOCK: %.2f | NA: %.2f"),
+	                         FMath::Max(0.0, FighterState.OffensiveRestrictionEndsAt - Now),
+	                         FMath::Max(0.0, FighterState.NARecoveryEndsAt - Now)),
+	         FLinearColor::White,
+	         X + 12,
+	         Y + 228);
+	const FString MotionName =
+	    StaticEnum<EVampsCombatMotion>()->GetNameStringByValue(int64(CombatMovement->CombatMotion));
+	DrawText(FString::Printf(TEXT("MOTION: %s | WALL: %s | RELEASED: %s"),
+	                         *MotionName,
+	                         CombatMovement->bCombatMotionBlocked ? TEXT("YES") : TEXT("NO"),
+	                         FighterState.bRecoveryVisualReleased ? TEXT("YES") : TEXT("NO")),
+	         FLinearColor::White,
+	         X + 12,
+	         Y + 250);
 }
 
 void AVampsCombatTestHUD::DrawHUD()
@@ -70,6 +112,10 @@ void AVampsCombatTestHUD::DrawHUD()
 	const float Width = FMath::Min(380.f, Canvas->SizeX * 0.43f);
 	AVampsCharacter* PlayerCharacter = Cast<AVampsCharacter>(PlayerOwner->GetPawn());
 	DrawFighter(PlayerCharacter, TEXT("PLAYER"), 20, 20, Width, false);
+	if (PlayerCharacter && !PlayerCharacter->LockOn)
+	{
+		return;
+	}
 	if (PlayerCharacter)
 	{
 		float TargetY = 20;
@@ -86,11 +132,20 @@ void AVampsCombatTestHUD::DrawHUD()
 			            TargetY,
 			            Width,
 			            Fighter == PlayerCharacter->LockOn->GetCurrentTarget());
-			TargetY += 220;
+			TargetY += 308;
 		}
 	}
-	const AVampsCombatTestGameMode* TestGameMode = CastChecked<AVampsCombatTestGameMode>(GetWorld()->GetAuthGameMode());
-	check(TestGameMode->OpponentAI);
+	const AVampsCombatTestGameMode* TestGameMode = Cast<AVampsCombatTestGameMode>(GetWorld()->GetAuthGameMode());
+	if (!TestGameMode || !IsValid(TestGameMode->OpponentAI))
+	{
+		DrawText(FString::Printf(TEXT("%hs: requires VampsCombatTestGameMode with a valid OpponentAI; got '%s'."),
+		                         __FUNCTION__,
+		                         *GetNameSafe(TestGameMode)),
+		         FLinearColor::Red,
+		         20,
+		         Canvas->SizeY - 75);
+		return;
+	}
 	const FString ModeName = StaticEnum<EVampsAIMode>()->GetNameStringByValue(int64(TestGameMode->OpponentAI->Mode));
 	DrawText(TEXT("AI: ") + ModeName + TEXT(" | F6 next mode | R reset"), FLinearColor::White, 20, Canvas->SizeY - 75);
 	DrawText(TEXT("WASD move | Auto camera | RMB combat (click) | F next target"),
