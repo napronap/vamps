@@ -1,0 +1,85 @@
+[2026.10.19-23.10.14:449][ 83]LogSlate: InvalidateAllWidgets triggered.  All widgets were invalidated
+[2026.10.19-23.10.14:486][ 83]LogSlate: Updating window title bar state: overlay mode, drag disabled, window buttons hidden, title bar hidden
+[2026.10.19-23.10.14:488][ 83]LogAudioMixer: Deinitializing Audio Bus Subsystem for audio device with ID 13
+[2026.10.19-23.10.14:488][ 83]LogAudioMixer: Display: FAudioMixerWasapi::StopAudioStream() InstanceID=13, StreamState=4
+[2026.10.19-23.10.14:496][ 83]LogAudioMixerWasapi: Display: FWasapiServiceWatcher stopped.
+[2026.10.19-23.10.14:531][ 83]LogUObjectHash: Compacting FUObjectHashTables data took   0.70ms
+[2026.10.19-23.10.14:738][ 84]LogPlayLevel: Display: Destroying online subsystem :Context_14
+[2026.10.19-23.10.16:078][ 88]LogModelContextProtocol: Running tool: 'call_tool'
+[2026.10.19-23.10.16:078][ 88]LogModelContextProtocol: Dispatching toolset tool: 'EditorToolset.EditorAppToolset.IsPIERunning'
+[2026.10.19-23.10.31:074][133]LogModelContextProtocol: Running tool: 'call_tool'
+[2026.10.19-23.10.31:074][133]LogModelContextProtocol: Dispatching toolset tool: 'LiveCodingToolset.LiveCodingToolset.CompileLiveCoding'
+[2026.10.19-23.10.31:074][133]LogLiveCodingToolset: CompileLiveCoding: entry
+[2026.10.19-23.10.31:077][133]LogLiveCoding: Display: Starting Live Coding compile.
+[2026.10.19-23.11.21:856][133]Display: Reload/Re-instancing Complete: No object changes detected
+[2026.10.19-23.11.21:856][133]LogLiveCoding: Error: Live coding failed, please see Live console for more information
+[2026.10.19-23.11.21:860][133]LogLiveCodingToolset: CompileLiveCoding: Result: CompileNotStarted
+[2026.10.19-23.12.01:534][253]LogModelContextProtocol: Running tool: 'call_tool'
+[2026.10.19-23.12.01:534][253]LogModelContextProtocol: Dispatching toolset tool: 'LiveCodingToolset.LiveCodingToolset.CompileLiveCoding'
+[2026.10.19-23.12.01:534][253]LogLiveCodingToolset: CompileLiveCoding: entry
+[2026.10.19-23.12.01:583][253]LogLiveCoding: Display: Starting Live Coding compile.
+[2026.10.19-23.12.34:230][253]LogLiveCoding: Display: UbaCli v5.8.1-Uba_v1.0.0-56050371 (Rootdir: "C:\ProgramData\Epic\UbaCli", StoreCapacity: 0Gb)
+
+---- Starting trace: Debugc26ff521-1c7e-4507-a8b5-e7e2202c44ae ----
+Running C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe @C:\Users\franc\AppData\Local\Temp\87D1.tmp
+   Creating library C:\dev\vamps\Binaries\Win64\UnrealEditor-vamps.patch_3.lib and object C:\dev\vamps\Binaries\Win64\UnrealEditor-vamps.patch_3.exp
+Detoured run took 1.0s
+[2026.10.19-23.12.34:659][253]LogClass: UClass VampsLockOnComponent Reload.
+[2026.10.19-23.12.34:717][253]LogClass: Could not find existing class VampsLockOnComponent in package /Script/vamps for reload, assuming new or modified class
+[2026.10.19-23.12.34:717][253]Warning: Property size mismatch. Will not update class VampsPlayerCameraManager (was 11496, new 11504).
+[2026.10.19-23.12.34:776][253]Re-instancing VampsLockOnComponent after reload.
+[2026.10.19-23.12.34:816][253]LogDatasmithContent: Do not use the UDatasmithStaticMeshCADImportData to store CAD data as the class is now deprecated.
+[2026.10.19-23.12.37:940][253]LogWindows: Error: === Critical error: ===
+[2026.10.19-23.12.37:940][253]LogWindows: Error: 
+[2026.10.19-23.12.37:940][253]LogWindows: Error: Fatal error!
+[2026.10.19-23.12.37:940][253]LogWindows: Error: 
+[2026.10.19-23.12.37:940][253]LogWindows: Error: Unhandled Exception: EXCEPTION_ACCESS_VIOLATION reading address 0x0000008000000070
+[2026.10.19-23.12.37:940][253]LogWindows: Error: 
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe62bd74b UnrealEditor-Core.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe5b43a1c UnrealEditor-Core.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189d6f16a45 UnrealEditor-vamps.patch_2.exe!TSparseArray<TSparseSetElement<TTuple<TWeakObjectPtr<UPrimitiveComponent,FWeakObjectPtr>,float> >,TSparseArrayAllocator<TSizedDefaultAllocator<32>,FDefaultBitArrayAllocator> >::~TSparseArray<TSparseSetElement<TTuple<TWeakObjectPtr<UPrimitiveComponent,FWeakObjectPtr>,float> >,TSparseArrayAllocator<TSizedDefaultAllocator<32>,FDefaultBitArrayAllocator> >() [C:\Program Files\Epic Games\UE_5.8\Engine\Source\Runtime\Core\Public\Containers\SparseArray.h:539]
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189d6f1b270 UnrealEditor-vamps.patch_2.exe!AVampsPlayerCameraManager::`vector deleting destructor'() []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe4e7d40d UnrealEditor-CoreUObject.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe4ec40a6 UnrealEditor-CoreUObject.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe4ec4501 UnrealEditor-CoreUObject.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe4e48043 UnrealEditor-CoreUObject.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe4ecca3a UnrealEditor-CoreUObject.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe4e77d3b UnrealEditor-CoreUObject.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fff97384ec8 UnrealEditor-LiveCoding.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fff97386922 UnrealEditor-LiveCoding.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x0000018880123fc2 UnrealEditor-LiveCodingToolset.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000188801257aa UnrealEditor-LiveCodingToolset.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe4e17b2c UnrealEditor-CoreUObject.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3c394fe UnrealEditor-ToolsetRegistry.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3c3ad39 UnrealEditor-ToolsetRegistry.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3c39edd UnrealEditor-ToolsetRegistry.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3c3a1b0 UnrealEditor-ToolsetRegistry.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3d63d93 UnrealEditor-ModelContextProtocolEditor.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3d6c9f9 UnrealEditor-ModelContextProtocolEditor.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3a0cfa4 UnrealEditor-ModelContextProtocol.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3a09dba UnrealEditor-ModelContextProtocol.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3a0b6e8 UnrealEditor-ModelContextProtocol.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3a03ce0 UnrealEditor-ModelContextProtocol.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f399e87e UnrealEditor-HTTPServer.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3997cbf UnrealEditor-HTTPServer.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f399853a UnrealEditor-HTTPServer.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f3995bbf UnrealEditor-HTTPServer.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f39a303b UnrealEditor-HTTPServer.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f39a3b70 UnrealEditor-HTTPServer.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f39a316e UnrealEditor-HTTPServer.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00000189f39a36cf UnrealEditor-HTTPServer.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe5a03805 UnrealEditor-Core.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe59d7e8b UnrealEditor-Core.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007fffe5a459df UnrealEditor-Core.dll!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007ff7e6283a11 UnrealEditor.exe!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007ff7e626c4ac UnrealEditor.exe!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007ff7e626c5ba UnrealEditor.exe!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007ff7e6271256 UnrealEditor.exe!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007ff7e6285c74 UnrealEditor.exe!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007ff7e628902a UnrealEditor.exe!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: [Callstack] 0x00007ff92f1ddda7 KERNEL32.DLL!UnknownFunction []
+[2026.10.19-23.12.37:940][253]LogWindows: Error: 
+[2026.10.19-23.12.37:946][253]LogExit: Executing StaticShutdownAfterError
+[2026.10.19-23.12.38:001][253]LogWindows: FPlatformMisc::RequestExit(1, LaunchWindowsStartup.ExceptionHandler)
+[2026.10.19-23.12.38:001][253]LogWindows: FPlatformMisc::RequestExitWithStatus(1, 3, LaunchWindowsStartup.ExceptionHandler)
+[2026.10.19-23.12.38:001][253]LogCore: Engine exit requested (reason: Win RequestExit)

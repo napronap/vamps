@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-20",
+  "scope": "Lecturas de defaults de Blueprints y componentes por MCP; no representan una captura de POV runtime ni preservación completa de Data Assets.",
+  "blueprints": {
+    "BP_VampsPlayerCameraManager": {
+      "followPitch": -15,
+      "trackingSpeed": 6,
+      "horizontalTolerance": 6,
+      "defaultFOV": 90,
+      "defaultAspectRatio": 1.3333300352096558,
+      "defaultModifiers": [
+        {
+          "refPath": "/Script/Engine.CameraModifier_CameraShake"
+        }
+      ]
+    },
+    "BP_VampsCharacter_Player": {
+      "cameraBoom": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CameraBoom"
+      },
+      "followCamera": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:FollowCamera"
+      },
+      "combatSettings": {
+        "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+      },
+      "mesh": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CharacterMesh0"
+      },
+      "capsuleComponent": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CollisionCylinder"
+      }
+    },
+    "BP_VampsPlayerController": {
+      "playerCameraManagerClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsPlayerCameraManager.BP_VampsPlayerCameraManager_C"
+      },
+      "defaultInputMappingContext": {
+        "refPath": "/Game/Vamps/Input/IMC_Vamps.IMC_Vamps"
+      },
+      "moveAction": {
+        "refPath": "/Game/Vamps/Input/IA_Move.IA_Move"
+      },
+      "mobilityAction": {
+        "refPath": "/Game/Vamps/Input/IA_Mobility.IA_Mobility"
+      }
+    },
+    "BP_VampsCombatTestPlayerController": {
+      "playerCameraManagerClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsPlayerCameraManager.BP_VampsPlayerCameraManager_C"
+      },
+      "defaultInputMappingContext": {
+        "refPath": "/Game/Vamps/Input/IMC_VampsCombatTest.IMC_VampsCombatTest"
+      },
+      "moveAction": {
+        "refPath": "/Game/Vamps/Input/IA_Move.IA_Move"
+      },
+      "mobilityAction": {
+        "refPath": "/Game/Vamps/Input/IA_Mobility.IA_Mobility"
+      }
+    },
+    "BP_VampsCombatTestGameMode": {
+      "defaultPawnClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.BP_VampsCharacter_Player_C"
+      },
+      "playerControllerClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCombatTestPlayerController.BP_VampsCombatTestPlayerController_C"
+      },
+      "hUDClass": {
+        "refPath": "/Script/vamps.VampsCombatTestHUD"
+      },
+      "opponentClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter.BP_VampsCharacter_C"
+      },
+      "opponentControllerClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsAIController.BP_VampsAIController_C"
+      }
+    }
+  },
+  "components": {
+    "cameraBoom": {
+      "path": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CameraBoom",
+      "values": {
+        "targetArmLength": 400,
+        "targetOffset": {
+          "x": 0,
+          "y": 0,
+          "z": 60
+        },
+        "socketOffset": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "bDoCollisionTest": true,
+        "probeSize": 12,
+        "probeChannel": "ECC_Camera",
+        "bEnableCameraLag": false,
+        "bUsePawnControlRotation": true
+      }
+    },
+    "followCamera": {
+      "path": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:FollowCamera",
+      "values": {
+        "fieldOfView": 90,
+        "aspectRatio": 1.7777780294418335,
+        "bConstrainAspectRatio": false,
+        "bOverrideAspectRatioAxisConstraint": false,
+        "aspectRatioAxisConstraint": "AspectRatio_MaintainXFOV"
+      }
+    },
+    "mesh": {
+      "path": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CharacterMesh0",
+      "values": {
+        "relativeLocation": {
+          "x": 0,
+          "y": 0,
+          "z": -88
+        },
+        "relativeRotation": {
+          "pitch": 0,
+          "yaw": -90,
+          "roll": 0
+        },
+        "skeletalMeshAsset": {
+          "refPath": "/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"
+        },
+        "overrideMaterials": []
+      }
+    },
+    "capsuleComponent": {
+      "path": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CollisionCylinder",
+      "values": {
+        "capsuleHalfHeight": 88,
+        "capsuleRadius": 34
+      }
+    }
+  },
+  "sceneActors": [
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.WorldSettings_1"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.Brush_1"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.DirectionalLight_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.SkyAtmosphere_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.SkyLight_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.ExponentialHeightFog_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.VolumetricCloud_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.PlayerStart_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.StaticMeshActor_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.Floor_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.BuoyancyManager_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.DefaultPhysicsVolume_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.GameplayDebuggerPlayerManager_0"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.ChaosDebugDrawActor"
+    },
+    {
+      "refPath": "/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.AbstractNavData-Default"
+    }
+  ]
+}

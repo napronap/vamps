@@ -1,0 +1,34 @@
+{
+  "properties": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"returnValue\":\"{\\\"blendMode\\\":\\\"BLEND_Masked\\\",\\\"twoSided\\\":true,\\\"ditherOpacityMask\\\":true,\\\"opacityMaskClipValue\\\":0.5}\"}"
+      }
+    ]
+  },
+  "MP_OpacityMask": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"returnValue\":{\"output_name\":\"\",\"expression\":{\"refPath\":\"/Game/Vamps/Materials/M_CameraOccluder.M_CameraOccluder:MaterialExpressionOneMinus_0\"},\"input_name\":\"\"}}"
+      }
+    ]
+  },
+  "MP_BaseColor": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"returnValue\":{\"output_name\":\"\",\"expression\":{\"refPath\":\"/Game/Vamps/Materials/M_CameraOccluder.M_CameraOccluder:MaterialExpressionConstant3Vector_0\"},\"input_name\":\"\"}}"
+      }
+    ]
+  },
+  "scalar": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"returnValue\":\"{\\\"parameterName\\\":\\\"VampsCameraFade\\\",\\\"defaultValue\\\":0,\\\"bUseCustomPrimitiveData\\\":true,\\\"primitiveDataIndex\\\":0}\"}"
+      }
+    ]
+  }
+}

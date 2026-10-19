@@ -18,6 +18,32 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "Player/VampsPlayerCameraManager.h"
+
+namespace
+{
+	void RequestCombatFraming(AVampsCharacter* ViewingFighter, AVampsCharacter* ChainSource)
+	{
+		APlayerController* LocalController = Cast<APlayerController>(ViewingFighter->GetController());
+		if (!LocalController || !LocalController->IsLocalPlayerController())
+		{
+			return;
+		}
+		AVampsPlayerCameraManager* CombatCamera = Cast<AVampsPlayerCameraManager>(LocalController->PlayerCameraManager);
+		if (!CombatCamera)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': combat framing requires VampsPlayerCameraManager; got '%s'."),
+			       __FUNCTION__,
+			       *ViewingFighter->GetPathName(),
+			       *GetPathNameSafe(LocalController->PlayerCameraManager));
+			return;
+		}
+		CombatCamera->BeginCombatFraming(ChainSource);
+	}
+}
 
 AVampsCharacter::AVampsCharacter(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer.SetDefaultSubobjectClass<UVampsCombatMovementComponent>(
@@ -430,6 +456,7 @@ bool AVampsCharacter::BeginCombatAction(int32 PlaybackInstanceID)
 		CombatState.ComboStep = 0;
 		return false;
 	}
+	RequestCombatFraming(this, this);
 	return true;
 }
 
@@ -821,6 +848,7 @@ void AVampsCharacter::RememberDefendedContact(const FVampsPendingContact& Contac
 	CombatState.DefendedActionNumber = Contact.ActionNumber;
 	DefendedGeneration = Contact.AttackerGeneration;
 	LockOn->SelectTarget(Contact.Attacker.Get());
+	RequestCombatFraming(this, Contact.Attacker.Get());
 }
 
 void AVampsCharacter::CancelCombatOffense()

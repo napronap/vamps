@@ -3,6 +3,9 @@
 #include "Camera/PlayerCameraManager.h"
 #include "VampsPlayerCameraManager.generated.h"
 
+class AVampsCharacter;
+class UPrimitiveComponent;
+
 UCLASS()
 class VAMPS_API AVampsPlayerCameraManager : public APlayerCameraManager
 {
@@ -10,16 +13,47 @@ class VAMPS_API AVampsPlayerCameraManager : public APlayerCameraManager
 
 public:
 
+	void BeginCombatFraming(AVampsCharacter* ChainSource);
+	virtual void UpdateCamera(float DeltaTime) override;
 	virtual void ProcessViewRotation(float DeltaTime, FRotator& OutViewRotation, FRotator& OutDeltaRot) override;
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
 protected:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lock On Camera", meta = (ClampMin = "-80.0", ClampMax = "0.0"))
-	float FollowPitch = -15.f;
+	virtual void UpdateViewTargetInternal(FTViewTarget& OutVT, float DeltaTime) override;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lock On Camera", meta = (ClampMin = "0.1"))
-	float TrackingSpeed = 6.f;
+private:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Lock On Camera", meta = (ClampMin = "0.0", ClampMax = "45.0"))
-	float HorizontalTolerance = 6.f;
+	UPROPERTY(VisibleInstanceOnly, Transient, Category = "Camera")
+	FVector EyePosition = FVector::ZeroVector;
+
+	UPROPERTY(VisibleInstanceOnly, Transient, Category = "Camera")
+	FVector InterestPosition = FVector::ZeroVector;
+
+	UPROPERTY(VisibleInstanceOnly, Transient, Category = "Camera")
+	bool bCombatFraming = false;
+
+	UPROPERTY(VisibleInstanceOnly, Transient, Category = "Camera")
+	TWeakObjectPtr<AVampsCharacter> FramingSource;
+
+	TWeakObjectPtr<AVampsCharacter> ObservedFighter;
+	TWeakObjectPtr<AVampsCharacter> ObservedTarget;
+	uint32 ObservedGeneration = 0;
+	uint32 FramingGeneration = 0;
+	int32 FramingMontageID = INDEX_NONE;
+	bool bHasCameraState = false;
+	double OrbitalYaw = 0;
+	double UnlockedHeadingYaw = 0;
+	float VerticalFov = 38.f;
+	float TransitionElapsed = 0;
+	FVector TransitionEye = FVector::ZeroVector;
+	FVector TransitionInterest = FVector::ZeroVector;
+	float TransitionFov = 38.f;
+	TMap<TWeakObjectPtr<UPrimitiveComponent>, float> FadedComponents;
+
+	void ResetCameraState();
+	void UpdateOccluders(const FVector& PublishedEye,
+	                     const FVector& PlayerAnchor,
+	                     const FVector* TargetAnchor,
+	                     float DeltaTime);
 };

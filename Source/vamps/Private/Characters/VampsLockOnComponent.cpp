@@ -58,7 +58,7 @@ void UVampsLockOnComponent::TickComponent(float DeltaSeconds,
 
 AVampsCharacter* UVampsLockOnComponent::GetCurrentTarget() const
 {
-	return CurrentTarget.Get();
+	return IsEligible(CurrentTarget.Get()) ? CurrentTarget.Get() : nullptr;
 }
 
 const TArray<TWeakObjectPtr<AVampsCharacter>>& UVampsLockOnComponent::GetCandidates() const
@@ -103,8 +103,38 @@ void UVampsLockOnComponent::RegisterCandidate(AActor* SpawnedActor)
 	}
 }
 
+#if !UE_BUILD_SHIPPING
+void UVampsLockOnComponent::ToggleDebugLockOn()
+{
+	const AVampsCharacter* OwningFighter = Cast<AVampsCharacter>(GetOwner());
+	if (!OwningFighter || !OwningFighter->IsPlayerControlled() || !OwningFighter->IsLocallyControlled())
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': debug lock-on toggle requires a locally controlled player fighter; owner='%s'."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(GetOwner()));
+		return;
+	}
+	bDebugLockOnDisabled = !bDebugLockOnDisabled;
+	CycleTarget();
+	UE_LOG(LogVampsCombat,
+	       Display,
+	       TEXT("%s: debug player lock-on %s (F7)."),
+	       *GetOwner()->GetPathName(),
+	       bDebugLockOnDisabled ? TEXT("disabled") : TEXT("enabled"));
+}
+#endif
+
 bool UVampsLockOnComponent::IsEligible(const AVampsCharacter* Candidate) const
 {
+#if !UE_BUILD_SHIPPING
+	if (bDebugLockOnDisabled)
+	{
+		return false;
+	}
+#endif
 	return IsValid(Candidate) && Candidate != GetOwner() && Candidate->HasActorBegunPlay() &&
 	       !Candidate->IsActorBeingDestroyed() && Candidate->CombatState.bIsAlive;
 }

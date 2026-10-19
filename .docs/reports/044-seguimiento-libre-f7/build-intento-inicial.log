@@ -1,0 +1,183 @@
+Log started at 10/20/2026 08:10:31 (2026-10-19T23:10:31Z)
+No project argument provided while trying to parse Project File. Attempting fallback parsing to attempt to find a Project File.
+-Target argument detected in original command line args. Will attempt to subparse in search of ProjectFile.
+Resolved project argument C:/dev/vamps/vamps.uproject to C:\dev\vamps\vamps.uproject
+Resolved project argument C:\dev\vamps\vamps.uproject to C:/dev/vamps/vamps.uproject through -Target resolution.
+No config file at C:\ProgramData\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+No config file at C:\Users\franc\AppData\Local\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+No config file at C:\Users\franc\OneDrive\Documents\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Configuration will be read from:
+  C:\Users\franc\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\dev\vamps\Intermediate\Build\XmlConfigCache.bin): C:\Users\franc\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\dev\vamps\Intermediate\Build\XmlConfigCache.bin): C:\dev\vamps\Saved\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\dev\vamps\Intermediate\Build\XmlConfigCache.bin): C:\Users\franc\AppData\Local\UnrealEngine\Intermediate\Build\UnrealBuildTool.Env.BuildConfiguration.xml
+Setting temp directory to 'C:\Users\franc\AppData\Local\Temp\UnrealBuildTool\eb6d2d82'
+    Registering build platform: UnrealBuildTool.AndroidPlatformFactory
+    Registering build platform: UnrealBuildTool.IOSPlatformFactory
+    Registering build platform: UnrealBuildTool.LinuxPlatformFactory
+    Registering build platform: UnrealBuildTool.MacPlatformFactory
+    Registering build platform: UnrealBuildTool.TVOSPlatformFactory
+    Registering build platform: UnrealBuildTool.WindowsPlatformFactory
+Found Windows 10 SDK root at C:\Program Files (x86)\Windows Kits\10 (1)
+Found Windows 10 SDK root at C:\Program Files (x86)\Windows Kits\10 (2)
+Found Windows 10 SDK version 10.0.22621.0 at C:\Program Files (x86)\Windows Kits\10
+Found Universal CRT version 10.0.22621.0 at C:\Program Files (x86)\Windows Kits\10
+Found Windows 10 SDK version 10.0.26100.0 at C:\Program Files (x86)\Windows Kits\10
+Found Universal CRT version 10.0.26100.0 at C:\Program Files (x86)\Windows Kits\10
+Win64 Installed SDK(s): MinVersion_Sdk=10.0.19041.0, MaxVersion_Sdk=10.9.99999.0, CurrentVersion_Sdk=10.0.22621.0, Version_AutoSdk=10.0.22621.0, CurrentVersion_AutoSdk=
+        Registering build platform: Win64 - buildable: True
+    Registering build platform: UnrealBuildTool.VisionOSPlatformFactory
+Command line: "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" "-Target=vampsEditor Win64 Development -Project=\"C:/dev/vamps/vamps.uproject\"" -LiveCoding "-LiveCodingModules=C:/Program Files/Epic Games/UE_5.8/Engine/Intermediate/LiveCodingModules.json" "-LiveCodingManifest=C:/Program Files/Epic Games/UE_5.8/Engine/Intermediate/LiveCoding.json" -WaitMutex -LiveCodingLimit=100
+Log file: C:\Users\franc\AppData\Local\UnrealBuildTool\Log.txt
+Deleting old log file: C:\Users\franc\AppData\Local\UnrealBuildTool\Log-backup-2025.04.23-10.42.04.txt
+Deleting old log file: C:\Users\franc\AppData\Local\UnrealBuildTool\Log-backup-2025.04.23-10.42.04.json
+
+Determining max actions to execute in parallel (8 physical cores, 16 logical cores)
+  Executing up to 8 processes, one per physical core
+  Requested 1.5 GB memory per action, 5.32 GB available: limiting max parallel actions to 3
+Using 'git status' to determine working set for adaptive non-unity build (C:\dev\vamps).
+UbaStorageServer - Database loaded from C:\ProgramData\Epic\UnrealBuildAccelerator\cas\casdb (v32) in <1ms (contained 0 entries estimated to 0b)
+UbaServer - Listening on 0.0.0.0:1345
+Skipping C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\BuildRules\UE5Rules.dll: File is installed
+Skipping C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\BuildRules\UE5ProgramRules.dll: File is installed
+C:\dev\vamps\Source\vamps\Private\Player\VampsCombatTestPlayerController.cpp was not part of source working set and should be
+Invalidating makefile for vampsEditor (working set of source files changed)
+Compiler: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cl.exe
+Linker: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe
+Library Manager: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe
+Resource Compiler: C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64\rc.exe
+Resource Converter: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cvtres.exe
+Using EngineIncludeOrderVersion.Unreal5_8 for target vampsEditor.Target.cs
+Building UnrealEditor - vampsEditor - Win64 - Development
+VerseVMBytecodeGenerator.Generate, generating CPP headers in: 'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMBytecodeOps.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMBytecodesAndCaptures.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMMakeCapturesFuncs.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMCaptureSwitch.gen.h'
+UnrealHeaderTool needs to run because SavedTimestamp is older than HeaderFileTimestamp (C:\dev\vamps\Source\vamps\Public\Characters\VampsLockOnComponent.h) for module vamps
+Found 5 shared PCH headers (listed in order of preference):
+	UnrealEd
+	Engine
+	Slate
+	CoreUObject
+	Core
+Parsing headers for vampsEditor
+  Running Internal UnrealHeaderTool C:\dev\vamps\vamps.uproject C:\dev\vamps\Intermediate\Build\Win64\vampsEditor\vampsEditor.uhtmanifest -WarningsAsErrors -installed
+Updating C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\Module.vamps.cpp: contents have changed. Saving previous version to C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\Module.vamps.cpp.old.
+Updating C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\LiveCodingInfo.json: contents have changed. Saving previous version to C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\LiveCodingInfo.json.old.
+UHT compiled-in object format Default
+Step - Parse Headers
+Updating C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\UnrealEditor-vamps.lib.rsp: contents have changed. Saving previous version to C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\UnrealEditor-vamps.lib.rsp.old.
+Updating C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\UnrealEditor-vamps.dll.rsp: contents have changed. Saving previous version to C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\UnrealEditor-vamps.dll.rsp.old.
+Reading engine version from file: C:\Program Files\Epic Games\UE_5.8\Engine\Source\Runtime\Launch\Resources\Version.h
+Got engine version 5.8.3
+Step - Populate symbol table
+Step - Exports
+       Exporter Stats skipped
+       Exporter Json skipped
+       Running exporter CodeGen
+UHT processed vampsEditor in 2.4831824 seconds (0 generated files written)
+Re-evaluating action graph
+Building vampsEditor...
+===== Toolchain Information =====
+Using ISPC compiler (C:\Program Files\Epic Games\UE_5.8\Engine\Source\ThirdParty\Intel\ISPC\bin\Windows\ispc.exe)
+  Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20250404, LLVM 18.1.2) 
+Using Visual Studio 14.44.35223 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+[Adaptive Build] Excluded from vamps unity file: VampsCharacter.cpp, VampsCharacter_Player.cpp, VampsLockOnComponent.cpp, VampsCombatTestPlayerController.cpp, VampsPlayerCameraManager.cpp
+=================================
+Using Unreal Build Accelerator local executor to run 6 action(s)
+  CPU 8 physical cores, 16 logical cores
+  Memory 31.29 GB physical, 47.3 GB/51.15 GB committed
+  UBA Storage capacity 40 GB
+  UBA RootDir C:\ProgramData\Epic\UnrealBuildAccelerator
+Cache bucket 3548692437 used. Action: Compile [x64] Module.vamps.cpp ()
+All processes queued
+[1/6] Compile [x64] Module.vamps.cpp
+[2/6] Compile [x64] VampsCharacter_Player.cpp
+ Compile [x64] VampsCombatTestPlayerController.cpp: Exited with error code 2 . The build will fail.
+ Compile [x64] VampsCombatTestPlayerController.cpp: WorkingDirectory C:\Program Files\Epic Games\UE_5.8\Engine\Source
+ Compile [x64] VampsCombatTestPlayerController.cpp: C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\cl.exe @C:\dev\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\VampsCombatTestPlayerController.cpp.obj.lc.rsp
+[3/6] Compile [x64] VampsCombatTestPlayerController.cpp
+C:\dev\vamps\Source\vamps\Private\Player\VampsCombatTestPlayerController.cpp(45,9): error C2280: 'FInputKeyBinding &UEnhancedInputComponent::BindKey<AVampsCombatTestPlayerController>(const FKey,const EInputEvent,UserClass *,RetType (__cdecl AVampsCombatTestPlayerController::* )(void))': attempting to reference a deleted function
+        with
+        [
+            UserClass=AVampsCombatTestPlayerController,
+            RetType=void
+        ]
+	Input->BindKey(EKeys::F7, IE_Pressed, this, &AVampsCombatTestPlayerController::ToggleLockOnDebug);
+	       ^
+C:\Program Files\Epic Games\UE_5.8\Engine\Plugins\EnhancedInput\Source\EnhancedInput\Public\EnhancedInputComponent.h(630,20): note: see declaration of 'UEnhancedInputComponent::BindKey'
+	FInputKeyBinding& BindKey(const FKey Key, const EInputEvent KeyEvent, UserClass* Object, typename FInputActionHandlerSignature::TMethodPtr< UserClass > Func) = delete;
+	                  ^
+[4/6] Compile [x64] VampsLockOnComponent.cpp
+[5/6] Compile [x64] VampsPlayerCameraManager.cpp
+[6/6] Compile [x64] VampsCharacter.cpp
+
+Total time in Unreal Build Accelerator local executor: 45.71 seconds
+UbaStorageServer - Database saved in <1ms (0 file entries, 0 cas entries. deleted 0 dropped cas files)
+CompilationResultException: OtherCompilationError
+   at UnrealBuildTool.ActionGraph.InternalExecuteActions(ActionExecutor Executor, List`1 ActionsToExecute, ILogger Logger)
+   at UnrealBuildTool.ActionGraph.ExecuteActionsAsync(BuildConfiguration BuildConfiguration, List`1 ActionsToExecute, List`1 TargetDescriptors, ILogger Logger, ActionExecutor executor)
+   at UnrealBuildTool.BuildMode.BuildAsync(List`1 Targets, BuildConfiguration BuildConfiguration, BuildOptions Options, FileReference WriteOutdatedActionsFile, CppDependencyCache cppDependencyCache, ILogger Logger, String ActionTypeFilter, ActionExecutor executor)
+   at UnrealBuildTool.BuildMode.ExecuteAsync(CommandLineArguments Arguments, ILogger Logger)
+   at UnrealBuildTool.BuildMode.ExecuteAsync(CommandLineArguments Arguments, ILogger Logger)
+   at UnrealBuildTool.UnrealBuildTool.Main(String[] ArgumentsArray)
+WriteFileIfChanged() wrote 0 changed files of 7 requested writes.
+
+Timeline:
+[  0.000]  +0.404 Main
+   0.016          [  0.016]  +0.096 Apply XmlConfig
+   0.023             0.023          [  0.007]  +0.008 Find target files
+   0.114          [  0.114]  +0.059 AddTelemetry
+   0.212          [  0.212]  +0.191 RegisterPlatforms
+[  0.424]  +0.022 ParseCommandLine
+[  0.497]  +0.122 LoadMakefile
+   0.527          [  0.029]  +0.033 EngineRulesPlugins
+   0.563          [  0.065]  +0.012 EngineRulesFetchDirs
+   0.585          [  0.087]  +0.009 EngineRulesAssembly
+   0.594          [  0.096]  +0.001 ProgramRulesAssembly
+   0.600          [  0.103]  +0.001 ProjectRulesAssembly
+   0.602          [  0.104]  +0.221 CreateTargetRules
+   0.630             0.132          [  0.027]  +0.000 FindPlugins
+   0.643             0.145          [  0.040]  +0.052 MakefileValid
+[  0.620]  +0.261 <unknown>
+[  0.882]  +0.005 CppDependencyCache
+[  0.897]  +1.900 vampsEditor Win64 Development
+   0.897          [  0.000]  +0.569 <unknown>
+   1.467          [  0.569]  +0.046 UHTModules
+   1.643          [  0.745]  +0.169 UHTManifest
+   1.812          [  0.915]  +2.487 UHT
+   1.812             0.915          [  0.000]  +0.933 <unknown>
+   2.745             1.848          [  0.933]  +0.000 WaitOnWrites
+   2.801             1.903          [  0.988]  +0.125 SavingMakefile
+   2.926             2.029          [  1.114]  +1.373 <unknown>
+[  2.797]  +1.504 <unknown>
+[  4.302]  +0.021 UHTTimestamps
+[  4.350]  +0.003 CppDependencyCache
+[  4.354]  +0.114 Preparing ActionGraph
+   4.366          [  0.012]  +0.005 LinkActions
+   4.372             0.017          [  0.005]  +0.000 DetectActionGraphCycles
+   4.373          [  0.018]  +0.000 GatherPrerequisiteActions
+   4.374          [  0.020]  +0.000 CppDependencyCacheWait
+   4.375          [  0.021]  +0.029 GatherOutdatedActions
+   4.407          [  0.053]  +0.002 LinkActions
+   4.407             0.053          [  0.000]  +0.000 DetectActionGraphCycles
+   4.415          [  0.061]  +0.003 CppDependencyCache
+   4.431          [  0.077]  +0.000 GatherOutdatedActions
+   4.456          [  0.102]  +0.000 GatherOutdatedActions
+   4.461          [  0.107]  +0.000 GatherOutdatedActions
+   4.462          [  0.107]  +0.000 LinkActions
+   4.462             0.107          [  0.000]  +0.000 DetectActionGraphCycles
+   4.462          [  0.108]  +0.000 DeleteOutdatedProducedItems
+   4.463          [  0.109]  +0.004 SaveActionHistory
+   4.468          [  0.114]  +0.000 CreateDirectoriesForProducedItems
+[  4.483]  +0.163 GarbageCollect
+[  4.647] +45.552 <unknown>
+[ 50.199]  +0.000 DisconnectCache
+[ 50.203]  +0.002 SaveCasTable
+[ 50.209]  +0.086 Saving caches
+[ 50.325]  +0.001 TelemetryService.FlushEvents
+[ 50.328]
+
+Result: Failed (OtherCompilationError)
+Total execution time: 50.33 seconds

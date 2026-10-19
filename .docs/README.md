@@ -46,6 +46,14 @@ El paso 4 tiene implementación y configuración en [037 — Movilidad integrada
 
 ## Reportes de trabajo
 
+Seguimiento libre vigente: [044 — Acompañamiento suave y F7](reports/044-seguimiento-libre-f7/reporte.md). Anticipación amortiguada de desplazamiento sin seguir el yaw corporal; F7 alterna el lock-on de prueba. [Guía y observación](reports/044-seguimiento-libre-f7/editor.md).
+
+Corrección anterior de cámara sin target: [043 — Referencia virtual y modo de observación](reports/043-camara-sin-target/reporte.md). El rumbo fijo y el comando de consola quedan sustituidos por 044. [Guía histórica](reports/043-camara-sin-target/editor.md).
+
+Implementación de cámara: [042 — Seguimiento, combate y oclusión](reports/042-camara-combate/reporte.md). Dos encuadres globales, historial Eye/Interest, entrada por ataque/bloqueo y salida por cierre de cadena, materiales por componente y obstáculos preparados. Parche aplicado y arranque PIE comprobados; [guía y observación jugable pendiente](reports/042-camara-combate/editor.md). HUD reservado para otro prompt.
+
+Revisión del paso 5: [041 — Cámara, oclusión y alcance posterior de HUD](reports/041-revision-paso-5/reporte.md). Incorpora las anotaciones: dos encuadres globales, ataque/bloqueo y salida por cierre de cadena, oclusión de ambos sujetos y HUD diferido. [Prompt de implementación de cámara](reports/041-revision-paso-5/prompt.md) y [lecturas/futura verificación](reports/041-revision-paso-5/editor.md). Solo análisis y preparación; sin implementación nueva.
+
 Control direccional vigente: [040 — Giro instantáneo solo al iniciar dash](reports/040-giro-direccional-dash/reporte.md). Captura WASD al pulsar Shift, conserva el giro gradual de locomoción y reutiliza los dos montages de 039. [Guía y comprobación visual pendiente](reports/040-giro-direccional-dash/editor.md).
 
 Implementación vigente de movilidad: [039 — Simplificación con GA_Dash y root motion](reports/039-simplificacion-movilidad/reporte.md). Dos montages, approach solo inicial y restricciones existentes; retira índices finales y desplazamiento programado del dash de 037. DA preservado y compilación/arranque comprobados. [Guía y observación pendiente](reports/039-simplificacion-movilidad/editor.md).

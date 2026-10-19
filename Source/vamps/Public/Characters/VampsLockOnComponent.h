@@ -19,6 +19,10 @@ public:
 	void CycleTarget();
 	void SelectTarget(AVampsCharacter* NewTarget);
 
+#if !UE_BUILD_SHIPPING
+	void ToggleDebugLockOn();
+#endif
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -34,6 +38,10 @@ private:
 
 	TArray<TWeakObjectPtr<AVampsCharacter>> Candidates;
 	FDelegateHandle ActorSpawnedHandle;
+
+#if !UE_BUILD_SHIPPING
+	bool bDebugLockOnDisabled = false;
+#endif
 
 	void RegisterCandidate(AActor* SpawnedActor);
 	bool IsEligible(const AVampsCharacter* Candidate) const;

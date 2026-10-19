@@ -1,5 +1,7 @@
 # 040 — Giro direccional al iniciar dash
 
+Revisión de la siguiente etapa: [041 — Cámara, oclusión y HUD del paso 5](../041-revision-paso-5/reporte.md). La movilidad de esta iteración sigue siendo la base de integración; 041 no modifica código ni assets.
+
 ## Resultado — 2026-10-20
 
 El usuario confirmó que el dash con root motion de 039 funciona, pero el giro gradual impedía orientar una evasión lateral a tiempo. Esta iteración aplica giro instantáneo únicamente al iniciar un dash aceptado. Sustituye la regla de 039 que usaba siempre el frente previo del cuerpo. [Guía y comprobación visual pendiente](editor.md).

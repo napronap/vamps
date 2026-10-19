@@ -22,4 +22,8 @@ private:
 
 	void CycleAIMode();
 	void ResetCombat();
+
+#if !UE_BUILD_SHIPPING
+	void ToggleLockOnDebug(FKey Key, FInputActionValue Value);
+#endif
 };
