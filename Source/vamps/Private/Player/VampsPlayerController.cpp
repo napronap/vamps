@@ -3,6 +3,7 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "EnhancedInputComponent.h"
+#include "EnhancedPlayerInput.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputAction.h"
@@ -69,23 +70,25 @@ void AVampsPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent);
-	if (!Input || !MoveAction || !CombatAction || !CycleTargetAction)
+	if (!Input || !MoveAction || !CombatAction || !CycleTargetAction || !MobilityAction)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
 		       TEXT("%hs: %s: input bindings require EnhancedInputComponent and all actions; component='%s', "
-		            "Move='%s', Combat='%s', CycleTarget='%s'."),
+		            "Move='%s', Combat='%s', CycleTarget='%s', Mobility='%s'."),
 		       __FUNCTION__,
 		       *GetPathName(),
 		       *GetPathNameSafe(InputComponent),
 		       *GetPathNameSafe(MoveAction),
 		       *GetPathNameSafe(CombatAction),
-		       *GetPathNameSafe(CycleTargetAction));
+		       *GetPathNameSafe(CycleTargetAction),
+		       *GetPathNameSafe(MobilityAction));
 		return;
 	}
 	if (MoveAction->ValueType != EInputActionValueType::Axis2D ||
 	    CombatAction->ValueType != EInputActionValueType::Boolean ||
-	    CycleTargetAction->ValueType != EInputActionValueType::Boolean)
+	    CycleTargetAction->ValueType != EInputActionValueType::Boolean ||
+	    MobilityAction->ValueType != EInputActionValueType::Boolean)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
@@ -99,12 +102,23 @@ void AVampsPlayerController::SetupInputComponent()
 		       int32(CombatAction->ValueType),
 		       *CycleTargetAction->GetPathName(),
 		       int32(CycleTargetAction->ValueType));
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: Mobility='%s' has type %d; expected Boolean."),
+		       __FUNCTION__,
+		       *MobilityAction->GetPathName(),
+		       int32(MobilityAction->ValueType));
 		return;
 	}
 
 	Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AVampsPlayerController::Move);
+	Input->BindAction(MoveAction, ETriggerEvent::Completed, this, &AVampsPlayerController::Move);
+	Input->BindAction(MoveAction, ETriggerEvent::Canceled, this, &AVampsPlayerController::Move);
 	Input->BindAction(CombatAction, ETriggerEvent::Started, this, &AVampsPlayerController::RequestCombat);
 	Input->BindAction(CycleTargetAction, ETriggerEvent::Started, this, &AVampsPlayerController::CycleTarget);
+	Input->BindAction(MobilityAction, ETriggerEvent::Started, this, &AVampsPlayerController::MobilityPressed);
+	Input->BindAction(MobilityAction, ETriggerEvent::Completed, this, &AVampsPlayerController::MobilityReleased);
+	Input->BindAction(MobilityAction, ETriggerEvent::Canceled, this, &AVampsPlayerController::MobilityReleased);
 }
 
 void AVampsPlayerController::Move(const FInputActionValue& Value)
@@ -123,6 +137,11 @@ void AVampsPlayerController::Move(const FInputActionValue& Value)
 		}
 		const FVector2D Movement = Value.Get<FVector2D>();
 		const FRotator Yaw(0.f, GetControlRotation().Yaw, 0.f);
+		if (AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(ControlledPawn))
+		{
+			ControlledFighter->SetMobilityDirection(Yaw.Vector() * Movement.Y +
+			                                        FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y) * Movement.X);
+		}
 		ControlledPawn->AddMovementInput(Yaw.Vector(), Movement.Y);
 		ControlledPawn->AddMovementInput(FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y), Movement.X);
 	}
@@ -163,5 +182,33 @@ void AVampsPlayerController::CycleTarget()
 			return;
 		}
 		ControlledFighter->LockOn->CycleTarget();
+	}
+}
+
+void AVampsPlayerController::MobilityPressed()
+{
+	AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(GetPawn());
+	const UEnhancedPlayerInput* EnhancedPlayerInput = Cast<UEnhancedPlayerInput>(PlayerInput);
+	if (!ControlledFighter || !EnhancedPlayerInput || !MoveAction)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': mobility requires VampsCharacter, EnhancedInput and MoveAction."),
+		       __FUNCTION__,
+		       *GetPathName());
+		return;
+	}
+	const FVector2D Direction = EnhancedPlayerInput->GetActionValue(MoveAction).Get<FVector2D>();
+	const FRotator Yaw(0.f, GetControlRotation().Yaw, 0.f);
+	ControlledFighter->SetMobilityDirection(Yaw.Vector() * Direction.Y +
+	                                        FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y) * Direction.X);
+	ControlledFighter->SetMobilityHeld(true);
+}
+
+void AVampsPlayerController::MobilityReleased()
+{
+	if (AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(GetPawn()))
+	{
+		ControlledFighter->SetMobilityHeld(false);
 	}
 }

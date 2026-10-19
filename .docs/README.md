@@ -23,15 +23,17 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 [Roadmap hacia la emulación FGOA](roadmap.md): consolidar contacto/cámara → botón compartido y fases → cadena/NA → daño/guardia → movilidad → presentación → equipos → red → calibración → extensiones propias. Incluye estado actual, decisiones previas y criterios de cierre; distingue combate local y base completa.
 
-**Avance:** etapas 0 y 1 cerradas por el usuario en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) y [021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). Etapa 2, cadena y NA, completada por confirmación del usuario el 2026-10-18; [cierre 031 y reglas del paso 3](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md). El estado se controla en el roadmap; la siguiente etapa es 3.
+**Avance:** etapas 0 y 1 cerradas por el usuario en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) y [021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). Etapa 2 completada el 2026-10-18 en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) y etapa 3 cerrada por confirmación del usuario el 2026-10-19 en [035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3). El estado se controla en el roadmap; la siguiente etapa es 4, acercamiento, evasión y sprint.
+
+El paso 4 tiene implementación y configuración en [037 — Movilidad integrada al combate](reports/037-movilidad-combate/reporte.md). Conserva estado pendiente hasta completar autoría y observación de su [guía del editor](reports/037-movilidad-combate/editor.md).
 
 1. Leer el [alcance y exclusiones](game/functional.md#alcance-de-la-base), seguido de combate y jugador.
-2. Consultar la [implementación actual del paso 3](reports/033-resultados-combate/reporte.md) y sus límites de verificación; la [revisión 028](reports/028-contraste-fgoa/analisis.md#10-evaluación-concreta-del-código-actual-de-vamps) y el prototipo conservan el punto de partida histórico.
+2. Consultar la [implementación del paso 3](reports/033-resultados-combate/reporte.md) y su [revisión y cierre 035](reports/035-revision-paso-3/reporte.md); la [revisión 028](reports/028-contraste-fgoa/analisis.md#10-evaluación-concreta-del-código-actual-de-vamps) y el prototipo conservan el punto de partida histórico.
 3. Resolver las preguntas al final de la funcionalidad que se implemente; las preguntas de extensiones no bloquean la base.
 
 ## Análisis de referencia
 
-[028 — Contraste FGOA y Vamps](reports/028-contraste-fgoa/analisis.md): referencia nativa y empírica, [13 recortes de video y trazas](reports/028-contraste-fgoa/evidencia.md), evaluación del C++ actual y correcciones de supuestos sobre defensa, IDs y tiempos. Es la revisión vigente del código; las descripciones de GA_Guard/FistHitbox del prototipo son históricas. [Reporte](reports/028-contraste-fgoa/reporte.md) y [guía del editor](reports/028-contraste-fgoa/editor.md). No cambia gameplay ni cierra etapas.
+[028 — Contraste FGOA y Vamps](reports/028-contraste-fgoa/analisis.md): referencia nativa y empírica, [13 recortes de video y trazas](reports/028-contraste-fgoa/evidencia.md) y correcciones de supuestos sobre defensa, IDs, tiempos y energía frente a carga de guardia. Su evaluación de C++ corresponde a la captura histórica; las implementaciones posteriores están en 033–035 y 037. [Reporte](reports/028-contraste-fgoa/reporte.md) y [guía del editor](reports/028-contraste-fgoa/editor.md). No cierra etapas.
 
 [016 — Cuatro videos de FGO Arcade](reports/016-analisis-fgo-arcade/analisis.md): [escenas y evidencia](reports/016-analisis-fgo-arcade/escenas.md), [comparación histórica con el prototipo](reports/016-analisis-fgo-arcade/comparacion.md), [decisiones y ubicación de preguntas](reports/016-analisis-fgo-arcade/preguntas.md) y [reporte](reports/016-analisis-fgo-arcade/reporte.md). La revisión de videos está cerrada. [017](reports/017-base-fgoa-y-extensiones/reporte.md) integra su alcance en las especificaciones principales, sin mantener una copia paralela dentro del reporte de análisis.
 
@@ -44,11 +46,15 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
-Revisión vigente del estado: [035 — Revisión del paso 3](reports/035-revision-paso-3/reporte.md). Montages Guard/Hit asignados y guardados, reacción de 1 s y 154 contactos previos con daños esperados verificados por MCP. El cierre manual sigue abierto; [comprobaciones y conservación en Git](reports/035-revision-paso-3/editor.md).
+Implementación vigente de movilidad: [037 — Acercamiento, dash y sprint](reports/037-movilidad-combate/reporte.md), con energía separada, señal explícita de impacto final y preservación del DA comprobada tras arranque limpio. [Configuración y pendientes manuales](reports/037-movilidad-combate/editor.md). Paso 4 pendiente de cierre.
+
+Revisión de la siguiente etapa: [036 — Paso 4: acercamiento, evasión y sprint](reports/036-revision-paso-4/reporte.md). Contrasta código/assets con 028 e incorpora recursos separados, dash tras impacto final de Guard, dash en NA, blending, prioridad de continuación y retroceso relativo al target. Solo análisis y preparación del prompt; etapa 4 pendiente. [Lecturas y guía del editor](reports/036-revision-paso-4/editor.md).
+
+Revisión y cierre vigente: [035 — Revisión del paso 3](reports/035-revision-paso-3/reporte.md). Montages Guard/Hit asignados y guardados, reacción de 1 s y 154 contactos previos con daños esperados verificados por MCP. Cierre aprobado por el usuario el 2026-10-19; [guía reproducible y conservación en Git](reports/035-revision-paso-3/editor.md).
 
 Corrección vigente de presentación: [034 — Montages independientes de Guard y Hit](reports/034-montage-guardia/reporte.md). Agrega GuardReactionMontage separado de HitReactionMontage y rechaza referencias iguales; conserva el resto del paso 3. [Configuración y comprobación](reports/034-montage-guardia/editor.md).
 
-Última iteración de implementación y documentación: [033 — Resultados de daño y defensa](reports/033-resultados-combate/reporte.md). Agrega Guard/Hit, memoria defensiva, residual, carga/ruptura/stun y crítico; conserva cadena, NA y armas independientes. Build completo y parche final aplicados, DA preservado/configurado y arranque PIE verificados. Intercambios reales y poses/transiciones pendientes en la [guía](reports/033-resultados-combate/editor.md); 3 permanece abierta. El cierre de 2 y las decisiones previas siguen en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md).
+Implementación base de 3: [033 — Resultados de daño y defensa](reports/033-resultados-combate/reporte.md). Agrega Guard/Hit, memoria defensiva, residual, carga/ruptura/stun y crítico; conserva cadena, NA y armas independientes. Build completo y parche final aplicados, DA preservado/configurado y arranque PIE verificados. Sus límites de observación son históricos; el cierre posterior está en [035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3). El cierre de 2 y las decisiones previas siguen en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md).
 
 Comprobación previa de scripts: [032 — Build y arranque del editor](reports/032-comprobacion-build-editor/reporte.md). Conserva la primera validación del ciclo autorizado; el cierre/reinicio y la verificación de los cambios actuales están en 033. [Guía 032](reports/032-comprobacion-build-editor/editor.md).
 
@@ -96,3 +102,4 @@ La [024 — Continuación al cerrar la ventana de combo](reports/024-cierre-vent
 | 032 — Comprobación de build y arranque | [Reporte](reports/032-comprobacion-build-editor/reporte.md) | [Guía](reports/032-comprobacion-build-editor/editor.md) |
 | 033 — Resultados de daño y defensa | [Reporte](reports/033-resultados-combate/reporte.md) | [Guía](reports/033-resultados-combate/editor.md) |
 | 034 — Montages independientes de Guard y Hit | [Reporte](reports/034-montage-guardia/reporte.md) | [Guía](reports/034-montage-guardia/editor.md) |
+| 035 — Revisión y cierre del paso 3 | [Reporte](reports/035-revision-paso-3/reporte.md) | [Guía](reports/035-revision-paso-3/editor.md) |

@@ -70,6 +70,14 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 		                                               SectionStart,
 		                                               SectionEnd);
 		const FVampsCombatStepSettings& StepSettings = Settings->ComboSteps[SectionIndex];
+		if (!FMath::IsFinite(StepSettings.AdvanceDistance) || StepSettings.AdvanceDistance < 0.f ||
+		    !FMath::IsFinite(StepSettings.AdvanceDuration) || StepSettings.AdvanceDuration <= 0.f ||
+		    !FMath::IsFinite(StepSettings.AdvanceStopDistance) || StepSettings.AdvanceStopDistance < 0.f ||
+		    !Settings->Weapons.IsValidIndex(StepSettings.FinalImpactWeaponIndex) || StepSettings.FinalImpactIndex < 0)
+		{
+			return SectionContext + TEXT(": requires finite nonnegative advance/stop distances, positive advance "
+			                             "duration and an explicit valid final weapon/impact index.");
+		}
 		if (!FMath::IsFinite(StepSettings.ContactReactionDuration) || StepSettings.ContactReactionDuration <= 0.f)
 		{
 			return FString::Printf(TEXT("%s: ContactReactionDuration must be finite and positive; got %f seconds."),
@@ -78,10 +86,10 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 		}
 		if (!FMath::IsFinite(StepSettings.TargetAlignmentDistance) ||
 		    !FMath::IsFinite(StepSettings.KnockbackDistance) ||
-		    !(StepSettings.TargetAlignmentDistance > 0.f && StepSettings.KnockbackDistance >= 0.f))
+		    !(StepSettings.TargetAlignmentDistance > 0.f && StepSettings.KnockbackDistance > 0.f))
 		{
 			return SectionContext +
-			       TEXT(": ComboSteps requires a positive alignment distance and a nonnegative knockback distance.");
+			       TEXT(": ComboSteps requires positive alignment and final-impact knockback distances.");
 		}
 		const FAnimNotifyEvent* ContactNotify = nullptr;
 		const FAnimNotifyEvent* ComboNotify = nullptr;
@@ -116,6 +124,7 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 		}
 		const float ContactStart = ContactNotify->GetTriggerTime();
 		const float ContactEnd = ContactNotify->GetEndTriggerTime();
+		int32 FinalWeaponResets = 0;
 		if (!(ContactStart > SectionStart && ContactEnd > ContactStart && ContactEnd < SectionEnd))
 		{
 			return FString::Printf(TEXT("%s: ANS_AttackTrace [%.6f, %.6f] must satisfy section start < trace start "
@@ -150,6 +159,10 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 			}
 			for (int32 WeaponIndex : ResetNotify->WeaponIndices)
 			{
+				if (WeaponIndex == StepSettings.FinalImpactWeaponIndex)
+				{
+					++FinalWeaponResets;
+				}
 				if (!Settings->Weapons.IsValidIndex(WeaponIndex))
 				{
 					return FString::Printf(TEXT("%s: AN_ResetWeaponHits '%s' has invalid weapon index %d; "
@@ -161,6 +174,15 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 					                       Settings->Weapons.Num());
 				}
 			}
+		}
+		if (StepSettings.FinalImpactIndex != FinalWeaponResets)
+		{
+			return FString::Printf(
+			    TEXT("%s: final impact index %d does not match %d authored resets for final weapon %d."),
+			    *SectionContext,
+			    StepSettings.FinalImpactIndex,
+			    FinalWeaponResets,
+			    StepSettings.FinalImpactWeaponIndex);
 		}
 		if (!ComboNotify && SectionIndex != Montage->GetNumSections() - 1)
 		{

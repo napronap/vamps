@@ -96,6 +96,18 @@ struct VAMPS_API FVampsCombatState
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bCanMove = true;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mobility")
+	bool bCanDash = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mobility")
+	bool bGuardDashReady = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mobility")
+	bool bIsSprinting = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mobility")
+	bool bDashRequested = false;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bDefenseRequestArmed = false;
 

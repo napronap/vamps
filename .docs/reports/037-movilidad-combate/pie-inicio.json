@@ -1,0 +1,18 @@
+{
+  "actors": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"returnValue\":[{\"refPath\":\"/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0\"},{\"refPath\":\"/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0\"}]}"
+      }
+    ]
+  },
+  "logs": {
+    "content": [
+      {
+        "type": "text",
+        "text": "{\"returnValue\":[]}"
+      }
+    ]
+  }
+}

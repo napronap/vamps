@@ -31,10 +31,10 @@ void AVampsCombatTestHUD::DrawFighter(
 	const float Health = Fighter->Attributes->GetHealth();
 	const float MaxHealth = Fighter->Attributes->GetMaxHealth();
 	const FVampsCombatState& FighterState = Fighter->CombatState;
-	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), X, Y, Width, 380);
+	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), X, Y, Width, 425);
 	if (bSelected)
 	{
-		DrawRect(FLinearColor(1.f, 0.75f, 0.15f), X, Y, 4, 380);
+		DrawRect(FLinearColor(1.f, 0.75f, 0.15f), X, Y, 4, 425);
 	}
 	DrawText(FString::Printf(TEXT("%s   %.0f / %.0f"), *Label, Health, MaxHealth), FLinearColor::White, X + 12, Y + 9);
 	DrawRect(FLinearColor(0.15f, 0.15f, 0.18f), X + 12, Y + 32, Width - 24, 10);
@@ -130,6 +130,20 @@ void AVampsCombatTestHUD::DrawFighter(
 	         FLinearColor::White,
 	         X + 12,
 	         Y + 354);
+	DrawText(FString::Printf(TEXT("MOBILITY ENERGY: %.0f / %.0f | SPRINT: %s"),
+	                         Fighter->Attributes->GetMobilityEnergy(),
+	                         Fighter->Attributes->GetMaxMobilityEnergy(),
+	                         FighterState.bIsSprinting ? TEXT("ON") : TEXT("OFF")),
+	         FLinearColor::White,
+	         X + 12,
+	         Y + 376);
+	DrawText(FString::Printf(TEXT("DASH: %s | FINAL GUARD: %s | PENDING: %s"),
+	                         FighterState.bCanDash ? TEXT("READY") : TEXT("NO"),
+	                         FighterState.bGuardDashReady ? TEXT("YES") : TEXT("NO"),
+	                         FighterState.bDashRequested ? TEXT("YES") : TEXT("NO")),
+	         FLinearColor::White,
+	         X + 12,
+	         Y + 398);
 }
 
 void AVampsCombatTestHUD::DrawHUD()
@@ -163,7 +177,7 @@ void AVampsCombatTestHUD::DrawHUD()
 			            TargetY,
 			            Width,
 			            Fighter == PlayerCharacter->LockOn->GetCurrentTarget());
-			TargetY += 400;
+			TargetY += 445;
 		}
 	}
 	const AVampsCombatTestGameMode* TestGameMode = Cast<AVampsCombatTestGameMode>(GetWorld()->GetAuthGameMode());
@@ -179,7 +193,7 @@ void AVampsCombatTestHUD::DrawHUD()
 	}
 	const FString ModeName = StaticEnum<EVampsAIMode>()->GetNameStringByValue(int64(TestGameMode->OpponentAI->Mode));
 	DrawText(TEXT("AI: ") + ModeName + TEXT(" | F6 next mode | R reset"), FLinearColor::White, 20, Canvas->SizeY - 75);
-	DrawText(TEXT("WASD move | Auto camera | RMB combat (click) | F next target"),
+	DrawText(TEXT("WASD move | Shift dash/hold sprint | RMB combat (click) | F next target"),
 	         FLinearColor::White,
 	         20,
 	         Canvas->SizeY - 50);

@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"returnValue\":\"Result: Success\\n\\nCompile Output:\\nStarting Live Coding compile.\\nUbaCli v5.8.1-Uba_v1.0.0-56050371 (Rootdir: \\\"C:\\\\ProgramData\\\\Epic\\\\UbaCli\\\", StoreCapacity: 0Gb)\\r\\n\\r\\n---- Starting trace: Debug8f624630-0b1e-41f2-8d1c-d06a60c9fb5d ----\\r\\nRunning C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Insiders\\\\VC\\\\Tools\\\\MSVC\\\\14.51.36231\\\\bin\\\\Hostx64\\\\x64\\\\link.exe @C:\\\\Users\\\\student\\\\AppData\\\\Local\\\\Temp\\\\3B27.tmp\\r\\n   \\r\\nDetoured run took 622ms\\nLive coding succeeded\"}"
+    }
+  ]
+}

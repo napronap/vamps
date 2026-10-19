@@ -2,10 +2,139 @@
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
 #include "Characters/VampsCharacter.h"
+#include "Characters/VampsLockOnComponent.h"
 #include "Combat/Data/VampsCombatSettings.h"
 #include "Combat/VampsCombatLog.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
+
+float UVampsCombatMovementComponent::GetMaxSpeed() const
+{
+	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+	return Fighter && Fighter->CombatSettings && Fighter->CombatState.bIsSprinting
+	           ? Fighter->CombatSettings->SprintSpeed
+	           : Super::GetMaxSpeed();
+}
+
+void UVampsCombatMovementComponent::StopVoluntaryMotion()
+{
+	if (CombatMotion == EVampsCombatMotion::Advance || CombatMotion == EVampsCombatMotion::Dash)
+	{
+		CombatMotion = EVampsCombatMotion::None;
+		Velocity.X = 0.f;
+		Velocity.Y = 0.f;
+	}
+	UAnimInstance* Animation = CharacterOwner ? CharacterOwner->GetMesh()->GetAnimInstance() : nullptr;
+	const FAnimMontageInstance* Playback =
+	    Animation ? Animation->GetMontageInstanceForID(DashPlaybackInstanceID) : nullptr;
+	if (Playback)
+	{
+		Animation->Montage_Stop(0.08f, Playback->Montage);
+	}
+	DashPlaybackInstanceID = INDEX_NONE;
+}
+
+void UVampsCombatMovementComponent::BeginOffensiveAdvance(const FVampsCombatStepSettings& StepSettings)
+{
+	StopVoluntaryMotion();
+	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+	const AVampsCharacter* TargetFighter = Fighter && Fighter->LockOn ? Fighter->LockOn->GetCurrentTarget() : nullptr;
+	if (!IsValid(TargetFighter) || !TargetFighter->CombatState.bIsAlive || !IsMovingOnGround())
+	{
+		return;
+	}
+	const FVector ToTarget = TargetFighter->GetActorLocation() - UpdatedComponent->GetComponentLocation();
+	const float AdvanceLength = FMath::Min(
+	    StepSettings.AdvanceDistance, FMath::Max(0.f, float(ToTarget.Size2D()) - StepSettings.AdvanceStopDistance));
+	if (ToTarget.GetSafeNormal2D().IsNearlyZero())
+	{
+		return;
+	}
+	CombatFacingStart = UpdatedComponent->GetComponentQuat();
+	CombatFacingGoal = ToTarget.GetSafeNormal2D().ToOrientationQuat();
+	BeginCombatMotion(EVampsCombatMotion::Advance,
+	                  UpdatedComponent->GetComponentLocation() + ToTarget.GetSafeNormal2D() * AdvanceLength,
+	                  StepSettings.AdvanceDuration);
+}
+
+UAnimMontage* UVampsCombatMovementComponent::FindCombatDashMontage(const FVector& DashDirection) const
+{
+	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+	const UVampsCombatSettings* Settings = Fighter ? Fighter->CombatSettings.Get() : nullptr;
+	UAnimInstance* Animation = Fighter ? Fighter->GetMesh()->GetAnimInstance() : nullptr;
+	if (!Settings || !Settings->HasValidMobilitySettings() || !Animation || !IsMovingOnGround() ||
+	    DashDirection.ContainsNaN() || DashDirection.GetSafeNormal2D().IsNearlyZero())
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': dash requires valid settings, animation, ground and direction=%s."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *DashDirection.ToString());
+		return nullptr;
+	}
+	const float Angle = FMath::UnwindDegrees(DashDirection.Rotation().Yaw - Fighter->GetActorRotation().Yaw);
+	const int32 DirectionIndex = (FMath::RoundToInt(Angle / 45.f) + 8) % 8;
+	UAnimMontage* Montage =
+	    Settings->DashMontages.IsValidIndex(DirectionIndex) ? Settings->DashMontages[DirectionIndex].Get() : nullptr;
+	if (Settings->DashMontages.Num() != 8 || !Montage || Montage == Settings->AttackMontage ||
+	    Montage == Settings->GuardReactionMontage || Montage == Settings->HitReactionMontage ||
+	    Montage->GetPlayLength() <= 0.f || !FMath::IsFinite(Montage->RateScale) || Montage->RateScale <= 0.f ||
+	    !Montage->bEnableAutoBlendOut || Montage->TimeStretchCurve.IsValid() || Montage->SlotAnimTracks.Num() != 1 ||
+	    !FMath::IsNearlyEqual(Montage->SlotAnimTracks[0].AnimTrack.GetLength(), Montage->GetPlayLength(), 0.001f))
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': invalid dash montage[%d]='%s' in '%s'. Define 8 independent constant-speed "
+		            "montages, one slot, Auto Blend Out and matching segment/montage lengths. Recalculate length in "
+		            "the editor."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       DirectionIndex,
+		       *GetPathNameSafe(Montage),
+		       *Settings->GetPathName());
+		return nullptr;
+	}
+	return Montage;
+}
+
+bool UVampsCombatMovementComponent::TryStartCombatDash(const FVector& DashDirection, UAnimMontage* DashMontage)
+{
+	AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+	UAnimInstance* Animation = Fighter ? Fighter->GetMesh()->GetAnimInstance() : nullptr;
+	if (!Fighter || !Fighter->CombatSettings || !Animation || !DashMontage)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': missing dash owner, settings, animation or montage '%s'."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(DashMontage));
+		return false;
+	}
+	StopVoluntaryMotion();
+	const float Played = Animation->Montage_Play(
+	    DashMontage, DashMontage->GetPlayLength() / (Fighter->CombatSettings->DashDuration * DashMontage->RateScale));
+	const FAnimMontageInstance* Playback = Animation->GetActiveInstanceForMontage(DashMontage);
+	if (Played <= 0.f || !Playback)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': dash montage '%s' did not start; verify skeleton and slot."),
+		       __FUNCTION__,
+		       *Fighter->GetPathName(),
+		       *DashMontage->GetPathName());
+		return false;
+	}
+	DashPlaybackInstanceID = Playback->GetInstanceID();
+	PendingKnockbackDistance = 0.f;
+	DashFacing = UpdatedComponent->GetComponentQuat();
+	BeginCombatMotion(EVampsCombatMotion::Dash,
+	                  UpdatedComponent->GetComponentLocation() +
+	                      DashDirection.GetSafeNormal2D() * Fighter->CombatSettings->DashDistance,
+	                  Fighter->CombatSettings->DashDuration);
+	return true;
+}
 
 void UVampsCombatMovementComponent::ReceiveCombatDisplacement(const FVector& AttackOrigin,
                                                               const FVector& AttackDirection,
@@ -51,6 +180,7 @@ void UVampsCombatMovementComponent::ReceiveCombatDisplacement(const FVector& Att
 		return;
 	}
 	CombatPushDirection = AttackDirection.GetSafeNormal2D();
+	StopVoluntaryMotion();
 	PendingKnockbackDistance = StepSettings.KnockbackDistance;
 	bCombatMotionBlocked = false;
 	CombatFacingStart = UpdatedComponent->GetComponentQuat();
@@ -82,6 +212,11 @@ void UVampsCombatMovementComponent::BeginCombatMotion(EVampsCombatMotion NewMoti
 
 void UVampsCombatMovementComponent::FinishCombatMotion()
 {
+	if (CombatMotion == EVampsCombatMotion::Dash)
+	{
+		StopVoluntaryMotion();
+		return;
+	}
 	if (CombatMotion == EVampsCombatMotion::Alignment)
 	{
 		BeginCombatKnockback();
@@ -109,8 +244,11 @@ void UVampsCombatMovementComponent::BeginCombatKnockback()
 
 void UVampsCombatMovementComponent::TickCharacterPose(float DeltaTime)
 {
-	Super::TickCharacterPose(DeltaTime);
 	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+	const bool bControlledPose = CombatMotion != EVampsCombatMotion::None ||
+	                             (Fighter && (Fighter->CombatState.Reaction != EVampsCombatReaction::None ||
+	                                          Fighter->CombatState.MontageInstanceID != INDEX_NONE));
+	Super::TickCharacterPose(DeltaTime);
 	UAnimInstance* Animation = Fighter ? Fighter->GetMesh()->GetAnimInstance() : nullptr;
 	if (!Fighter || !Fighter->CombatSettings || !Animation)
 	{
@@ -127,9 +265,10 @@ void UVampsCombatMovementComponent::TickCharacterPose(float DeltaTime)
 		return;
 	}
 	const FAnimMontageInstance* RootPlayback = Animation->GetRootMotionMontageInstance();
-	if (CombatMotion != EVampsCombatMotion::None || Fighter->CombatState.Reaction != EVampsCombatReaction::None ||
-	    (RootPlayback && Fighter->CombatState.bRecoveryVisualReleased &&
-	     RootPlayback->Montage == Fighter->CombatSettings->AttackMontage))
+	if (bControlledPose || CombatMotion != EVampsCombatMotion::None ||
+	    Fighter->CombatState.Reaction != EVampsCombatReaction::None ||
+	    (RootPlayback && (RootPlayback->Montage == Fighter->CombatSettings->AttackMontage ||
+	                      Fighter->CombatSettings->DashMontages.Contains(RootPlayback->Montage))))
 	{
 		RootMotionParams.Clear();
 	}
@@ -140,6 +279,13 @@ void UVampsCombatMovementComponent::ApplyRootMotionToVelocity(float DeltaTime)
 	Super::ApplyRootMotionToVelocity(DeltaTime);
 	if (CombatMotion == EVampsCombatMotion::None || DeltaTime < MIN_TICK_TIME)
 	{
+		const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+		if (Fighter && (!Fighter->CombatState.bCanMove || (Fighter->CombatState.MontageInstanceID != INDEX_NONE &&
+		                                                   !Fighter->CombatState.bRecoveryVisualReleased)))
+		{
+			Velocity.X = 0.f;
+			Velocity.Y = 0.f;
+		}
 		return;
 	}
 	const float Progress =
@@ -152,8 +298,26 @@ void UVampsCombatMovementComponent::ApplyRootMotionToVelocity(float DeltaTime)
 
 void UVampsCombatMovementComponent::PhysicsRotation(float DeltaTime)
 {
+	if (CombatMotion == EVampsCombatMotion::Dash)
+	{
+		MoveUpdatedComponent(FVector::ZeroVector, DashFacing, true);
+		return;
+	}
+	if (CombatMotion == EVampsCombatMotion::Advance)
+	{
+		const FRotator Facing = FMath::RInterpConstantTo(
+		    UpdatedComponent->GetComponentRotation(), CombatFacingGoal.Rotator(), DeltaTime, 500.f);
+		MoveUpdatedComponent(FVector::ZeroVector, Facing, true);
+		return;
+	}
 	if (CombatMotion == EVampsCombatMotion::None)
 	{
+		const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+		if (Fighter && Fighter->CombatState.MontageInstanceID != INDEX_NONE &&
+		    !Fighter->CombatState.bRecoveryVisualReleased)
+		{
+			return;
+		}
 		Super::PhysicsRotation(DeltaTime);
 		return;
 	}
@@ -198,6 +362,7 @@ float UVampsCombatMovementComponent::SlideAlongSurface(
 
 void UVampsCombatMovementComponent::ResetCombatMotion()
 {
+	StopVoluntaryMotion();
 	CombatMotion = EVampsCombatMotion::None;
 	PendingKnockbackDistance = 0.f;
 	bCombatMotionBlocked = false;

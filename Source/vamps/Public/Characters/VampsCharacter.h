@@ -53,6 +53,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestCombatAction();
 
+	void SetMobilityDirection(const FVector& WorldDirection);
+	void SetMobilityHeld(bool bHeld);
+	void ResolveCombatDash();
+
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	FVampsCombatState CombatState;
 
@@ -70,7 +74,7 @@ public:
 	void RememberDefendedContact(const FVampsPendingContact& Contact);
 	void RegisterCombatContact(bool bBlocked);
 	bool ReceiveCombatHit(const FVampsPendingContact& Contact);
-	void ApplyCombatReaction(const FVampsPendingContact& Contact);
+	void ApplyCombatReaction(const FVampsPendingContact& Contact, bool bFinalGuardImpact);
 	void ResetCombatState();
 
 private:
@@ -82,6 +86,14 @@ private:
 	double GuardRecoveryStartsAt = 0;
 	uint32 DefendedGeneration = 0;
 	int32 ReactionPlaybackInstanceID = INDEX_NONE;
+	FVector MobilityDirection = FVector::ZeroVector;
+	FVector PendingDashDirection = FVector::ZeroVector;
+	bool bMobilityHeld = false;
+	double MobilityRecoveryStartsAt = 0;
+	int32 DashRequestActionNumber = INDEX_NONE;
+
+	void UpdateMobilityEnergy(float DeltaSeconds);
+	void ClearMobilityIntent();
 
 	bool InitializeCombatWeapons();
 	void DestroyCombatWeapons();

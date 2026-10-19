@@ -10,7 +10,8 @@ La primera prioridad es reproducir el intercambio, movilidad, lock-on y presenta
 | Cartas | Sin mano, selección Q/A/B, bonificaciones, Extra Attack ni disponibilidad causada por estados de cartas; cadena/NA directas |
 | Personaje | Un melee jugable; reaparece el mismo personaje, sin reservas ni sustitución al morir |
 | Movilidad y presentación | Evasión/sprint, lock-on continuo, selección manual/por guardia, cámara de acciones, HUD de amenaza y desvanecimiento de oclusores |
-| Shift sin dirección | Evasión hacia atrás como adaptación explícita |
+| Shift sin dirección | Evasión alejándose del target como adaptación explícita |
+| Recursos | Carga de guardia y energía de movilidad separadas; agotamiento de movilidad sin guard break |
 | Partida | Equipos, puntos por bajas y portador de recompensa sin temática Grial |
 | Fuera del primer alcance | Ranged y SUPPORT; atacar al mismo enemigo que otro aliado sigue permitido |
 | Después de la base | [Parry, skills, identidades propias y ultimate de Vamps](../extensions/functional.md) |

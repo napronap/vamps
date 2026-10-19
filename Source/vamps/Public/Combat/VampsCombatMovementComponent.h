@@ -11,7 +11,9 @@ enum class EVampsCombatMotion : uint8
 {
 	None,
 	Alignment,
-	Knockback
+	Knockback,
+	Advance,
+	Dash
 };
 
 UCLASS()
@@ -20,6 +22,12 @@ class VAMPS_API UVampsCombatMovementComponent : public UCharacterMovementCompone
 	GENERATED_BODY()
 
 public:
+
+	virtual float GetMaxSpeed() const override;
+	void BeginOffensiveAdvance(const FVampsCombatStepSettings& StepSettings);
+	UAnimMontage* FindCombatDashMontage(const FVector& DashDirection) const;
+	bool TryStartCombatDash(const FVector& DashDirection, UAnimMontage* DashMontage);
+	void StopVoluntaryMotion();
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	EVampsCombatMotion CombatMotion = EVampsCombatMotion::None;
@@ -53,6 +61,8 @@ private:
 	double CombatMotionStartedAt = 0;
 	float CombatMotionDuration = 0.f;
 	float PendingKnockbackDistance = 0.f;
+	int32 DashPlaybackInstanceID = INDEX_NONE;
+	FQuat DashFacing = FQuat::Identity;
 
 	void BeginCombatMotion(EVampsCombatMotion NewMotion, const FVector& Destination, float Duration);
 	void BeginCombatKnockback();

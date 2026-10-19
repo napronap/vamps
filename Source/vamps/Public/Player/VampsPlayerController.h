@@ -34,9 +34,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> CycleTargetAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> MobilityAction;
+
 private:
 
 	void Move(const FInputActionValue& Value);
 	void RequestCombat();
 	void CycleTarget();
+	void MobilityPressed();
+	void MobilityReleased();
 };

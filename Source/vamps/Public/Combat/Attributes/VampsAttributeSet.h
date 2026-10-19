@@ -26,6 +26,22 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxGuardLoad, Category = "Guard")
 	FGameplayAttributeData MaxGuardLoad;
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MobilityEnergy, Category = "Mobility")
+	FGameplayAttributeData MobilityEnergy;
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxMobilityEnergy, Category = "Mobility")
+	FGameplayAttributeData MaxMobilityEnergy;
+
+	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UVampsAttributeSet, MobilityEnergy)
+	GAMEPLAYATTRIBUTE_VALUE_GETTER(MobilityEnergy)
+	GAMEPLAYATTRIBUTE_VALUE_SETTER(MobilityEnergy)
+	GAMEPLAYATTRIBUTE_VALUE_INITTER(MobilityEnergy)
+
+	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UVampsAttributeSet, MaxMobilityEnergy)
+	GAMEPLAYATTRIBUTE_VALUE_GETTER(MaxMobilityEnergy)
+	GAMEPLAYATTRIBUTE_VALUE_SETTER(MaxMobilityEnergy)
+	GAMEPLAYATTRIBUTE_VALUE_INITTER(MaxMobilityEnergy)
+
 	GAMEPLAYATTRIBUTE_PROPERTY_GETTER(UVampsAttributeSet, GuardLoad)
 	GAMEPLAYATTRIBUTE_VALUE_GETTER(GuardLoad)
 	GAMEPLAYATTRIBUTE_VALUE_SETTER(GuardLoad)
@@ -51,6 +67,12 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+
+	UFUNCTION()
+	void OnRep_MobilityEnergy(const FGameplayAttributeData& OldValue);
+
+	UFUNCTION()
+	void OnRep_MaxMobilityEnergy(const FGameplayAttributeData& OldValue);
 
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldValue);

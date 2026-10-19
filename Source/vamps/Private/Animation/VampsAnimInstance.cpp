@@ -3,6 +3,7 @@
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Combat/VampsCombatLog.h"
+#include "Combat/VampsCombatMovementComponent.h"
 
 void UVampsAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -37,4 +38,8 @@ void UVampsAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsHitReacting = CurrentCombat.Reaction == EVampsCombatReaction::Hit;
 	bIsStunned = CurrentCombat.Reaction == EVampsCombatReaction::Stun;
 	CombatReactionRemaining = FMath::Max(0.f, float(CurrentCombat.ReactionEndsAt - GetWorld()->GetTimeSeconds()));
+	const UVampsCombatMovementComponent* Movement =
+	    Cast<UVampsCombatMovementComponent>(OwningCharacter->GetCharacterMovement());
+	bIsDashing = Movement && Movement->CombatMotion == EVampsCombatMotion::Dash;
+	bIsSprinting = CurrentCombat.bIsSprinting;
 }

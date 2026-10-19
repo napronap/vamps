@@ -23,6 +23,7 @@ struct FVampsPendingContact
 	bool bBlocked = false;
 	bool bCritical = false;
 	bool bGuardBreak = false;
+	bool bFinalImpact = false;
 };
 
 UCLASS()
@@ -35,7 +36,11 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void QueueCombatContact(AVampsCharacter* Attacker, AVampsCharacter* Recipient);
+	void QueueCombatContact(AVampsCharacter* Attacker,
+	                        AVampsCharacter* Recipient,
+	                        int32 WeaponIndex,
+	                        int32 ImpactIndex);
+	void QueueCombatDash(AVampsCharacter* Fighter);
 	void QueueCombatContinuation(AVampsCharacter* Fighter);
 	void QueueCombatLocomotion(AVampsCharacter* Fighter);
 	void DiscardContactsFor(const AVampsCharacter* Fighter);
@@ -45,6 +50,8 @@ protected:
 	virtual bool DoesSupportWorldType(const EWorldType::Type WorldType) const override;
 
 private:
+
+	TArray<TWeakObjectPtr<AVampsCharacter>> PendingDashes;
 
 	TArray<FVampsPendingContact> PendingContacts;
 	TArray<TWeakObjectPtr<AVampsCharacter>> PendingContinuations;

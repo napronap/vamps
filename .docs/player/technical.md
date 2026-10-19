@@ -4,15 +4,21 @@ Comportamiento: [functional.md](functional.md). Estado existente: [prototipo](..
 
 ## Entrada y movimiento
 
-`AVampsPlayerController` pasa de Attack/Guard separados a una solicitud contextual por `Started`. Mantener RMB no genera repetición. La ventana y vigencia defensiva se evalúan en combate; cambiar el mapping por sí solo no implementa la regla. Evasión/sprint y selección necesitan sus entradas y condiciones propias.
+`AVampsPlayerController` enlaza IA_Combat por Started; mantener RMB no repite solicitudes. IA_Mobility enlaza Started para solicitar dash y Completed/Canceled para terminar la intención de sprint. Move conserva referencia al yaw de cámara y comunica dirección incluso cuando el personaje rechaza caminar; Completed/Canceled la pone en cero. Al pulsar Shift se lee también el valor actual de IA_Move para no depender del orden de callbacks.
 
-La base actual aplica Move relativo al yaw y Look libre. Se debe coordinar la referencia direccional con el encuadre de lock-on, la orientación del personaje y el desplazamiento de ataque/evasión, conservando la distinción entre dirección de viaje y target. No se limita todo movimiento por un tag de ataque ni se confunde NA con inmovilidad.
+AVampsCharacter deriva bCanDash por vida, energía, suelo y reacción; bCanMove sigue representando locomoción voluntaria. SetMobilityHeld conserva una solicitud del paso actual. UVampsCombatResolver procesa contactos, continuación, dash y liberación de locomoción en ese orden. BeginCombatStep descarta el dash anterior al avanzar; Guard/Hit/Stun, muerte y reset invalidan intención y permiso. El cierre por movilidad conserva el plazo de Recovery y la NA posterior. La salida de Guard no borra una NA ya vigente.
+
+UVampsCombatMovementComponent ejecuta Advance y Dash mediante su ruta de movimiento con colisión. Dash fija dirección y facing iniciales y elige un montage por sector de 45 grados relativo al cuerpo: Fw, FR, R, BR, Bw, BL, L, FL. La traslación/rotación de raíz de ataque/dash se suprime para usar un solo dueño del desplazamiento; Guard/Hit conservan su alineación/empuje independiente. Comenzar ataque o materializar una reacción termina la movilidad incompatible con blend out del dash; no se cambia colisión para dar invulnerabilidad.
+
+MobilityEnergy/MaxMobilityEnergy son atributos GAS separados de GuardLoad. El personaje paga dash al iniciar reproducción correctamente, drena sprint y recupera energía con su retraso. GetMaxSpeed aplica SprintSpeed solo cuando bIsSprinting. Los datos escalares se validan sin asserts; los montages requieren ocho referencias independientes, un slot, Auto Blend Out, velocidad constante y longitud de segmentos consistente con la del montage. Una configuración inválida cancela el dash con diagnóstico antes de abandonar Guard o cobrar energía.
+
+La conexión vigente está en /Game/Vamps/Input/IA_Mobility, LeftShift de IMC_Vamps, MobilityAction de BP_VampsPlayerController y los ocho AM_Executioner_Dash_* de /Game/Vamps/Animations/Executioner. BS_Executioner conserva sus muestras 0/180/420 y agrega Run_Fw en 700 con RateScale=700/420. UVampsAnimInstance publica bIsDashing/bIsSprinting y el HUD de observación muestra energía, permiso y solicitud. [037](../reports/037-movilidad-combate/reporte.md) registra configuración y límites de verificación.
 
 ## Una selección para cámara y HUD
 
-El controller conserva selección y orden de rivales mostrado por HUD. La guardia efectiva entrega el agresor como selección forzada; contacto ofensivo con otro rival no produce ese evento. Cámara y HUD reciben el mismo target para evitar selecciones independientes por cercanía. La elegibilidad se conecta con equipos, muerte y respawn.
+UVampsLockOnComponent conserva selección y orden de rivales mostrado por HUD. La guardia efectiva entrega el agresor como selección forzada; contacto ofensivo con otro rival no produce ese evento. Cámara y HUD reciben el mismo target. La selección inicial, reemplazo y ausencia están implementados en 018–019; equipos y respawn se conectan al incorporarlos.
 
-`AVampsCharacter_Player` aporta actualmente SpringArm de 400 cm y cámara ligada a ControlRotation; eso no implementa seguimiento de target. La cámara de referencia necesita calcular la relación visual jugador/target y aplicar tolerancia/corrección, distancia visual y presentación por acción. La elección entre FOV y distancia se hace al calibrarla, sin atribuirle una fórmula interna al original.
+AVampsCharacter_Player aporta SpringArm de 400 cm y cámara ligada a ControlRotation. AVampsPlayerCameraManager ya implementa seguimiento automático suave y tolerancia lateral, con retorno detrás del personaje sin target. La etapa 4 conserva ese comportamiento. Distancia/FOV y planos por acción se completan en 5, sin atribuirles una fórmula interna al original.
 
 ## Oclusión y señales
 
@@ -24,5 +30,4 @@ Las conexiones de input y animación `/Game/Vamps` se documentan en el [prototip
 
 ## Preguntas
 
-1. Tras definir pérdida y ausencia de target, ¿cómo se representa la selección y se mantiene coherente entre controller, cámara y HUD?
-2. ¿Qué tratamiento de colisión de cámara y qué materiales de los mapas cubren los oclusores visibles del alcance?
+1. ¿Qué tratamiento de colisión de cámara y qué materiales de los mapas cubren los oclusores visibles del alcance?

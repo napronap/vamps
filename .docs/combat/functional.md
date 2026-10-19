@@ -22,11 +22,11 @@ Cada continuación exige una pulsación individual dentro de la ventana del paso
 
 Alcanzar a cualquier enemigo habilita continuación, incluso si no es el seleccionado o bloquea el golpe. El contacto defendido cuenta para el atacante y no corta su combo. Acertar a otro rival no cambia automáticamente el target ofensivo. Un paso que no alcanza a nadie corta la cadena aunque sigan llegando pulsaciones.
 
-La cadena termina tras el tercer paso, al fallar uno o voluntariamente al final de un paso por no continuar o usar evasión. Evasión permite cerrar en esa frontera; no habilita cancelación libre en cualquier punto de la animación. La recuperación depende de la acción.
+La cadena termina tras el tercer paso, al fallar uno o voluntariamente al final de un paso por no continuar o usar evasión. Evasión permite cerrar en esa frontera; no habilita cancelación libre en cualquier punto de la animación. Una continuación ofensiva válida tiene prioridad sobre la evasión solicitada y la descarta. La recuperación depende de la acción y se conserva al salir por evasión.
 
 ## Recuperación y NA
 
-NA es la recuperación que impide atacar y defender después del cierre ofensivo. Permite locomoción y es distinta de reacción al daño, stun y muerte. No hay draw real ni cartas ocultas que simulen esa indisponibilidad.
+NA es la recuperación que impide atacar y defender después del cierre ofensivo. Permite locomoción y dash/sprint sin acortar su plazo y es distinta de reacción al daño, stun y muerte. No hay draw real ni cartas ocultas que simulen esa indisponibilidad.
 
 Bloquear cancela la ofensiva propia en curso, incluida su continuación pendiente, y pasa al defensor a la reacción de guardia. Puede verse un comienzo de ataque que termina sustituido por Guard. La interrupción no inicia NA ni conserva una continuación ofensiva para ejecutarla automáticamente después. Durante la reacción se siguen evaluando solicitudes defensivas, pero no se permite atacar.
 
@@ -40,9 +40,15 @@ Solo se recuerda la instancia ofensiva de la interacción defensiva actual. Si A
 
 El bloqueo y el daño abierto deshabilitan temporalmente movimiento voluntario y ataque. Ambos usan la misma duración configurada en el atacante para el paso que conecta, sin calcularla a partir de la longitud de su sección o de un mínimo de animación. El desplazamiento impuesto por el contacto sigue siendo posible y respeta colisión. Las solicitudes defensivas se evalúan durante la reacción cuando el receptor puede defender; stun y NA impiden defensa.
 
+Guard tiene una salida específica por dash al registrar el impacto final autorado del ataque enemigo, el de cierre con knockback. Los contactos anteriores no la habilitan. Se puede salir inmediatamente después de ese contacto, sin esperar el final de su empuje ni ReactionEndsAt. Salir termina la reacción y su memoria defensiva, pero conserva cualquier NA vigente. Un contacto nuevo reemplaza el permiso anterior; daño abierto, ruptura/stun, muerte o reset lo invalidan. Si el impacto final falla, no entrega permiso: la reacción previa termina por su plazo ordinario. El dash no agrega invulnerabilidad ni descarta contactos válidos ya capturados.
+
+El impacto final se identifica explícitamente dentro del ataque. No equivale a cualquier contacto con empuje, al tercer paso de la cadena ni al final visual de una animación. En un lote simultáneo se mantienen las prioridades ruptura, daño abierto y bloqueo; solo un resultado final de Guard puede habilitar su salida.
+
 Cada contacto aceptado instala de nuevo esa duración desde el contacto, reemplazando el plazo anterior. Los impactos de un mismo paso comparten la configuración. Las animaciones multihit se ajustan para que el intervalo entre sus contactos no supere esta duración; mientras conecten, mantienen la restricción y el último contacto fija su vencimiento final. Un impacto que falla no renueva el plazo ni el reposicionamiento garantiza los impactos siguientes.
 
 El daño residual puede matar. La barra de guardia acumula carga al bloquear; al llenarse se produce guard break con stun y se impide seguir defendiendo. Reacción ordinaria y stun son estados distintos. El HUD distingue acumulación de guardia, bloqueo, reacción, stun y NA.
+
+La carga de guardia es distinta de la [energía de movilidad](../player/functional.md#energía-de-movilidad). Gastar energía en dash/sprint no cambia GuardLoad ni causa ruptura al agotarse.
 
 Cada contacto bloqueado agrega la carga configurada en el atacante, incluso los contactos independientes de dos armas. El contacto que llena la barra todavía aplica residual y provoca stun; los siguientes contactos se reciben abiertos. La capacidad, recuperación y duración de stun pertenecen al defensor. La barra disminuye a una tasa por segundo después del retraso desde el último bloqueo y solo fuera de reacción. Durante stun no se recupera; al terminar queda en cero. Recibir más golpes durante stun no renueva su duración, aunque aplica daño y desplazamiento.
 
@@ -58,4 +64,6 @@ Se aplica todo el daño válido del lote y se elige una sola reacción y desplaz
 
 El ataque intenta cerrar distancia hasta el límite propio de la acción. Puede comenzar contra un target lejano, quedar corto y ejecutar igualmente el golpe. Alcance de desplazamiento y alcance de contacto son distintos. No se garantiza acierto ni se teletransporta sin límite al target. La geometría conserva sus restricciones.
 
-Los parámetros y el estado de comprobación del paso 3 se registran en [033](../reports/033-resultados-combate/reporte.md). La calibración se realiza sobre estas reglas, sin atribuir los valores iniciales a mediciones de FGOA.
+Cada paso fija al inicio la dirección y el destino de avance hacia su target elegible, respetando el máximo y la distancia de detención configurados. El avance reemplaza la traslación de raíz ofensiva, que no se suma por separado. Cambiar F, perder el target o que este se aleje no recalcula una persecución durante ese paso. Sin target se ejecuta el ataque sin acercamiento; un paso posterior vuelve a consultar la selección.
+
+Los parámetros y la implementación inicial del paso 3 se registran en [033](../reports/033-resultados-combate/reporte.md); la configuración vigente y el cierre por confirmación del usuario están en [035](../reports/035-revision-paso-3/reporte.md). La calibración se realiza sobre estas reglas, sin atribuir los valores iniciales a mediciones de FGOA.

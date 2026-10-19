@@ -1,6 +1,6 @@
 # Implementación del combate de referencia
 
-Reglas: [functional.md](functional.md). La implementación de cadena/NA y los resultados del paso 3 usan clases propias sobre Unreal/GAS. [033](../reports/033-resultados-combate/reporte.md) distingue código, configuración, compilación y observaciones pendientes.
+Reglas: [functional.md](functional.md). La implementación de cadena/NA y los resultados del paso 3 usan clases propias sobre Unreal/GAS. [033](../reports/033-resultados-combate/reporte.md) conserva código, configuración, compilación y límites de su observación inicial; [035](../reports/035-revision-paso-3/reporte.md) registra la configuración vigente y el cierre aprobado por el usuario.
 
 ## Responsabilidades
 
@@ -13,6 +13,7 @@ Reglas: [functional.md](functional.md). La implementación de cadena/NA y los re
 | `UVampsCombatSettings` / `FVampsCombatStepSettings` | Duración total por paso y parámetros de crítico, bloqueo, acumulación, recuperación, stun y vigencia de solicitud. HasValidReactionSettings diagnostica configuración inválida sin cerrar el editor. |
 | `UVampsAttributeSet` / `UGE_VampsDamage` | Health/MaxHealth y GuardLoad/MaxGuardLoad replicados. Daño instantáneo vía GameplayEffect; acumulación/recuperación por el ASC. |
 | `UVampsCombatMovementComponent` | Movimiento impuesto y root motion con colisión; elimina root motion de reacción y orienta hacia la fuente del desplazamiento. |
+| Movilidad de 4 | Advance/Dash en el componente existente, energía GAS independiente y permisos en el personaje; [implementación de jugador](../player/technical.md). |
 | `UVampsAnimInstance` / `AVampsCombatTestHUD` | Exponen reacción efectiva, duración, permisos, guardia, daño y crítico sin decidir disponibilidad. |
 
 Jugador e IA usan RequestCombatAction y AddMovementInput del personaje. No se añadió otra ruta de input, daño o validación ni infraestructura de red, cartas o extensiones posteriores.
@@ -32,6 +33,12 @@ AnimInstance publica bIsGuarding, bIsHitReacting, bIsStunned y CombatReactionRem
 La cola captura emisor, receptor, ActionNumber, generaciones, tiempo, daño normal/crítico elegido, reducción del defensor, carga de guardia y settings completos del paso, además de origen/dirección. El crítico se decide con autoridad una vez por contacto deduplicado, no por muestra del barrido. La recepción no vuelve a leer daño de una acción posterior.
 
 La memoria defensiva usa emisor, ActionNumber y generación. ActionNumber cambia por paso: otro paso requiere nueva admisión; armas y reinicios del mismo paso conservan identidad. La memoria se limpia con la salida de Guard, daño abierto, stun o reset. La [política funcional del lote](functional.md#guardia-daño-y-reacción) define orden, una admisión nueva por pulsación y prioridades de reacción; no usa el valor del ID para elegir ganador.
+
+FinalImpactWeaponIndex y FinalImpactIndex se autoran por paso. AVampsWeapon mantiene un índice de subimpacto: cero al empezar sección e incremento en ResetImpactHits. QueueCombatContact recibe arma/índice y captura bFinalImpact. UGA_Attack valida que el arma exista y que el índice coincida con su último reinicio autorado dentro del ANS. Es identidad del subgolpe seleccionado, no contador de impactos acertados ni un final inferido por número de combo.
+
+El resolver conserva la prioridad de reacción. Solo Guard puede recibir bGuardDashReady al incluir el impacto final bloqueado de la instancia que determina esa reacción. Una reacción posterior sustituye ese permiso; Hit/Stun/reset/muerte lo limpian. Un golpe final fallido no crea señal y Guard vence por su plazo normal. Los contactos capturados siguen resolviéndose antes de la solicitud de dash.
+
+AdvanceDistance, AdvanceDuration y AdvanceStopDistance pertenecen al atacante. BeginOffensiveAdvance captura el target actual y un destino acotado por paso; no persigue cambios posteriores. El componente reemplaza la raíz ofensiva por ese avance controlado, con giro limitado a 500 grados/s y detención ante colisión. TargetAlignmentDistance y KnockbackDistance siguen siendo desplazamientos del receptor y no se usan como máximo de avance.
 
 Los contactos capturados sobreviven a una interrupción ordinaria y pueden producir intercambio letal del mismo frame. Reset invalida generaciones; destrucción y receptor ya eliminado impiden aplicación. El registro habilitante se realiza antes de materializar interrupciones y solo corresponde al paso capturado. Una única reacción/desplazamiento por receptor evita sumar empujes por orden accidental de barridos.
 

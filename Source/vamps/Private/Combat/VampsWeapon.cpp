@@ -85,10 +85,12 @@ void AVampsWeapon::ResetSectionHits()
 {
 	SetTracingEnabled(false);
 	ResetImpactHits();
+	ImpactIndex = 0;
 }
 
 void AVampsWeapon::ResetImpactHits()
 {
+	++ImpactIndex;
 	HitActors.Reset();
 	bHasPreviousTrace = false;
 }
@@ -233,6 +235,7 @@ void AVampsWeapon::SweepWeaponSegment(const FVector& SweepStart,
 			continue;
 		}
 		HitActors.Add(Target);
-		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContact(Fighter, Target);
+		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContact(
+		    Fighter, Target, Fighter->Weapons.IndexOfByKey(this), ImpactIndex);
 	}
 }

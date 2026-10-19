@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-19",
+  "search": {
+    "baseClass": "/Script/vamps.VampsCombatSettings",
+    "subclasses": [
+      "/Script/vamps.VampsCombatSettings"
+    ],
+    "allRoots": true
+  },
+  "assets": {
+    "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings": {
+      "weapons": [
+        {
+          "weaponClass": {
+            "refPath": "/Game/Vamps/Blueprints/Weapons/BP_VampsGreatSword.BP_VampsGreatSword_C"
+          },
+          "attachSocket": "HandGrip_R",
+          "relativeTransform": {
+            "location": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "rotation": {
+              "pitch": 0,
+              "yaw": 0,
+              "roll": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            }
+          }
+        }
+      ],
+      "attackMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Combo.AM_Executioner_Combo"
+      },
+      "nARecoveryDuration": 0.5,
+      "comboSteps": [
+        {
+          "targetAlignmentDistance": 130,
+          "knockbackDistance": 100,
+          "contactReactionDuration": 1
+        },
+        {
+          "targetAlignmentDistance": 130,
+          "knockbackDistance": 100,
+          "contactReactionDuration": 1
+        },
+        {
+          "targetAlignmentDistance": 150,
+          "knockbackDistance": 250,
+          "contactReactionDuration": 1
+        }
+      ],
+      "hitReactionMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Hit.AM_Executioner_Hit"
+      },
+      "guardReactionMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Block.AM_Executioner_Block"
+      },
+      "criticalDamage": 24,
+      "criticalChancePercent": 10,
+      "blockDamageReduction": 10,
+      "guardCapacity": 100,
+      "guardLoadPerHit": 25,
+      "guardRecoveryDelay": 1,
+      "guardRecoveryPerSecond": 20,
+      "stunDuration": 2,
+      "defenseRequestDuration": 0.5
+    }
+  }
+}

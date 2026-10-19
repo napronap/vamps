@@ -1,0 +1,394 @@
+[
+  {
+    "asset": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Fw",
+    "properties": {
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Dash_Fw_RM.A_GreatSwordCombatAnimationV1_Dash_Fw_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "sequenceLength": 1,
+      "rateScale": 1,
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "dirty": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"returnValue\":false}"
+        }
+      ]
+    }
+  },
+  {
+    "asset": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_FR",
+    "properties": {
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Dash_FR_RM.A_GreatSwordCombatAnimationV1_Dash_FR_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "sequenceLength": 1,
+      "rateScale": 1,
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "dirty": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"returnValue\":false}"
+        }
+      ]
+    }
+  },
+  {
+    "asset": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_R",
+    "properties": {
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Dash_R_RM.A_GreatSwordCombatAnimationV1_Dash_R_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "sequenceLength": 1,
+      "rateScale": 1,
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "dirty": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"returnValue\":false}"
+        }
+      ]
+    }
+  },
+  {
+    "asset": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_BR",
+    "properties": {
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Dash_BR_RM.A_GreatSwordCombatAnimationV1_Dash_BR_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "sequenceLength": 1,
+      "rateScale": 1,
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "dirty": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"returnValue\":false}"
+        }
+      ]
+    }
+  },
+  {
+    "asset": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Bw",
+    "properties": {
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Dash_Bw_RM.A_GreatSwordCombatAnimationV1_Dash_Bw_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "sequenceLength": 1,
+      "rateScale": 1,
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "dirty": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"returnValue\":false}"
+        }
+      ]
+    }
+  },
+  {
+    "asset": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_BL",
+    "properties": {
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Dash_BL_RM.A_GreatSwordCombatAnimationV1_Dash_BL_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "sequenceLength": 1,
+      "rateScale": 1,
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "dirty": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"returnValue\":false}"
+        }
+      ]
+    }
+  },
+  {
+    "asset": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_L",
+    "properties": {
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Dash_L_RM.A_GreatSwordCombatAnimationV1_Dash_L_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "sequenceLength": 1,
+      "rateScale": 1,
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "dirty": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"returnValue\":false}"
+        }
+      ]
+    }
+  },
+  {
+    "asset": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_FL",
+    "properties": {
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Dash_FL_RM.A_GreatSwordCombatAnimationV1_Dash_FL_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "sequenceLength": 1,
+      "rateScale": 1,
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "dirty": {
+      "content": [
+        {
+          "type": "text",
+          "text": "{\"returnValue\":false}"
+        }
+      ]
+    }
+  }
+]

@@ -173,7 +173,7 @@ El evento ofensivo `MHD_ATK_REVISE` de Artoria Q01 permite3° por frame y30° ac
 
 **Nativo:** hay guard break real y animaciones específicas. Lo reconstruido no prueba una barra de guardia que disminuya con `strength_guard` por cada bloqueo. [N08](evidencia.md#trazas-nativas).
 
-El recurso actor+3530 se usa en guardia, carrera y esquiva. La guardia ordinaria puede cobrar si el ID difiere del último defendido, no es el tipo de proyectil excluido y no hay exención. El importe observado proviene de un parámetro del defensor. El descuento limita a0, pero el caller auditado no usa el retorno «llegó a cero» para solicitar ruptura. La conexión completa de ese importe con nombres de parámetros sigue abierta.
+La energía nativa del campo actor+3530 se gasta en las rutas auditadas de guardia, carrera y esquiva. Ese coste de bloquear no identifica el campo con una barra de resistencia de guardia. La guardia ordinaria puede cobrar si el ID difiere del último defendido, no es el tipo de proyectil excluido y no hay exención. El importe observado proviene de un parámetro del defensor. El descuento limita a0, pero el caller auditado no usa el retorno «llegó a cero» para solicitar ruptura. La conexión completa de ese importe con nombres de parámetros sigue abierta.
 
 `StatusStun` es otro sistema. Se encontraron productores por flags de golpe, eventos y una ruta condicionada de pared; no una suma demostrada por toda guardia normal. Una condición concreta de Stun del objetivo puede habilitar una primera carta especial. Su contexto queda capturado por ID, impide guardia y produce resultado `AR_GUARD_BREAK`; un flag adicional por impacto permite la reacción `GRD_BRK`.
 
@@ -181,7 +181,7 @@ Los5586 eventos de ataque inventariados tenían `strength_guard`, `strength_hit`
 
 **Video:** V02 muestra pérdida de HP durante barreras; [V08](<evidencia/V08-full demo-03120-03240.mp4>) muestra `Stunned`. Son resultados visibles distintos. Stunned no revela por qué se acumuló ni demuestra agotamiento de stamina. Tampoco esas escenas demuestran por sí solas muerte causada exclusivamente por residual.
 
-**Para Vamps:** residual, coste de recurso, stun, ataque no guardable y guard break deben distinguirse. La regla anterior «recurso vacío → ruptura» puede mantenerse como decisión propia, pero no atribuirse a la ruta original reconstruida. Conviene resolver este punto antes de calibrar una barra.
+**Para Vamps:** residual, coste de energía, carga de guardia, stun, ataque no guardable y guard break deben distinguirse. La energía de movilidad y GuardLoad son sistemas separados: el agotamiento de la primera no explica la ruptura del segundo. La regla de Vamps cerrada en 3 es ruptura por acumulación de GuardLoad; [037](../037-movilidad-combate/reporte.md) incorpora movilidad independiente. Esta precisión no convierte esas decisiones en una fórmula reconstruida del original.
 
 ## 9. Movimiento, cámara y sistemas fuera del intercambio
 
@@ -236,7 +236,7 @@ La captura histórica de027 registra `DA_VampsCombatSettings`, montage `AM_Execu
 | Renovar siempre significa sumar o conservar el mayor vencimiento. | El calendario nativo reemplaza inicio/duración; el movimiento también participa en la restricción efectiva. |
 | El defensor gira3°/segundo hasta30°. | Mezcla dos sistemas y una unidad: el3/30 de Q01 es seguimiento ofensivo por frame, entre hits. |
 | El empuje fuerte demuestra una señal universal de último hit. | Hay empuje por índice de ventana y señales específicas como BLOW_ARTS. No se cerró aquella señal universal. |
-| Vaciar el recurso de guardia demuestra la causa de guard break. | No probado; la ruta auditada separa recurso, StatusStun y contexto/flags de ruptura. |
+| Agotar energía demuestra la causa de guard break. | No probado; la ruta auditada separa gasto de energía, StatusStun y contexto/flags de ruptura. No identifica esa energía con una barra de guardia. |
 | Perder HP causa siempre NA/draw. | Contraejemplos V02/V09; V06 ya estaba en NA antes de los golpes. |
 | La defensa lateral prueba cobertura360° global. | No basta.360° está elegido en las specs de Vamps; el alcance universal del original sigue abierto. |
 | La documentación antigua describe la implementación actual. | `prototype/technical.md` y partes de `combat/technical.md` aún mencionan GA_Guard/FistHitbox y otros recorridos retirados. Usar el código y esta revisión para evaluar la base presente. |

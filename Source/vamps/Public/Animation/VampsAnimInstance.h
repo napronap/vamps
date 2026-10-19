@@ -32,4 +32,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	float CombatReactionRemaining = 0.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Animation")
+	bool bIsDashing = false;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Animation")
+	bool bIsSprinting = false;
 };

@@ -2,6 +2,35 @@
 #include "Animation/AnimMontage.h"
 #include "Combat/VampsCombatLog.h"
 
+bool UVampsCombatSettings::HasValidMobilitySettings() const
+{
+	if (!FMath::IsFinite(MobilityEnergyCapacity) || MobilityEnergyCapacity <= 0.f || !FMath::IsFinite(DashEnergyCost) ||
+	    DashEnergyCost < 0.f || DashEnergyCost > MobilityEnergyCapacity || !FMath::IsFinite(SprintEnergyPerSecond) ||
+	    SprintEnergyPerSecond < 0.f || !FMath::IsFinite(MobilityRecoveryPerSecond) || MobilityRecoveryPerSecond < 0.f ||
+	    !FMath::IsFinite(MobilityRecoveryDelay) || MobilityRecoveryDelay < 0.f || !FMath::IsFinite(DashDistance) ||
+	    DashDistance <= 0.f || !FMath::IsFinite(DashDuration) || DashDuration <= 0.f || !FMath::IsFinite(SprintSpeed) ||
+	    SprintSpeed <= 0.f)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': invalid mobility settings: capacity=%f, dashCost=%f, sprintCost=%f, recovery=%f, "
+		            "delay=%f, distance=%f, duration=%f, speed=%f. Expected finite nonnegative costs/recovery and "
+		            "positive capacity/distance/duration/speed; dash cost must not exceed capacity."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       MobilityEnergyCapacity,
+		       DashEnergyCost,
+		       SprintEnergyPerSecond,
+		       MobilityRecoveryPerSecond,
+		       MobilityRecoveryDelay,
+		       DashDistance,
+		       DashDuration,
+		       SprintSpeed);
+		return false;
+	}
+	return true;
+}
+
 bool UVampsCombatSettings::HasValidReactionSettings() const
 {
 	if (HitReactionMontage && GuardReactionMontage && HitReactionMontage == GuardReactionMontage)
