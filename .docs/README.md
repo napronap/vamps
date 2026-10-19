@@ -46,7 +46,13 @@ El paso 4 tiene implementación y configuración en [037 — Movilidad integrada
 
 ## Reportes de trabajo
 
-Implementación vigente de movilidad: [037 — Acercamiento, dash y sprint](reports/037-movilidad-combate/reporte.md), con energía separada, señal explícita de impacto final y preservación del DA comprobada tras arranque limpio. [Configuración y pendientes manuales](reports/037-movilidad-combate/editor.md). Paso 4 pendiente de cierre.
+Control direccional vigente: [040 — Giro instantáneo solo al iniciar dash](reports/040-giro-direccional-dash/reporte.md). Captura WASD al pulsar Shift, conserva el giro gradual de locomoción y reutiliza los dos montages de 039. [Guía y comprobación visual pendiente](reports/040-giro-direccional-dash/editor.md).
+
+Implementación vigente de movilidad: [039 — Simplificación con GA_Dash y root motion](reports/039-simplificacion-movilidad/reporte.md). Dos montages, approach solo inicial y restricciones existentes; retira índices finales y desplazamiento programado del dash de 037. DA preservado y compilación/arranque comprobados. [Guía y observación pendiente](reports/039-simplificacion-movilidad/editor.md).
+
+Revisión actual: [038 — Estado del paso 4](reports/038-estado-paso-4/reporte.md), con lectura MCP del DA y los ocho montages recibidos. Implementación presente; quedan impacto final y observación jugable. [Guía de cierre](reports/038-estado-paso-4/editor.md). La implementación y evidencia previa se conservan en 037.
+
+Implementación anterior de movilidad: [037 — Acercamiento, dash y sprint](reports/037-movilidad-combate/reporte.md). Su configuración de ocho direcciones e impacto final queda sustituida por 039; conserva las capturas de preservación del DA y su [guía histórica](reports/037-movilidad-combate/editor.md).
 
 Revisión de la siguiente etapa: [036 — Paso 4: acercamiento, evasión y sprint](reports/036-revision-paso-4/reporte.md). Contrasta código/assets con 028 e incorpora recursos separados, dash tras impacto final de Guard, dash en NA, blending, prioridad de continuación y retroceso relativo al target. Solo análisis y preparación del prompt; etapa 4 pendiente. [Lecturas y guía del editor](reports/036-revision-paso-4/editor.md).
 

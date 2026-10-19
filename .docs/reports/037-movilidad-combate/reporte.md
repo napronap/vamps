@@ -1,5 +1,7 @@
 # 037 — Movilidad integrada al combate
 
+Configuración sustituida por [039 — Simplificación de movilidad](../039-simplificacion-movilidad/reporte.md), con [guía vigente](../039-simplificacion-movilidad/editor.md). Esta carpeta conserva la evidencia histórica de ocho direcciones, approach por paso e impacto final.
+
 ## Alcance y estado
 
 Implementa el paso 4: acercamiento ofensivo limitado, dash/evasión y sprint sobre el combate de 3. La etapa permanece **pendiente de cierre** hasta completar autoría y observación en juego. [Guía y pendientes del editor](editor.md). Reemplaza la planificación de [036](../036-revision-paso-4/reporte.md), conservando su evidencia previa; [035](../035-revision-paso-3/reporte.md) sigue siendo el cierre de 3.

@@ -5,6 +5,7 @@
 #include "Animation/AnimMontage.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
 #include "Combat/Abilities/GA_Attack.h"
+#include "Combat/Abilities/GA_Dash.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
 #include "Combat/Data/VampsCombatSettings.h"
 #include "Combat/VampsCombatTags.h"
@@ -52,6 +53,7 @@ void AVampsCharacter::BeginPlay()
 		if (HasAuthority())
 		{
 			AttackHandle = AbilitySystem->GiveAbility(FGameplayAbilitySpec(UGA_Attack::StaticClass(), 1));
+			DashHandle = AbilitySystem->GiveAbility(FGameplayAbilitySpec(UGA_Dash::StaticClass(), 1));
 			AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetMaxGuardLoadAttribute(),
 			                                       CombatSettings->GuardCapacity);
 			AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetMaxMobilityEnergyAttribute(),
@@ -94,7 +96,6 @@ void AVampsCharacter::Tick(float DeltaSeconds)
 	{
 		CombatState.DefendedAttacker.Reset();
 		CombatState.DefendedActionNumber = INDEX_NONE;
-		CombatState.bGuardDashReady = false;
 	}
 	if (CombatState.Reaction == EVampsCombatReaction::None && Now >= GuardRecoveryStartsAt &&
 	    Attributes->GetGuardLoad() > 0.f)
@@ -108,20 +109,9 @@ void AVampsCharacter::Tick(float DeltaSeconds)
 	UpdateMobilityEnergy(DeltaSeconds);
 }
 
-void AVampsCharacter::SetMobilityDirection(const FVector& WorldDirection)
+void AVampsCharacter::SetMobilityInput(bool bHasInput)
 {
-	if (WorldDirection.ContainsNaN())
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s': invalid mobility direction %s."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *WorldDirection.ToString());
-		ClearMobilityIntent();
-		return;
-	}
-	MobilityDirection = WorldDirection.GetSafeNormal2D();
+	bHasMobilityInput = bHasInput;
 }
 
 void AVampsCharacter::ClearMobilityIntent()
@@ -129,11 +119,12 @@ void AVampsCharacter::ClearMobilityIntent()
 	bMobilityHeld = false;
 	CombatState.bIsSprinting = false;
 	CombatState.bDashRequested = false;
-	CombatState.bGuardDashReady = false;
 	DashRequestActionNumber = INDEX_NONE;
+	RequestedDashDirection = FVector::ZeroVector;
+	AbilitySystem->CancelAbilityHandle(DashHandle);
 }
 
-void AVampsCharacter::SetMobilityHeld(bool bHeld)
+void AVampsCharacter::SetMobilityHeld(bool bHeld, const FVector& DashDirection)
 {
 	if (!HasAuthority())
 	{
@@ -146,44 +137,21 @@ void AVampsCharacter::SetMobilityHeld(bool bHeld)
 		return;
 	}
 	SetCombatPhase(CombatState.Phase);
-	const UVampsCombatMovementComponent* Movement = Cast<UVampsCombatMovementComponent>(GetCharacterMovement());
-	if (!Movement)
-	{
-		UE_LOG(
-		    LogVampsCombat, Error, TEXT("%hs: '%s': missing combat movement component."), __FUNCTION__, *GetPathName());
-		return;
-	}
-	if (!CombatState.bCanDash || Movement->CombatMotion == EVampsCombatMotion::Dash ||
-	    (CombatState.MontageInstanceID != INDEX_NONE && !CombatState.bComboWindowOpen &&
-	     CombatState.Phase != EVampsActionPhase::Recovery))
+	if (!CombatState.bCanDash)
 	{
 		return;
 	}
-	PendingDashDirection = MobilityDirection;
-	if (PendingDashDirection.IsNearlyZero())
+	if (DashDirection.ContainsNaN())
 	{
-		const AVampsCharacter* TargetFighter = LockOn ? LockOn->GetCurrentTarget() : nullptr;
-		if (!IsValid(TargetFighter))
-		{
-			UE_LOG(LogVampsCombat,
-			       Warning,
-			       TEXT("%hs: '%s': backward dash requires an eligible target or directional input."),
-			       __FUNCTION__,
-			       *GetPathName());
-			return;
-		}
-		PendingDashDirection = (GetActorLocation() - TargetFighter->GetActorLocation()).GetSafeNormal2D();
-		if (PendingDashDirection.IsNearlyZero())
-		{
-			UE_LOG(LogVampsCombat,
-			       Warning,
-			       TEXT("%hs: '%s': backward dash direction is undefined at target '%s'."),
-			       __FUNCTION__,
-			       *GetPathName(),
-			       *TargetFighter->GetPathName());
-			return;
-		}
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': dash requires a finite input direction; received %s."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *DashDirection.ToString());
+		return;
 	}
+	RequestedDashDirection = DashDirection.GetSafeNormal2D();
 	bMobilityHeld = true;
 	CombatState.bDashRequested = true;
 	DashRequestActionNumber = CombatState.ActionNumber;
@@ -192,53 +160,17 @@ void AVampsCharacter::SetMobilityHeld(bool bHeld)
 
 void AVampsCharacter::ResolveCombatDash()
 {
-	if (!CombatState.bDashRequested)
-	{
-		return;
-	}
-	if (CombatState.MontageInstanceID != INDEX_NONE && CombatState.bComboWindowOpen)
+	if (!CombatState.bDashRequested || (CombatState.MontageInstanceID != INDEX_NONE && CombatState.bComboWindowOpen))
 	{
 		return;
 	}
 	CombatState.bDashRequested = false;
 	SetCombatPhase(CombatState.Phase);
-	if (!CombatState.bCanDash || DashRequestActionNumber != CombatState.ActionNumber)
+	if (!CombatState.bCanDash || DashRequestActionNumber != CombatState.ActionNumber ||
+	    !AbilitySystem->TryActivateAbility(DashHandle) || !CombatState.bIsDashing)
 	{
 		bMobilityHeld = false;
-		return;
 	}
-	UVampsCombatMovementComponent* Movement = Cast<UVampsCombatMovementComponent>(GetCharacterMovement());
-	UAnimMontage* DashMontage = Movement ? Movement->FindCombatDashMontage(PendingDashDirection) : nullptr;
-	if (!DashMontage)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s': dash cancelled; movement or authored montage is unavailable."),
-		       __FUNCTION__,
-		       *GetPathName());
-		bMobilityHeld = false;
-		return;
-	}
-	if (CombatState.MontageInstanceID != INDEX_NONE)
-	{
-		ResolveCombatLocomotion();
-	}
-	if (!Movement->TryStartCombatDash(PendingDashDirection, DashMontage))
-	{
-		bMobilityHeld = false;
-		return;
-	}
-	if (CombatState.Reaction == EVampsCombatReaction::Guard)
-	{
-		FinishCombatReaction();
-		CombatState.bDefenseRequestArmed = false;
-		CombatState.DefenseRequestEndsAt = 0;
-	}
-	AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetMobilityEnergyAttribute(),
-	                                       Attributes->GetMobilityEnergy() - CombatSettings->DashEnergyCost);
-	MobilityRecoveryStartsAt = GetWorld()->GetTimeSeconds() + CombatSettings->MobilityRecoveryDelay;
-	CombatState.bGuardDashReady = false;
-	SetCombatPhase(CombatState.Phase);
 }
 
 void AVampsCharacter::UpdateMobilityEnergy(float DeltaSeconds)
@@ -254,8 +186,8 @@ void AVampsCharacter::UpdateMobilityEnergy(float DeltaSeconds)
 		ClearMobilityIntent();
 		return;
 	}
-	const bool bSprinting = bMobilityHeld && !CombatState.bDashRequested && !MobilityDirection.IsNearlyZero() &&
-	                        CombatState.bCanMove && Movement->IsMovingOnGround() &&
+	const bool bSprinting = bMobilityHeld && !CombatState.bDashRequested && bHasMobilityInput &&
+	                        !CombatState.bIsDashing && CombatState.bCanMove && Movement->IsMovingOnGround() &&
 	                        Movement->CombatMotion == EVampsCombatMotion::None &&
 	                        (CombatState.MontageInstanceID == INDEX_NONE || CombatState.bRecoveryVisualReleased) &&
 	                        Attributes->GetMobilityEnergy() > 0.f;
@@ -273,7 +205,7 @@ void AVampsCharacter::UpdateMobilityEnergy(float DeltaSeconds)
 			CombatState.bIsSprinting = false;
 		}
 	}
-	else if (Now >= MobilityRecoveryStartsAt && Movement->CombatMotion != EVampsCombatMotion::Dash)
+	else if (Now >= MobilityRecoveryStartsAt && !CombatState.bIsDashing)
 	{
 		const float RecoverySeconds = FMath::Min(DeltaSeconds, float(Now - MobilityRecoveryStartsAt));
 		AbilitySystem->SetNumericAttributeBase(
@@ -444,6 +376,7 @@ void AVampsCharacter::RequestCombatAction()
 
 	if (CombatState.bCanStartAction)
 	{
+		AbilitySystem->CancelAbilityHandle(DashHandle);
 		if (AbilitySystem->TryActivateAbility(AttackHandle) && CombatState.MontageInstanceID != INDEX_NONE)
 		{
 			CombatState.LastRequest = EVampsCombatRequest::ActionStarted;
@@ -546,7 +479,10 @@ bool AVampsCharacter::BeginCombatStep()
 		       *GetPathName());
 		return false;
 	}
-	Movement->BeginOffensiveAdvance(CombatSettings->ComboSteps[CombatState.ComboStep - 1]);
+	if (CombatState.ComboStep == 1)
+	{
+		Movement->BeginOffensiveAdvance();
+	}
 	return true;
 }
 
@@ -907,7 +843,6 @@ void AVampsCharacter::CancelCombatOffense()
 
 void AVampsCharacter::FinishCombatReaction()
 {
-	CombatState.bGuardDashReady = false;
 	if (CombatState.Reaction == EVampsCombatReaction::Stun)
 	{
 		AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetGuardLoadAttribute(), 0.f);
@@ -949,8 +884,7 @@ void AVampsCharacter::RegisterCombatContact(bool bBlocked)
 void AVampsCharacter::ResetCombatState()
 {
 	ClearMobilityIntent();
-	MobilityDirection = FVector::ZeroVector;
-	PendingDashDirection = FVector::ZeroVector;
+	bHasMobilityInput = false;
 	MobilityRecoveryStartsAt = 0;
 	if (CombatSettings && CombatSettings->HasValidMobilitySettings())
 	{
@@ -1008,15 +942,12 @@ void AVampsCharacter::SetCombatPhase(EVampsActionPhase NewPhase)
 	CombatState.bOffenseRestricted = bInReaction;
 	CombatState.bCanMove = CombatState.bIsAlive && !bInReaction;
 	const UVampsCombatMovementComponent* Mobility = Cast<UVampsCombatMovementComponent>(GetCharacterMovement());
-	CombatState.bCanDash = CombatState.bIsAlive && AttackHandle.IsValid() && CombatSettings &&
+	CombatState.bCanDash = CombatState.bIsAlive && DashHandle.IsValid() && CombatSettings &&
 	                       Attributes->GetMobilityEnergy() >= CombatSettings->DashEnergyCost && Mobility &&
-	                       Mobility->CombatMotion != EVampsCombatMotion::Dash &&
+	                       !CombatState.bIsDashing &&
 	                       (CombatState.MontageInstanceID == INDEX_NONE || CombatState.bComboWindowOpen ||
 	                        NewPhase == EVampsActionPhase::Recovery) &&
-	                       GetCharacterMovement()->IsMovingOnGround() &&
-	                       (!bInReaction || (CombatState.Reaction == EVampsCombatReaction::Guard &&
-	                                         CombatState.bGuardDashReady && CombatState.DefendedAttacker.IsValid() &&
-	                                         CombatState.DefendedAttacker->CombatGeneration == DefendedGeneration));
+	                       GetCharacterMovement()->IsMovingOnGround() && !bInReaction;
 	CombatState.bCanRequestCombat =
 	    CombatState.bIsAlive && AttackHandle.IsValid() && NewPhase != EVampsActionPhase::NARecovery &&
 	    CombatState.Reaction != EVampsCombatReaction::Stun &&
@@ -1158,7 +1089,7 @@ bool AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact)
 	return true;
 }
 
-void AVampsCharacter::ApplyCombatReaction(const FVampsPendingContact& Contact, bool bFinalGuardImpact)
+void AVampsCharacter::ApplyCombatReaction(const FVampsPendingContact& Contact)
 {
 	if (!CombatState.bIsAlive)
 	{
@@ -1187,7 +1118,6 @@ void AVampsCharacter::ApplyCombatReaction(const FVampsPendingContact& Contact, b
 	const float Duration =
 	    Contact.bGuardBreak ? CombatSettings->StunDuration : Contact.StepSettings.ContactReactionDuration;
 	CombatState.ReactionEndsAt = Contact.ContactTime + Duration;
-	CombatState.bGuardDashReady = CombatState.Reaction == EVampsCombatReaction::Guard && bFinalGuardImpact;
 	if (CombatState.Reaction != EVampsCombatReaction::Guard)
 	{
 		CombatState.DefendedAttacker.Reset();

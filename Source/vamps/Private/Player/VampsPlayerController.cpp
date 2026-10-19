@@ -139,8 +139,7 @@ void AVampsPlayerController::Move(const FInputActionValue& Value)
 		const FRotator Yaw(0.f, GetControlRotation().Yaw, 0.f);
 		if (AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(ControlledPawn))
 		{
-			ControlledFighter->SetMobilityDirection(Yaw.Vector() * Movement.Y +
-			                                        FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y) * Movement.X);
+			ControlledFighter->SetMobilityInput(!Movement.IsNearlyZero());
 		}
 		ControlledPawn->AddMovementInput(Yaw.Vector(), Movement.Y);
 		ControlledPawn->AddMovementInput(FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y), Movement.X);
@@ -200,9 +199,9 @@ void AVampsPlayerController::MobilityPressed()
 	}
 	const FVector2D Direction = EnhancedPlayerInput->GetActionValue(MoveAction).Get<FVector2D>();
 	const FRotator Yaw(0.f, GetControlRotation().Yaw, 0.f);
-	ControlledFighter->SetMobilityDirection(Yaw.Vector() * Direction.Y +
-	                                        FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y) * Direction.X);
-	ControlledFighter->SetMobilityHeld(true);
+	const FVector DashDirection = Yaw.Vector() * Direction.Y + FRotationMatrix(Yaw).GetUnitAxis(EAxis::Y) * Direction.X;
+	ControlledFighter->SetMobilityInput(!Direction.IsNearlyZero());
+	ControlledFighter->SetMobilityHeld(true, DashDirection);
 }
 
 void AVampsPlayerController::MobilityReleased()

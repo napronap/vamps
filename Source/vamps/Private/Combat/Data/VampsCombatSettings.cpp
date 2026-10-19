@@ -7,15 +7,16 @@ bool UVampsCombatSettings::HasValidMobilitySettings() const
 	if (!FMath::IsFinite(MobilityEnergyCapacity) || MobilityEnergyCapacity <= 0.f || !FMath::IsFinite(DashEnergyCost) ||
 	    DashEnergyCost < 0.f || DashEnergyCost > MobilityEnergyCapacity || !FMath::IsFinite(SprintEnergyPerSecond) ||
 	    SprintEnergyPerSecond < 0.f || !FMath::IsFinite(MobilityRecoveryPerSecond) || MobilityRecoveryPerSecond < 0.f ||
-	    !FMath::IsFinite(MobilityRecoveryDelay) || MobilityRecoveryDelay < 0.f || !FMath::IsFinite(DashDistance) ||
-	    DashDistance <= 0.f || !FMath::IsFinite(DashDuration) || DashDuration <= 0.f || !FMath::IsFinite(SprintSpeed) ||
-	    SprintSpeed <= 0.f)
+	    !FMath::IsFinite(MobilityRecoveryDelay) || MobilityRecoveryDelay < 0.f || !FMath::IsFinite(SprintSpeed) ||
+	    SprintSpeed <= 0.f || !FMath::IsFinite(ApproachDistance) || ApproachDistance < 0.f ||
+	    !FMath::IsFinite(ApproachDuration) || ApproachDuration <= 0.f || !FMath::IsFinite(ApproachStopDistance) ||
+	    ApproachStopDistance < 0.f)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
 		       TEXT("%hs: '%s': invalid mobility settings: capacity=%f, dashCost=%f, sprintCost=%f, recovery=%f, "
-		            "delay=%f, distance=%f, duration=%f, speed=%f. Expected finite nonnegative costs/recovery and "
-		            "positive capacity/distance/duration/speed; dash cost must not exceed capacity."),
+		            "delay=%f, speed=%f, approach=%f/%f/%f. Expected finite nonnegative costs/recovery/distances and "
+		            "positive capacity/duration/speed; dash cost must not exceed capacity."),
 		       __FUNCTION__,
 		       *GetPathName(),
 		       MobilityEnergyCapacity,
@@ -23,9 +24,10 @@ bool UVampsCombatSettings::HasValidMobilitySettings() const
 		       SprintEnergyPerSecond,
 		       MobilityRecoveryPerSecond,
 		       MobilityRecoveryDelay,
-		       DashDistance,
-		       DashDuration,
-		       SprintSpeed);
+		       SprintSpeed,
+		       ApproachDistance,
+		       ApproachDuration,
+		       ApproachStopDistance);
 		return false;
 	}
 	return true;

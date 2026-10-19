@@ -34,21 +34,6 @@ struct VAMPS_API FVampsCombatStepSettings
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0.001", Units = "s"))
 	float ContactReactionDuration = 0.5f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Advance", meta = (ClampMin = "0", Units = "cm"))
-	float AdvanceDistance = 250.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Advance", meta = (ClampMin = "0.001", Units = "s"))
-	float AdvanceDuration = 0.25f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Advance", meta = (ClampMin = "0", Units = "cm"))
-	float AdvanceStopDistance = 130.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0"))
-	int32 FinalImpactWeaponIndex = 0;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0"))
-	int32 FinalImpactIndex = 0;
 };
 
 UCLASS(BlueprintType)
@@ -104,7 +89,19 @@ public:
 	float DefenseRequestDuration = 0.5f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mobility")
-	TArray<TObjectPtr<UAnimMontage>> DashMontages;
+	TObjectPtr<UAnimMontage> ForwardDashMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mobility")
+	TObjectPtr<UAnimMontage> BackwardDashMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Approach", meta = (ClampMin = "0", Units = "cm"))
+	float ApproachDistance = 250.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Approach", meta = (ClampMin = "0.001", Units = "s"))
+	float ApproachDuration = 0.25f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Approach", meta = (ClampMin = "0", Units = "cm"))
+	float ApproachStopDistance = 130.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mobility", meta = (ClampMin = "0.001"))
 	float MobilityEnergyCapacity = 100.f;
@@ -120,12 +117,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mobility", meta = (ClampMin = "0", Units = "s"))
 	float MobilityRecoveryDelay = 1.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mobility", meta = (ClampMin = "0.001", Units = "cm"))
-	float DashDistance = 350.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mobility", meta = (ClampMin = "0.001", Units = "s"))
-	float DashDuration = 0.3f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mobility", meta = (ClampMin = "0.001", Units = "cm/s"))
 	float SprintSpeed = 700.f;

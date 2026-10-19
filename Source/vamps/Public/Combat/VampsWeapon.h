@@ -34,7 +34,6 @@ public:
 	float TraceRadius = 8.f;
 
 	void ResetSectionHits();
-	int32 ImpactIndex = 0;
 	void ResetImpactHits();
 	bool SetTracingEnabled(bool bEnabled);
 

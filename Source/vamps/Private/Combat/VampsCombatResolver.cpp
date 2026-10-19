@@ -28,10 +28,7 @@ bool UVampsCombatResolver::DoesSupportWorldType(const EWorldType::Type WorldType
 	return WorldType == EWorldType::Game || WorldType == EWorldType::PIE;
 }
 
-void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker,
-                                              AVampsCharacter* Recipient,
-                                              int32 WeaponIndex,
-                                              int32 ImpactIndex)
+void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker, AVampsCharacter* Recipient)
 {
 	if (!IsValid(Attacker) || !IsValid(Recipient) || Attacker == Recipient || !Attacker->HasAuthority() ||
 	    !Recipient->HasAuthority() || Attacker->GetWorld() != GetWorld() || Recipient->GetWorld() != GetWorld())
@@ -48,21 +45,17 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker,
 	}
 	if (!Attacker->CombatSettings ||
 	    !Attacker->CombatSettings->ComboSteps.IsValidIndex(Attacker->CombatState.ComboStep - 1) || !Recipient->LockOn ||
-	    !Attacker->Weapons.IsValidIndex(WeaponIndex) || ImpactIndex < 0 ||
 	    !Cast<UVampsCombatMovementComponent>(Recipient->GetCharacterMovement()))
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
 		       TEXT("%hs: contact rejected: attacker='%s', step=%d, CombatSettings='%s', recipient='%s'. Required step "
-		            "settings, valid weapon/impact indices, recipient LockOn or combat movement are missing. "
-		            "weapon=%d, impact=%d."),
+		            "settings, recipient LockOn or combat movement are missing."),
 		       __FUNCTION__,
 		       *Attacker->GetPathName(),
 		       Attacker->CombatState.ComboStep,
 		       *GetPathNameSafe(Attacker->CombatSettings),
-		       *Recipient->GetPathName(),
-		       WeaponIndex,
-		       ImpactIndex);
+		       *Recipient->GetPathName());
 		return;
 	}
 	const UVampsCombatSettings* AttackSettings = Attacker->CombatSettings;
@@ -103,8 +96,6 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker,
 	Contact.AttackOrigin = Attacker->GetActorLocation();
 	Contact.AttackDirection = Attacker->GetActorForwardVector().GetSafeNormal2D();
 	Contact.StepSettings = StepSettings;
-	Contact.bFinalImpact =
-	    WeaponIndex == StepSettings.FinalImpactWeaponIndex && ImpactIndex == StepSettings.FinalImpactIndex;
 }
 
 void UVampsCombatResolver::QueueCombatDash(AVampsCharacter* Fighter)
@@ -294,16 +285,7 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 		}
 		if (ReactionContact && Recipient->CombatState.bIsAlive)
 		{
-			const bool bFinalGuardImpact = ReactionContact->bBlocked && !ReactionContact->bGuardBreak &&
-			                               Contacts.ContainsByPredicate(
-			                                   [ReactionContact](const FVampsPendingContact& Candidate)
-			                                   {
-				                                   return Candidate.Recipient == ReactionContact->Recipient &&
-				                                          Candidate.Attacker == ReactionContact->Attacker &&
-				                                          Candidate.ActionNumber == ReactionContact->ActionNumber &&
-				                                          Candidate.bBlocked && Candidate.bFinalImpact;
-			                                   });
-			Recipient->ApplyCombatReaction(*ReactionContact, bFinalGuardImpact);
+			Recipient->ApplyCombatReaction(*ReactionContact);
 			UVampsCombatMovementComponent* CombatMovement =
 			    Cast<UVampsCombatMovementComponent>(Recipient->GetCharacterMovement());
 			if (CombatMovement)

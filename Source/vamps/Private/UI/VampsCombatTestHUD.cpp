@@ -137,9 +137,9 @@ void AVampsCombatTestHUD::DrawFighter(
 	         FLinearColor::White,
 	         X + 12,
 	         Y + 376);
-	DrawText(FString::Printf(TEXT("DASH: %s | FINAL GUARD: %s | PENDING: %s"),
+	DrawText(FString::Printf(TEXT("DASH: %s | ACTIVE: %s | PENDING: %s"),
 	                         FighterState.bCanDash ? TEXT("READY") : TEXT("NO"),
-	                         FighterState.bGuardDashReady ? TEXT("YES") : TEXT("NO"),
+	                         FighterState.bIsDashing ? TEXT("YES") : TEXT("NO"),
 	                         FighterState.bDashRequested ? TEXT("YES") : TEXT("NO")),
 	         FLinearColor::White,
 	         X + 12,

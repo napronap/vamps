@@ -53,8 +53,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestCombatAction();
 
-	void SetMobilityDirection(const FVector& WorldDirection);
-	void SetMobilityHeld(bool bHeld);
+	void SetMobilityInput(bool bHasInput);
+	void SetMobilityHeld(bool bHeld, const FVector& DashDirection = FVector::ZeroVector);
 	void ResolveCombatDash();
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
@@ -74,23 +74,26 @@ public:
 	void RememberDefendedContact(const FVampsPendingContact& Contact);
 	void RegisterCombatContact(bool bBlocked);
 	bool ReceiveCombatHit(const FVampsPendingContact& Contact);
-	void ApplyCombatReaction(const FVampsPendingContact& Contact, bool bFinalGuardImpact);
+	void ApplyCombatReaction(const FVampsPendingContact& Contact);
 	void ResetCombatState();
 
 private:
 
+	friend class UGA_Dash;
+
 	FGameplayAbilitySpecHandle AttackHandle;
+	FGameplayAbilitySpecHandle DashHandle;
 	FTimerHandle NARecoveryTimer;
 	FTimerHandle ActionRecoveryTimer;
 	double CombatStepEndsAt = 0;
 	double GuardRecoveryStartsAt = 0;
 	uint32 DefendedGeneration = 0;
 	int32 ReactionPlaybackInstanceID = INDEX_NONE;
-	FVector MobilityDirection = FVector::ZeroVector;
-	FVector PendingDashDirection = FVector::ZeroVector;
+	bool bHasMobilityInput = false;
 	bool bMobilityHeld = false;
 	double MobilityRecoveryStartsAt = 0;
 	int32 DashRequestActionNumber = INDEX_NONE;
+	FVector RequestedDashDirection = FVector::ZeroVector;
 
 	void UpdateMobilityEnergy(float DeltaSeconds);
 	void ClearMobilityIntent();

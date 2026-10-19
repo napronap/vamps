@@ -1,5 +1,7 @@
 # Editor — Movilidad integrada al combate
 
+Guía sustituida por [039 — Simplificación de movilidad](../039-simplificacion-movilidad/editor.md). No repetir la configuración de ocho direcciones ni de índices finales de esta guía histórica.
+
 **Para el usuario:** el build/arranque limpio y el recálculo de los ocho montages ya están completados. Quedan la comprobación del impacto final y la observación de gameplay. El DA, las entradas y los montages están configurados y guardados. El paso 4 sigue pendiente de cierre.
 
 ## 1. Preservar configuración y compilar
