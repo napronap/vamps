@@ -1,5 +1,7 @@
 # 034 — Montages independientes de bloqueo y daño
 
+Estado posterior de configuración y cierre: [035 — Revisión del paso 3](../035-revision-paso-3/reporte.md). Conserva las comprobaciones históricas de esta implementación.
+
 ## Alcance — 2026-10-18
 
 Corrección del paso 3: Guard necesita su propio montage, además de HitReactionMontage. La implementación 033 solo exponía el montaje de daño y señalaba Guard al AnimBP. Se agrega GuardReactionMontage sin reutilizar el de Hit ni elegir un asset por suposición.

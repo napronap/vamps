@@ -44,6 +44,8 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Reportes de trabajo
 
+Revisión vigente del estado: [035 — Revisión del paso 3](reports/035-revision-paso-3/reporte.md). Montages Guard/Hit asignados y guardados, reacción de 1 s y 154 contactos previos con daños esperados verificados por MCP. El cierre manual sigue abierto; [comprobaciones y conservación en Git](reports/035-revision-paso-3/editor.md).
+
 Corrección vigente de presentación: [034 — Montages independientes de Guard y Hit](reports/034-montage-guardia/reporte.md). Agrega GuardReactionMontage separado de HitReactionMontage y rechaza referencias iguales; conserva el resto del paso 3. [Configuración y comprobación](reports/034-montage-guardia/editor.md).
 
 Última iteración de implementación y documentación: [033 — Resultados de daño y defensa](reports/033-resultados-combate/reporte.md). Agrega Guard/Hit, memoria defensiva, residual, carga/ruptura/stun y crítico; conserva cadena, NA y armas independientes. Build completo y parche final aplicados, DA preservado/configurado y arranque PIE verificados. Intercambios reales y poses/transiciones pendientes en la [guía](reports/033-resultados-combate/editor.md); 3 permanece abierta. El cierre de 2 y las decisiones previas siguen en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md).

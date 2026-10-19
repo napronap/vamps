@@ -1,0 +1,420 @@
+{
+  "date": "2026-10-19",
+  "scope": "Read-only MCP inspection; pre-existing session contacts; no new PIE, compilation or asset mutation.",
+  "dataAsset": {
+    "weapons": [
+      {
+        "weaponClass": {
+          "refPath": "/Game/Vamps/Blueprints/Weapons/BP_VampsGreatSword.BP_VampsGreatSword_C"
+        },
+        "attachSocket": "HandGrip_R",
+        "relativeTransform": {
+          "location": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "rotation": {
+            "pitch": 0,
+            "yaw": 0,
+            "roll": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        }
+      }
+    ],
+    "attackMontage": {
+      "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Combo.AM_Executioner_Combo"
+    },
+    "nARecoveryDuration": 0.5,
+    "comboSteps": [
+      {
+        "targetAlignmentDistance": 130,
+        "knockbackDistance": 100,
+        "contactReactionDuration": 1
+      },
+      {
+        "targetAlignmentDistance": 130,
+        "knockbackDistance": 100,
+        "contactReactionDuration": 1
+      },
+      {
+        "targetAlignmentDistance": 150,
+        "knockbackDistance": 250,
+        "contactReactionDuration": 1
+      }
+    ],
+    "hitReactionMontage": {
+      "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Hit.AM_Executioner_Hit"
+    },
+    "guardReactionMontage": {
+      "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Block.AM_Executioner_Block"
+    },
+    "criticalDamage": 24,
+    "criticalChancePercent": 10,
+    "blockDamageReduction": 10,
+    "guardCapacity": 100,
+    "guardLoadPerHit": 25,
+    "guardRecoveryDelay": 1,
+    "guardRecoveryPerSecond": 20,
+    "stunDuration": 2,
+    "defenseRequestDuration": 0.5
+  },
+  "blueprints": {
+    "opponent": {
+      "combatSettings": {
+        "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+      },
+      "attackDamage": 12,
+      "mesh": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter.Default__BP_VampsCharacter_C:CharacterMesh0"
+      }
+    },
+    "player": {
+      "combatSettings": {
+        "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+      },
+      "attackDamage": 12,
+      "mesh": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CharacterMesh0"
+      }
+    },
+    "playerMesh": {
+      "skeletalMeshAsset": {
+        "refPath": "/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"
+      },
+      "animClass": {
+        "refPath": "/Game/Vamps/Animations/Executioner/ABP_Executioner.ABP_Executioner_C"
+      }
+    }
+  },
+  "montages": {
+    "AM_Executioner_Block": {
+      "sequenceLength": 1.7666666507720947,
+      "rateScale": 1,
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      },
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1.7666666507720947,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/IP/A_GreatSwordCombatAnimationV1_Defence_Hit_IP.A_GreatSwordCombatAnimationV1_Defence_Hit_IP"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1.7666666507720947,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "timeStretchCurve": {
+        "samplingRate": 60,
+        "curveValueMinPrecision": 0.009999999776482582,
+        "markers": [],
+        "sum_dT_i_by_C_i": [
+          0,
+          0,
+          0
+        ]
+      },
+      "parentAsset": "None"
+    },
+    "AM_Executioner_Hit": {
+      "sequenceLength": 1.5,
+      "rateScale": 1,
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      },
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1.5,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Hit_RM.A_GreatSwordCombatAnimationV1_Hit_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1.5,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "timeStretchCurve": {
+        "samplingRate": 60,
+        "curveValueMinPrecision": 0.009999999776482582,
+        "markers": [],
+        "sum_dT_i_by_C_i": [
+          0,
+          0,
+          0
+        ]
+      },
+      "parentAsset": "None"
+    },
+    "AM_Executioner_Combo": {
+      "sequenceLength": 7.366666793823242,
+      "rateScale": 1,
+      "bEnableAutoBlendOut": true,
+      "skeleton": {
+        "refPath": "/Game/Characters/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      },
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1.0333333015441895,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_AttackCombo7_Stage1_RM.A_GreatSwordCombatAnimationV1_AttackCombo7_Stage1_RM"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1.0333333015441895,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              },
+              {
+                "cachedPlayLength": 0.8999999761581421,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_AttackCombo7_Stage1_Back_RM.A_GreatSwordCombatAnimationV1_AttackCombo7_Stage1_Back_RM"
+                },
+                "startPos": 1.0333333015441895,
+                "animStartTime": 0,
+                "animEndTime": 0.8999999761581421,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              },
+              {
+                "cachedPlayLength": 1.100000023841858,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_AttackCombo7_Stage2_RM.A_GreatSwordCombatAnimationV1_AttackCombo7_Stage2_RM"
+                },
+                "startPos": 1.9333332777023315,
+                "animStartTime": 0,
+                "animEndTime": 1.100000023841858,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              },
+              {
+                "cachedPlayLength": 0.7666666507720947,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_AttackCombo7_Stage2_Back_RM.A_GreatSwordCombatAnimationV1_AttackCombo7_Stage2_Back_RM"
+                },
+                "startPos": 3.0333333015441895,
+                "animStartTime": 0,
+                "animEndTime": 0.7666666507720947,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              },
+              {
+                "cachedPlayLength": 3.566666603088379,
+                "animReference": {
+                  "refPath": "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_AttackCombo7_Stage3_RM.A_GreatSwordCombatAnimationV1_AttackCombo7_Stage3_RM"
+                },
+                "startPos": 3.799999952316284,
+                "animStartTime": 0,
+                "animEndTime": 3.566666603088379,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "timeStretchCurve": {
+        "samplingRate": 60,
+        "curveValueMinPrecision": 0.009999999776482582,
+        "markers": [],
+        "sum_dT_i_by_C_i": [
+          0,
+          0,
+          0
+        ]
+      },
+      "parentAsset": "None"
+    }
+  },
+  "saved": {
+    "dataAsset": true,
+    "block": true,
+    "hit": true
+  },
+  "combatLog": [
+    "[2026.10.19-00.18.21:409][866]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.18.22:533][  1]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.18.23:724][144]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.18.27:268][568]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=25.00/100.00.",
+    "[2026.10.19-00.18.28:562][723]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=19.13/100.00.",
+    "[2026.10.19-00.18.29:770][868]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=14.79/100.00.",
+    "[2026.10.19-00.18.35:762][587]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.18.36:704][700]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=50.00/100.00.",
+    "[2026.10.19-00.18.38:031][859]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=43.48/100.00.",
+    "[2026.10.19-00.18.42:640][412]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.18.43:867][559]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=45.47/100.00.",
+    "[2026.10.19-00.18.45:098][686]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=40.85/100.00.",
+    "[2026.10.19-00.18.47:874][ 19]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.18.49:158][173]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=25.00/100.00.",
+    "[2026.10.19-00.18.50:359][317]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.98/100.00.",
+    "[2026.10.19-00.18.55:474][921]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.18.56:709][ 69]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.29/100.00.",
+    "[2026.10.19-00.18.57:917][214]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=66.12/100.00.",
+    "[2026.10.19-00.26.22:167][507]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=1, damage=24.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.25:230][873]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.26:479][ 22]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.27:686][166]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.31:645][638]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.32:896][787]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.34:096][930]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=1, damage=24.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.41:887][858]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.26.42:932][978]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=24.12/100.00.",
+    "[2026.10.19-00.26.44:189][126]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=18.92/100.00.",
+    "[2026.10.19-00.26.46:331][376]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.47:623][529]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.26.48:830][673]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.86/100.00.",
+    "[2026.10.19-00.26.51:092][942]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.52:206][ 74]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.53:394][216]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.55:532][470]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.26.56:815][623]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.26.58:030][768]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.69/100.00.",
+    "[2026.10.19-00.27.00:405][ 51]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.27.01:532][185]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.27.02:720][326]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.27.05:333][638]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.27.06:624][792]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.27.07:832][936]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.83/100.00.",
+    "[2026.10.19-00.27.11:930][424]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=25.00/100.00.",
+    "[2026.10.19-00.27.13:173][572]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.12/100.00.",
+    "[2026.10.19-00.27.14:395][717]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=65.69/100.00.",
+    "[2026.10.19-00.27.16:177][929]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.35.18:909][920]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.35.20:062][ 56]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=1, damage=24.00, guard=0.00/100.00.",
+    "[2026.10.19-00.35.21:253][199]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.35.25:078][658]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.35.26:311][806]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.35.27:512][950]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.35.31:404][417]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.35.32:379][534]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=50.00/100.00.",
+    "[2026.10.19-00.35.33:671][689]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=69.17/100.00.",
+    "[2026.10.19-00.35.38:379][254]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.35.39:614][402]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.33/100.00.",
+    "[2026.10.19-00.35.40:829][548]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=66.00/100.00.",
+    "[2026.10.19-00.35.45:130][ 64]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.35.46:406][217]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=44.48/100.00.",
+    "[2026.10.19-00.35.47:556][355]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=66.48/100.00.",
+    "[2026.10.19-00.35.49:781][622]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.35.51:064][776]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.35.52:265][920]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.99/100.00.",
+    "[2026.10.19-00.35.56:783][462]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.35.58:032][612]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=44.99/100.00.",
+    "[2026.10.19-00.35.59:250][758]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=65.66/100.00.",
+    "[2026.10.19-00.36.03:667][288]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.36.04:926][439]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=1, damage=14.00, guard=44.83/100.00.",
+    "[2026.10.19-00.36.09:717][ 14]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.36.10:917][158]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=46.00/100.00.",
+    "[2026.10.19-00.36.12:159][307]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=41.16/100.00.",
+    "[2026.10.19-00.36.14:745][617]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.16:029][771]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.36.17:231][915]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.96/100.00.",
+    "[2026.10.19-00.36.21:544][430]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.22:269][517]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.23:494][664]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=1, damage=24.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.28:297][240]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.29:181][346]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.30:819][542]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.32:037][688]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.36.33:237][832]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.99/100.00.",
+    "[2026.10.19-00.36.38:207][428]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.36.39:410][572]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=45.91/100.00.",
+    "[2026.10.19-00.36.40:651][720]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=66.12/100.00.",
+    "[2026.10.19-00.36.43:146][ 18]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.44:438][172]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.36.45:647][316]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.82/100.00.",
+    "[2026.10.19-00.36.47:699][560]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.48:839][696]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.50:038][839]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.52:542][138]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.36.55:547][497]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.36.56:789][645]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.16/100.00.",
+    "[2026.10.19-00.36.58:014][791]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=65.67/100.00.",
+    "[2026.10.19-00.36.59:927][ 19]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.01:072][155]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.02:254][296]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.04:647][582]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.05:937][736]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.37.07:146][880]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.80/100.00.",
+    "[2026.10.19-00.37.09:106][114]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.10:239][249]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.11:425][390]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.13:487][636]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.14:737][785]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.37.15:942][929]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=45.89/100.00.",
+    "[2026.10.19-00.37.20:020][416]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.37.21:219][559]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=Blocked, critical=0, damage=2.00, guard=46.03/100.00.",
+    "[2026.10.19-00.37.24:046][894]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.37.25:335][ 48]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.37.26:550][193]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.72/100.00.",
+    "[2026.10.19-00.37.30:942][718]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.37.32:198][868]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=44.89/100.00.",
+    "[2026.10.19-00.37.33:394][ 11]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=65.95/100.00.",
+    "[2026.10.19-00.37.37:844][543]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=25.00/100.00.",
+    "[2026.10.19-00.37.39:083][691]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.21/100.00.",
+    "[2026.10.19-00.37.40:313][838]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=65.62/100.00.",
+    "[2026.10.19-00.37.44:545][345]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=25.98/100.00.",
+    "[2026.10.19-00.37.48:745][848]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.37.49:990][997]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.10/100.00.",
+    "[2026.10.19-00.37.51:219][144]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=65.52/100.00.",
+    "[2026.10.19-00.37.55:544][662]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.37.56:781][810]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.26/100.00.",
+    "[2026.10.19-00.37.57:995][955]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=65.97/100.00.",
+    "[2026.10.19-00.38.00:250][224]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.01:424][364]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.02:628][507]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.04:543][736]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.05:832][890]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.07:039][ 34]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.12:313][664]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.13:292][781]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=1, damage=24.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.14:471][922]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=1, damage=24.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.16:964][220]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.18:134][360]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.19:329][503]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.38.22:123][837]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=1, damage=24.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.27:140][434]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.28:426][588]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=25.00/100.00.",
+    "[2026.10.19-00.38.29:630][732]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.92/100.00.",
+    "[2026.10.19-00.38.32:728][101]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.33:818][231]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.35:016][374]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.37:757][702]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.38:768][823]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=25.00/100.00.",
+    "[2026.10.19-00.38.40:033][974]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=44.70/100.00.",
+    "[2026.10.19-00.38.42:959][324]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.44:131][464]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0', result=OpenHit, critical=0, damage=12.00, guard=0.00/100.00.",
+    "[2026.10.19-00.38.46:532][751]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=25.00/100.00.",
+    "[2026.10.19-00.38.47:778][900]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=0, damage=2.00, guard=45.08/100.00.",
+    "[2026.10.19-00.38.49:007][ 47]LogVampsCombat: Display: AVampsCharacter::ReceiveCombatHit: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0' from '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0', result=Blocked, critical=1, damage=14.00, guard=65.49/100.00."
+  ],
+  "combatErrors": []
+}
