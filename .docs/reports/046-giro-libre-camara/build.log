@@ -1,0 +1,151 @@
+Log started at 10/20/2026 10:10:47 (2026-10-20T01:10:47Z)
+No project argument provided while trying to parse Project File. Attempting fallback parsing to attempt to find a Project File.
+-Target argument detected in original command line args. Will attempt to subparse in search of ProjectFile.
+Resolved project argument C:/fran/vamps/vamps.uproject to C:\fran\vamps\vamps.uproject
+Resolved project argument C:\fran\vamps\vamps.uproject to C:/fran/vamps/vamps.uproject through -Target resolution.
+No config file at C:\ProgramData\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+No config file at C:\Users\student\AppData\Local\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+No config file at C:\Users\student\Documents\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Configuration will be read from:
+  C:\Users\student\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\fran\vamps\Intermediate\Build\XmlConfigCache.bin): C:\Users\student\AppData\Roaming\Unreal Engine\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\fran\vamps\Intermediate\Build\XmlConfigCache.bin): C:\fran\vamps\Saved\UnrealBuildTool\BuildConfiguration.xml
+Reading configuration file from cache (C:\fran\vamps\Intermediate\Build\XmlConfigCache.bin): C:\Users\student\AppData\Local\UnrealEngine\Intermediate\Build\UnrealBuildTool.Env.BuildConfiguration.xml
+Setting temp directory to 'C:\Users\student\AppData\Local\Temp\UnrealBuildTool\eb6d2d82'
+    Registering build platform: UnrealBuildTool.AndroidPlatformFactory
+    Registering build platform: UnrealBuildTool.IOSPlatformFactory
+    Registering build platform: UnrealBuildTool.LinuxPlatformFactory
+    Registering build platform: UnrealBuildTool.MacPlatformFactory
+    Registering build platform: UnrealBuildTool.TVOSPlatformFactory
+    Registering build platform: UnrealBuildTool.WindowsPlatformFactory
+Found Windows 10 SDK root at C:\Program Files (x86)\Windows Kits\10 (1)
+Found Windows 10 SDK root at C:\Program Files (x86)\Windows Kits\10 (2)
+Found Windows 10 SDK version 10.0.26100.0 at C:\Program Files (x86)\Windows Kits\10
+Found Universal CRT version 10.0.26100.0 at C:\Program Files (x86)\Windows Kits\10
+Win64 Installed SDK(s): MinVersion_Sdk=10.0.19041.0, MaxVersion_Sdk=10.9.99999.0, CurrentVersion_Sdk=10.0.26100.0, Version_AutoSdk=10.0.22621.0, CurrentVersion_AutoSdk=
+        Registering build platform: Win64 - buildable: True
+    Registering build platform: UnrealBuildTool.VisionOSPlatformFactory
+Command line: "C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" "-Target=vampsEditor Win64 Development -Project=\"C:/fran/vamps/vamps.uproject\"" -LiveCoding "-LiveCodingModules=C:/Program Files/Epic Games/UE_5.8/Engine/Intermediate/LiveCodingModules.json" "-LiveCodingManifest=C:/Program Files/Epic Games/UE_5.8/Engine/Intermediate/LiveCoding.json" -WaitMutex -LiveCodingLimit=100
+Log file: C:\Users\student\AppData\Local\UnrealBuildTool\Log.txt
+Deleting old log file: C:\Users\student\AppData\Local\UnrealBuildTool\Log-backup-2026.05.21-05.26.09.txt
+Deleting old log file: C:\Users\student\AppData\Local\UnrealBuildTool\Log-backup-2026.05.21-05.26.09.json
+
+Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
+  Executing up to 20 processes, one per physical core
+Using 'git status' to determine working set for adaptive non-unity build (C:\fran\vamps).
+UbaStorageServer - Database loaded from C:\ProgramData\Epic\UnrealBuildAccelerator\cas\casdb (v32) in <1ms (contained 0 entries estimated to 0b)
+UbaServer - Listening on 0.0.0.0:1345
+Skipping C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\BuildRules\UE5Rules.dll: File is installed
+Skipping C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\BuildRules\UE5ProgramRules.dll: File is installed
+C:\fran\vamps\Source\vamps\Private\Player\VampsPlayerCameraManager.cpp was not part of source working set and should be
+Invalidating makefile for vampsEditor (working set of source files changed)
+Available x64 toolchains (1):
+ * C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231
+    (Family=14.51.36231, FamilyRank=2, Version=14.51.36231, HostArchitecture=x64, ReleaseChannel=Preview, Architecture=x64)
+Visual Studio compiler version 14.51.36231 is newer than latest preferred version 14.50.35717. Please use caution as this compiler has not been heavily tested
+Compiler: C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x64\cl.exe
+Linker: C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x64\link.exe
+Library Manager: C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x64\link.exe
+Resource Compiler: C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\rc.exe
+Resource Converter: C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231\bin\Hostx64\x64\cvtres.exe
+Using EngineIncludeOrderVersion.Unreal5_8 for target vampsEditor.Target.cs
+Building UnrealEditor - vampsEditor - Win64 - Development
+VerseVMBytecodeGenerator.Generate, generating CPP headers in: 'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMBytecodeOps.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMBytecodesAndCaptures.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMMakeCapturesFuncs.gen.h'
+	Writing out generated header file. Changed:False Path:'C:\Program Files\Epic Games\UE_5.8\Engine\Intermediate\Build\Win64\UnrealEditor\Inc\CoreUObject\VerseVMBytecode\VVMCaptureSwitch.gen.h'
+Generated code is up to date.
+Found 5 shared PCH headers (listed in order of preference):
+	UnrealEd
+	Engine
+	Slate
+	CoreUObject
+	Core
+Updating C:\fran\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\Module.vamps.cpp: contents have changed. Saving previous version to C:\fran\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\Module.vamps.cpp.old.
+Updating C:\fran\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\LiveCodingInfo.json: contents have changed. Saving previous version to C:\fran\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\LiveCodingInfo.json.old.
+Updating C:\fran\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\UnrealEditor-vamps.lib.rsp: contents have changed. Saving previous version to C:\fran\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\UnrealEditor-vamps.lib.rsp.old.
+Updating C:\fran\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\UnrealEditor-vamps.dll.rsp: contents have changed. Saving previous version to C:\fran\vamps\Intermediate\Build\Win64\x64\UnrealEditor\Development\vamps\UnrealEditor-vamps.dll.rsp.old.
+Re-evaluating action graph
+Building vampsEditor...
+===== Toolchain Information =====
+Using ISPC compiler (C:\Program Files\Epic Games\UE_5.8\Engine\Source\ThirdParty\Intel\ISPC\bin\Windows\ispc.exe)
+  Intel(r) Implicit SPMD Program Compiler (Intel(r) ISPC), 1.24.0 (build commit  @ 20250404, LLVM 18.1.2) 
+Using Visual Studio 14.51.36231 toolchain (C:\Program Files\Microsoft Visual Studio\18\Insiders\VC\Tools\MSVC\14.51.36231) and Windows 10.0.26100.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+Warning: Visual Studio compiler 14.51.36231 is not a preferred version
+[Adaptive Build] Excluded from vamps unity file: VampsPlayerCameraManager.cpp
+=================================
+Using Unreal Build Accelerator local executor to run 2 action(s)
+  CPU 20 physical cores, 28 logical cores
+  Memory 31.68 GB physical, 46.93 GB/49.37 GB committed
+  UBA Storage capacity 40 GB
+  UBA RootDir C:\ProgramData\Epic\UnrealBuildAccelerator
+Cache bucket 3483572773 used. Action: Compile [x64] Module.vamps.cpp ()
+All processes queued
+[1/2] Compile [x64] Module.vamps.cpp
+C:\Program Files\Epic Games\UE_5.8\Engine\Source\Runtime\Engine\Classes\GameFramework\Character.h(798,31): warning C4996: 'APawn::GetMovementBase': GetMovementBase is deprecated. Use GetMovementBaseObject or GetMovementBaseInterfaceData instead. - Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.
+	virtual UPrimitiveComponent* GetMovementBase() const override final { return Cast<UPrimitiveComponent>(GetMovementBaseObject()); }
+	                             ^
+[2/2] Compile [x64] VampsPlayerCameraManager.cpp
+C:\Program Files\Epic Games\UE_5.8\Engine\Source\Runtime\Engine\Classes\GameFramework\Character.h(798,31): warning C4996: 'APawn::GetMovementBase': GetMovementBase is deprecated. Use GetMovementBaseObject or GetMovementBaseInterfaceData instead. - Please update your code to the new API before upgrading to the next release, otherwise your project will no longer compile.
+	virtual UPrimitiveComponent* GetMovementBase() const override final { return Cast<UPrimitiveComponent>(GetMovementBaseObject()); }
+	                             ^
+
+Total time in Unreal Build Accelerator local executor: 41.26 seconds
+Output binary: C:\Program Files\Epic Games\UE_5.8\Engine\Binaries\Win64\UnrealEditor.exe
+UbaStorageServer - Database saved in <1ms (0 file entries, 0 cas entries. deleted 0 dropped cas files)
+WriteFileIfChanged() wrote 0 changed files of 3 requested writes.
+
+Timeline:
+[  0.000]  +0.370 Main
+   0.016          [  0.016]  +0.098 Apply XmlConfig
+   0.025             0.025          [  0.008]  +0.008 Find target files
+   0.117          [  0.117]  +0.060 AddTelemetry
+   0.196          [  0.195]  +0.174 RegisterPlatforms
+[  0.395]  +0.026 ParseCommandLine
+[  0.484]  +0.129 LoadMakefile
+   0.502          [  0.017]  +0.045 EngineRulesPlugins
+   0.551          [  0.067]  +0.003 EngineRulesFetchDirs
+   0.564          [  0.079]  +0.013 EngineRulesAssembly
+   0.577          [  0.092]  +0.002 ProgramRulesAssembly
+   0.587          [  0.102]  +0.002 ProjectRulesAssembly
+   0.590          [  0.105]  +0.255 CreateTargetRules
+   0.630             0.146          [  0.040]  +0.000 FindPlugins
+   0.649             0.164          [  0.058]  +0.065 MakefileValid
+[  0.613]  +0.285 <unknown>
+[  0.898]  +0.005 CppDependencyCache
+[  0.917]  +2.031 vampsEditor Win64 Development
+   0.917          [  0.000]  +1.303 <unknown>
+   2.221          [  1.303]  +0.040 UHTModules
+   2.347          [  1.430]  +0.017 UHTManifest
+   2.365          [  1.448]  +0.009 UHTTimestamps
+   2.375          [  1.457]  +0.565 <unknown>
+   2.940          [  2.022]  +0.000 WaitOnWrites
+[  2.949]  +0.044 SavingMakefile
+   2.949          [  0.000]  +0.001 UHTWait
+   2.967          [  0.017]  +0.002 CppDependencyCache
+   2.969          [  0.020]  +0.082 Preparing ActionGraph
+   2.978             0.028          [  0.008]  +0.004 LinkActions
+   2.982             0.033          [  0.012]  +0.000 GatherPrerequisiteActions
+   2.984             0.035          [  0.014]  +0.000 CppDependencyCacheWait
+   2.985             0.035          [  0.015]  +0.027 GatherOutdatedActions
+   3.015             0.065          [  0.045]  +0.005 LinkActions
+   3.024             0.075          [  0.054]  +0.002 CppDependencyCache
+   3.032             0.083          [  0.063]  +0.000 GatherOutdatedActions
+   3.043             0.094          [  0.073]  +0.000 GatherOutdatedActions
+   3.048             0.099          [  0.078]  +0.000 GatherOutdatedActions
+   3.048             0.099          [  0.078]  +0.000 LinkActions
+   3.049             0.099          [  0.079]  +0.000 DeleteOutdatedProducedItems
+   3.049             0.099          [  0.079]  +0.002 SaveActionHistory
+   3.052             0.103          [  0.082]  +0.000 CreateDirectoriesForProducedItems
+[  3.061]  +0.111 GarbageCollect
+[  3.172] +41.154 <unknown>
+[ 44.327]  +0.000 Deploying targets
+[ 44.328]  +0.000 DisconnectCache
+[ 44.332]  +0.001 SaveCasTable
+[ 44.337]  +0.055 Saving caches
+[ 44.393]  +0.002 TelemetryService.FlushEvents
+[ 44.396]
+
+Result: Succeeded
+Total execution time: 44.40 seconds

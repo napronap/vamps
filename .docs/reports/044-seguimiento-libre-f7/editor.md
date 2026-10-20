@@ -1,5 +1,7 @@
 # Editor — Seguimiento libre y F7
 
+Continuar por [045 — Estado de cámara](../045-estado-camara/editor.md): el arranque actual ya fue comprobado. El build/reinicio pendiente que figura abajo corresponde al cierre histórico de esta iteración.
+
 **Para el usuario:** primero completar un build con el editor cerrado y reabrirlo; Live Coding compiló pero el editor se cerró al recargar las clases. Después observar en Play el acompañamiento lateral y comprobar F7. No hay assets ni teclas que asignar. Esta guía sustituye los comandos y el rumbo fijo de [043](../043-camara-sin-target/editor.md).
 
 ## 1. Preparar y compilar

@@ -46,6 +46,10 @@ El paso 4 tiene implementación y configuración en [037 — Movilidad integrada
 
 ## Reportes de trabajo
 
+Giro libre vigente: [046 — Orientación progresiva sin lock-on](reports/046-giro-libre-camara/reporte.md). Mantener desplazamiento permite orientar la vista más allá del desvío corto, conservando el acompañamiento suave. Parche aplicado y arranque comprobado; [observación pendiente](reports/046-giro-libre-camara/editor.md).
+
+Estado comprobado de cámara: [045 — Revisión de código, assets y arranque](reports/045-estado-camara/reporte.md). Incluye 042–044 y registros de F7 en la versión compilada; resta observación visual integrada y calibración. [Guía vigente](reports/045-estado-camara/editor.md).
+
 Seguimiento libre vigente: [044 — Acompañamiento suave y F7](reports/044-seguimiento-libre-f7/reporte.md). Anticipación amortiguada de desplazamiento sin seguir el yaw corporal; F7 alterna el lock-on de prueba. [Guía y observación](reports/044-seguimiento-libre-f7/editor.md).
 
 Corrección anterior de cámara sin target: [043 — Referencia virtual y modo de observación](reports/043-camara-sin-target/reporte.md). El rumbo fijo y el comando de consola quedan sustituidos por 044. [Guía histórica](reports/043-camara-sin-target/editor.md).

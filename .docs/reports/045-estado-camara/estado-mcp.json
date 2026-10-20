@@ -1,0 +1,536 @@
+{
+  "date": "2026-10-20",
+  "scope": "Revisión del estado existente; sin cambios de código o assets.",
+  "discovery": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "cvars",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"vamps.Camera.FollowDistance\\\":{\\\"help\\\":\\\"Follow distance in cm.\\\",\\\"value\\\":600},\\\"vamps.Camera.CombatDistance\\\":{\\\"help\\\":\\\"Combat distance in cm.\\\",\\\"value\\\":425},\\\"vamps.Camera.FollowEyeHeight\\\":{\\\"help\\\":\\\"Follow eye height above capsule center in cm.\\\",\\\"value\\\":70},\\\"vamps.Camera.CombatEyeHeight\\\":{\\\"help\\\":\\\"Combat eye height above capsule center in cm.\\\",\\\"value\\\":30},\\\"vamps.Camera.FollowInterestHeight\\\":{\\\"help\\\":\\\"Follow interest height in cm.\\\",\\\"value\\\":30},\\\"vamps.Camera.CombatInterestHeight\\\":{\\\"help\\\":\\\"Combat interest height in cm.\\\",\\\"value\\\":-20},\\\"vamps.Camera.FollowVerticalFOV\\\":{\\\"help\\\":\\\"Follow vertical FOV in degrees.\\\",\\\"value\\\":38},\\\"vamps.Camera.CombatVerticalFOV\\\":{\\\"help\\\":\\\"Combat vertical FOV in degrees.\\\",\\\"value\\\":32.400001525878906},\\\"vamps.Camera.InteriorDistance\\\":{\\\"help\\\":\\\"Combat pivot displacement toward target in cm.\\\",\\\"value\\\":95},\\\"vamps.Camera.CombatYawOffset\\\":{\\\"help\\\":\\\"Combat composition yaw offset in degrees.\\\",\\\"value\\\":20},\\\"vamps.Camera.PositionRadius\\\":{\\\"help\\\":\\\"Spatial filter radius in cm; zero disables it.\\\",\\\"value\\\":180},\\\"vamps.Camera.AngularSpeed\\\":{\\\"help\\\":\\\"Angular response per second.\\\",\\\"value\\\":6},\\\"vamps.Camera.TransitionDuration\\\":{\\\"help\\\":\\\"Framing and target transition duration in seconds.\\\",\\\"value\\\":0.30000001192092896}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "walls",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[{\"refPath\":\"/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.StaticMeshActor_1\"},{\"refPath\":\"/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.StaticMeshActor_2\"},{\"refPath\":\"/Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic:PersistentLevel.StaticMeshActor_3\"}]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "BP_VampsPlayerCameraManager",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"/Game/Vamps/Blueprints/BP_VampsPlayerCameraManager\"]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "BP_VampsPlayerController",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"/Game/Vamps/Blueprints/BP_VampsPlayerController\"]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "BP_VampsCombatTestPlayerController",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"/Game/Vamps/Blueprints/BP_VampsCombatTestPlayerController\"]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "BP_VampsCharacter_Player",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"/Game/Vamps/Blueprints/BP_VampsCharacter_Player\"]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "BP_VampsGameMode",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"/Game/Vamps/Blueprints/BP_VampsGameMode\"]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "BP_VampsCombatTestGameMode",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"/Game/Vamps/Blueprints/BP_VampsCombatTestGameMode\"]}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "assetValues": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "controller",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"playerCameraManagerClass\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Blueprints/BP_VampsPlayerCameraManager.BP_VampsPlayerCameraManager_C\\\"},\\\"cycleAIModeAction\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Input/IA_CycleAIMode.IA_CycleAIMode\\\"},\\\"resetCombatAction\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Input/IA_ResetCombat.IA_ResetCombat\\\"}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "controllerBase",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"playerCameraManagerClass\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Blueprints/BP_VampsPlayerCameraManager.BP_VampsPlayerCameraManager_C\\\"}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "player",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"cameraBoom\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CameraBoom\\\"},\\\"followCamera\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:FollowCamera\\\"},\\\"lockOn\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:LockOn\\\"}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "gamemode",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"playerControllerClass\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Blueprints/BP_VampsCombatTestPlayerController.BP_VampsCombatTestPlayerController_C\\\"},\\\"hUDClass\\\":{\\\"refPath\\\":\\\"/Script/vamps.VampsCombatTestHUD\\\"},\\\"defaultPawnClass\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Blueprints/BP_VampsCharacter_Player.BP_VampsCharacter_Player_C\\\"}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "material",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"blendMode\\\":\\\"BLEND_Masked\\\",\\\"opacityMaskClipValue\\\":0.5,\\\"twoSided\\\":true,\\\"ditherOpacityMask\\\":true}\"}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "runtimeValues": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "runtimeCamera",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"eyePosition\\\":{\\\"x\\\":-820,\\\"y\\\":0,\\\"z\\\":160.14999961853027},\\\"interestPosition\\\":{\\\"x\\\":-220,\\\"y\\\":0,\\\"z\\\":120.14999961853027},\\\"bCombatFraming\\\":false,\\\"framingSource\\\":\\\"None\\\"}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "runtimeFighter",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"lockOn\\\":{\\\"refPath\\\":\\\"/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0.LockOn\\\"},\\\"combatState\\\":{\\\"phase\\\":\\\"Idle\\\",\\\"bIsAlive\\\":true,\\\"bCanRequestCombat\\\":true,\\\"bCanStartAction\\\":true,\\\"bCanDealDamage\\\":false,\\\"bCanDefend\\\":false,\\\"bIsRecovering\\\":false,\\\"comboStep\\\":0,\\\"bComboWindowOpen\\\":false,\\\"bContinuationRequested\\\":false,\\\"bRecoveryVisualReleased\\\":false,\\\"bOffenseRestricted\\\":false,\\\"reactionEndsAt\\\":0,\\\"reaction\\\":\\\"None\\\",\\\"bCanMove\\\":true,\\\"bCanDash\\\":true,\\\"bIsDashing\\\":false,\\\"bIsSprinting\\\":false,\\\"bDashRequested\\\":false,\\\"bDefenseRequestArmed\\\":false,\\\"defenseRequestEndsAt\\\":0,\\\"defendedAttacker\\\":\\\"None\\\",\\\"defendedActionNumber\\\":-1,\\\"reactionSource\\\":\\\"None\\\",\\\"bLastIncomingCritical\\\":false,\\\"lastDamageReceived\\\":0,\\\"nARecoveryEndsAt\\\":0,\\\"montageInstanceId\\\":-1,\\\"lastRequest\\\":\\\"None\\\",\\\"lastOutgoingContact\\\":\\\"None\\\",\\\"lastIncomingContact\\\":\\\"None\\\",\\\"requestCount\\\":0,\\\"actionNumber\\\":0,\\\"bActionConnected\\\":false,\\\"lastOutgoingContactFrame\\\":0,\\\"lastIncomingContactFrame\\\":0}}\"}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "boom",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"bDoCollisionTest\\\":false,\\\"bUsePawnControlRotation\\\":false,\\\"bAutoActivate\\\":false,\\\"primaryComponentTick\\\":{\\\"tickGroup\\\":\\\"TG_PostPhysics\\\",\\\"endTickGroup\\\":\\\"TG_PrePhysics\\\",\\\"bTickEvenWhenPaused\\\":false,\\\"bCanEverTick\\\":true,\\\"bStartWithTickEnabled\\\":true,\\\"bAllowTickOnDedicatedServer\\\":true,\\\"tickInterval\\\":0}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "followCamera",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"bAutoActivate\\\":false}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "materialExpressions",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[{\"refPath\":\"/Game/Vamps/Materials/M_CameraOccluder.M_CameraOccluder:MaterialExpressionScalarParameter_0\"},{\"refPath\":\"/Game/Vamps/Materials/M_CameraOccluder.M_CameraOccluder:MaterialExpressionOneMinus_0\"},{\"refPath\":\"/Game/Vamps/Materials/M_CameraOccluder.M_CameraOccluder:MaterialExpressionConstant3Vector_0\"}]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "opacity",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":{\"output_name\":\"\",\"expression\":{\"refPath\":\"/Game/Vamps/Materials/M_CameraOccluder.M_CameraOccluder:MaterialExpressionOneMinus_0\"},\"input_name\":\"\"}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "f7Log",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"[2026.10.20-00.25.57:396][608]LogVampsCombat: Display: /Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0: debug player lock-on disabled (F7).\",\"[2026.10.20-00.26.01:947][154]LogVampsCombat: Warning: UGA_Dash::ActivateAbility: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0': backward dash requires a target at a different position; target='None'.\",\"[2026.10.20-00.26.17:926][ 59]LogVampsCombat: Warning: UGA_Dash::ActivateAbility: '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0': backward dash requires a target at a different position; target='None'.\",\"[2026.10.20-00.26.57:356][781]LogVampsCombat: Display: /Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0: debug player lock-on enabled (F7).\",\"[2026.10.20-00.26.59:273][ 11]LogVampsCombat: Display: /Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0: debug player lock-on disabled (F7).\",\"[2026.10.20-00.26.59:781][ 72]LogVampsCombat: Display: /Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0: debug player lock-on enabled (F7).\",\"[2026.10.20-00.27.05:289][733]LogVampsCombat: Display: /Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0: debug player lock-on disabled (F7).\",\"[2026.10.20-00.27.12:047][544]LogVampsCombat: Display: /Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0: debug player lock-on enabled (F7).\"]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "moduleLog",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"[2026.10.20-00.19.52:233][  0]LogModuleManager: InternalLoadLibrary: 'vamps' ('C:/fran/vamps/Binaries/Win64/UnrealEditor-vamps.dll')\"]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "pieLog",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[\"[2026.10.20-00.28.18:697][527]LogPlayLevel: Display: Destroying online subsystem :Context_3\",\"[2026.10.20-00.54.20:543][757]LogPlayLevel: PlayLevel: No blueprints needed recompiling\",\"[2026.10.20-00.54.20:543][757]LogPlayLevel: Creating play world package: /Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic\",\"[2026.10.20-00.54.20:546][757]LogPlayLevel: PIE: StaticDuplicateObject took: (0.002850s)\",\"[2026.10.20-00.54.20:546][757]LogPlayLevel: PIE: Created PIE world by copying editor world from /Game/Vamps/Maps/L_CharacterBasic.L_CharacterBasic to /Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic (0.002930s)\",\"[2026.10.20-00.54.20:578][757]LogPlayLevel: PIE: World Init took: (0.003082s)\",\"[2026.10.20-00.55.30:569][967]LogPlayLevel: Display: Shutting down PIE online subsystems\",\"[2026.10.20-00.55.30:878][968]LogPlayLevel: Display: Destroying online subsystem :Context_4\"]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "wall_2",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"bodyInstance\\\":{\\\"positionSolverIterationCount\\\":8,\\\"velocitySolverIterationCount\\\":2,\\\"projectionSolverIterationCount\\\":1,\\\"objectType\\\":\\\"ECC_WorldStatic\\\",\\\"collisionEnabled\\\":\\\"QueryAndPhysics\\\",\\\"sleepFamily\\\":\\\"Normal\\\",\\\"dOFMode\\\":\\\"Default\\\",\\\"bUseCCD\\\":false,\\\"bUseMACD\\\":false,\\\"bAllowPartialIslandSleep\\\":true,\\\"bIgnoreAnalyticCollisions\\\":false,\\\"bNotifyRigidBodyCollision\\\":false,\\\"bSmoothEdgeCollisions\\\":false,\\\"bLockTranslation\\\":true,\\\"bLockRotation\\\":true,\\\"bLockXTranslation\\\":false,\\\"bLockYTranslation\\\":false,\\\"bLockZTranslation\\\":false,\\\"bLockXRotation\\\":false,\\\"bLockYRotation\\\":false,\\\"bLockZRotation\\\":false,\\\"bOverrideMaxAngularVelocity\\\":false,\\\"bOverrideMaxDepenetrationVelocity\\\":false,\\\"bOverrideWalkableSlopeOnInstance\\\":false,\\\"bOverrideIterationCounts\\\":false,\\\"bInterpolateWhenSubStepping\\\":true,\\\"bInertiaConditioning\\\":true,\\\"bOneWayInteraction\\\":false,\\\"bOverrideSolverAsyncDeltaTime\\\":false,\\\"solverAsyncDeltaTime\\\":0.01666666753590107,\\\"collisionProfileName\\\":\\\"BlockAll\\\",\\\"collisionResponses\\\":{\\\"responseArray\\\":[]},\\\"maxDepenetrationVelocity\\\":0,\\\"massInKgOverride\\\":100,\\\"linearDamping\\\":0.0099999997764825821,\\\"angularDamping\\\":0,\\\"customDOFPlaneNormal\\\":{\\\"x\\\":0,\\\"y\\\":0,\\\"z\\\":0},\\\"cOMNudge\\\":{\\\"x\\\":0,\\\"y\\\":0,\\\"z\\\":0},\\\"massScale\\\":1,\\\"gravityGroupIndex\\\":0,\\\"inertiaTensorScale\\\":{\\\"x\\\":1,\\\"y\\\":1,\\\"z\\\":1},\\\"walkableSlopeOverride\\\":{\\\"walkableSlopeBehavior\\\":\\\"WalkableSlope_Default\\\",\\\"walkableSlopeAngle\\\":0},\\\"physMaterialOverride\\\":\\\"None\\\",\\\"maxAngularVelocity\\\":3600,\\\"customSleepThresholdMultiplier\\\":1,\\\"stabilizationThresholdMultiplier\\\":1,\\\"physicsBlendWeight\\\":0,\\\"bSimulatePhysics\\\":false,\\\"bOverrideMass\\\":false,\\\"bEnableGravity\\\":true,\\\"bUpdateKinematicFromSimulation\\\":false,\\\"bGyroscopicTorqueEnabled\\\":false,\\\"bAutoWeld\\\":true,\\\"bStartAwake\\\":true,\\\"bGenerateWakeEvents\\\":false,\\\"bUpdateMassWhenScaleChanges\\\":true},\\\"overrideMaterials\\\":[{\\\"refPath\\\":\\\"/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial\\\"}],\\\"componentTags\\\":[],\\\"customPrimitiveData\\\":{\\\"data\\\":[]},\\\"bHiddenInGame\\\":false,\\\"bUseDefaultCollision\\\":false,\\\"relativeLocation\\\":{\\\"x\\\":-500,\\\"y\\\":500,\\\"z\\\":125},\\\"relativeScale3D\\\":{\\\"x\\\":0.29999999999999999,\\\"y\\\":3,\\\"z\\\":2.5}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "wall_3",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"bodyInstance\\\":{\\\"positionSolverIterationCount\\\":8,\\\"velocitySolverIterationCount\\\":2,\\\"projectionSolverIterationCount\\\":1,\\\"objectType\\\":\\\"ECC_WorldStatic\\\",\\\"collisionEnabled\\\":\\\"QueryAndPhysics\\\",\\\"sleepFamily\\\":\\\"Normal\\\",\\\"dOFMode\\\":\\\"Default\\\",\\\"bUseCCD\\\":false,\\\"bUseMACD\\\":false,\\\"bAllowPartialIslandSleep\\\":true,\\\"bIgnoreAnalyticCollisions\\\":false,\\\"bNotifyRigidBodyCollision\\\":false,\\\"bSmoothEdgeCollisions\\\":false,\\\"bLockTranslation\\\":true,\\\"bLockRotation\\\":true,\\\"bLockXTranslation\\\":false,\\\"bLockYTranslation\\\":false,\\\"bLockZTranslation\\\":false,\\\"bLockXRotation\\\":false,\\\"bLockYRotation\\\":false,\\\"bLockZRotation\\\":false,\\\"bOverrideMaxAngularVelocity\\\":false,\\\"bOverrideMaxDepenetrationVelocity\\\":false,\\\"bOverrideWalkableSlopeOnInstance\\\":false,\\\"bOverrideIterationCounts\\\":false,\\\"bInterpolateWhenSubStepping\\\":true,\\\"bInertiaConditioning\\\":true,\\\"bOneWayInteraction\\\":false,\\\"bOverrideSolverAsyncDeltaTime\\\":false,\\\"solverAsyncDeltaTime\\\":0.01666666753590107,\\\"collisionProfileName\\\":\\\"Custom\\\",\\\"collisionResponses\\\":{\\\"responseArray\\\":[{\\\"channel\\\":\\\"Camera\\\",\\\"response\\\":\\\"ECR_Ignore\\\"}]},\\\"maxDepenetrationVelocity\\\":0,\\\"massInKgOverride\\\":100,\\\"linearDamping\\\":0.0099999997764825821,\\\"angularDamping\\\":0,\\\"customDOFPlaneNormal\\\":{\\\"x\\\":0,\\\"y\\\":0,\\\"z\\\":0},\\\"cOMNudge\\\":{\\\"x\\\":0,\\\"y\\\":0,\\\"z\\\":0},\\\"massScale\\\":1,\\\"gravityGroupIndex\\\":0,\\\"inertiaTensorScale\\\":{\\\"x\\\":1,\\\"y\\\":1,\\\"z\\\":1},\\\"walkableSlopeOverride\\\":{\\\"walkableSlopeBehavior\\\":\\\"WalkableSlope_Default\\\",\\\"walkableSlopeAngle\\\":0},\\\"physMaterialOverride\\\":\\\"None\\\",\\\"maxAngularVelocity\\\":3600,\\\"customSleepThresholdMultiplier\\\":1,\\\"stabilizationThresholdMultiplier\\\":1,\\\"physicsBlendWeight\\\":0,\\\"bSimulatePhysics\\\":false,\\\"bOverrideMass\\\":false,\\\"bEnableGravity\\\":true,\\\"bUpdateKinematicFromSimulation\\\":false,\\\"bGyroscopicTorqueEnabled\\\":false,\\\"bAutoWeld\\\":true,\\\"bStartAwake\\\":true,\\\"bGenerateWakeEvents\\\":false,\\\"bUpdateMassWhenScaleChanges\\\":true},\\\"overrideMaterials\\\":[{\\\"refPath\\\":\\\"/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial\\\"}],\\\"componentTags\\\":[],\\\"customPrimitiveData\\\":{\\\"data\\\":[]},\\\"bHiddenInGame\\\":true,\\\"bUseDefaultCollision\\\":false,\\\"relativeLocation\\\":{\\\"x\\\":-500,\\\"y\\\":-500,\\\"z\\\":125},\\\"relativeScale3D\\\":{\\\"x\\\":0.29999999999999999,\\\"y\\\":3,\\\"z\\\":2.5}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "MaterialExpressionScalarParameter_0",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"defaultValue\\\":0,\\\"primitiveDataIndex\\\":0,\\\"parameterName\\\":\\\"VampsCameraFade\\\"}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "MaterialExpressionOneMinus_0",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{}\"}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "dirty": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "path": "/Game/Vamps/Maps/L_CharacterBasic",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":false}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "path": "/Game/Vamps/Materials/M_CameraOccluder",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":false}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "path": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":false}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "path": "/Game/Vamps/Blueprints/BP_VampsPlayerCameraManager",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":false}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "parents": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "BP_VampsPlayerCameraManager",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":{\"refPath\":\"/Script/vamps.VampsPlayerCameraManager\"}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "BP_VampsCharacter_Player",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":{\"refPath\":\"/Script/vamps.VampsCharacter_Player\"}}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "name": "BP_VampsCombatTestPlayerController",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":{\"refPath\":\"/Script/vamps.VampsCombatTestPlayerController\"}}"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "last": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "primitiveData",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"bUseCustomPrimitiveData\\\":true}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "oneMinusInput",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":[{\"output_name\":\"\",\"expression\":{\"refPath\":\"/Game/Vamps/Materials/M_CameraOccluder.M_CameraOccluder:MaterialExpressionScalarParameter_0\"},\"input_name\":\"None\"}]}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "fadeWall",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":\"{\\\"bodyInstance\\\":{\\\"positionSolverIterationCount\\\":8,\\\"velocitySolverIterationCount\\\":2,\\\"projectionSolverIterationCount\\\":1,\\\"objectType\\\":\\\"ECC_WorldStatic\\\",\\\"collisionEnabled\\\":\\\"QueryAndPhysics\\\",\\\"sleepFamily\\\":\\\"Normal\\\",\\\"dOFMode\\\":\\\"Default\\\",\\\"bUseCCD\\\":false,\\\"bUseMACD\\\":false,\\\"bAllowPartialIslandSleep\\\":true,\\\"bIgnoreAnalyticCollisions\\\":false,\\\"bNotifyRigidBodyCollision\\\":false,\\\"bSmoothEdgeCollisions\\\":false,\\\"bLockTranslation\\\":true,\\\"bLockRotation\\\":true,\\\"bLockXTranslation\\\":false,\\\"bLockYTranslation\\\":false,\\\"bLockZTranslation\\\":false,\\\"bLockXRotation\\\":false,\\\"bLockYRotation\\\":false,\\\"bLockZRotation\\\":false,\\\"bOverrideMaxAngularVelocity\\\":false,\\\"bOverrideMaxDepenetrationVelocity\\\":false,\\\"bOverrideWalkableSlopeOnInstance\\\":false,\\\"bOverrideIterationCounts\\\":false,\\\"bInterpolateWhenSubStepping\\\":true,\\\"bInertiaConditioning\\\":true,\\\"bOneWayInteraction\\\":false,\\\"bOverrideSolverAsyncDeltaTime\\\":false,\\\"solverAsyncDeltaTime\\\":0.01666666753590107,\\\"collisionProfileName\\\":\\\"Custom\\\",\\\"collisionResponses\\\":{\\\"responseArray\\\":[{\\\"channel\\\":\\\"Camera\\\",\\\"response\\\":\\\"ECR_Ignore\\\"}]},\\\"maxDepenetrationVelocity\\\":0,\\\"massInKgOverride\\\":100,\\\"linearDamping\\\":0.0099999997764825821,\\\"angularDamping\\\":0,\\\"customDOFPlaneNormal\\\":{\\\"x\\\":0,\\\"y\\\":0,\\\"z\\\":0},\\\"cOMNudge\\\":{\\\"x\\\":0,\\\"y\\\":0,\\\"z\\\":0},\\\"massScale\\\":1,\\\"gravityGroupIndex\\\":0,\\\"inertiaTensorScale\\\":{\\\"x\\\":1,\\\"y\\\":1,\\\"z\\\":1},\\\"walkableSlopeOverride\\\":{\\\"walkableSlopeBehavior\\\":\\\"WalkableSlope_Default\\\",\\\"walkableSlopeAngle\\\":0},\\\"physMaterialOverride\\\":\\\"None\\\",\\\"maxAngularVelocity\\\":3600,\\\"customSleepThresholdMultiplier\\\":1,\\\"stabilizationThresholdMultiplier\\\":1,\\\"physicsBlendWeight\\\":0,\\\"bSimulatePhysics\\\":false,\\\"bOverrideMass\\\":false,\\\"bEnableGravity\\\":true,\\\"bUpdateKinematicFromSimulation\\\":false,\\\"bGyroscopicTorqueEnabled\\\":false,\\\"bAutoWeld\\\":true,\\\"bStartAwake\\\":true,\\\"bGenerateWakeEvents\\\":false,\\\"bUpdateMassWhenScaleChanges\\\":true},\\\"overrideMaterials\\\":[{\\\"refPath\\\":\\\"/Game/Vamps/Materials/M_CameraOccluder.M_CameraOccluder\\\"}],\\\"componentTags\\\":[\\\"VampsCameraFade\\\"],\\\"customPrimitiveData\\\":{\\\"data\\\":[0]},\\\"bHiddenInGame\\\":false,\\\"bUseDefaultCollision\\\":false,\\\"relativeLocation\\\":{\\\"x\\\":-500,\\\"y\\\":0,\\\"z\\\":125},\\\"relativeScale3D\\\":{\\\"x\\\":0.29999999999999999,\\\"y\\\":3,\\\"z\\\":2.5}}\"}"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "key": "playStopped",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "{\"returnValue\":false}"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

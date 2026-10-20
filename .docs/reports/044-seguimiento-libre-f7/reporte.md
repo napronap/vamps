@@ -1,5 +1,7 @@
 # 044 — Seguimiento libre suave y depuración con F7
 
+Estado posterior comprobado: [045 — Estado de cámara](../045-estado-camara/reporte.md). El editor actual carga la DLL principal, arranca PIE y conserva registros de alternancia F7; la observación visual integrada sigue pendiente. El fallo de recarga descrito abajo es histórico.
+
 ## Alcance
 
 Reemplaza el rumbo completamente fijo sin target de [043](../043-camara-sin-target/reporte.md) por acompañamiento amortiguado del desplazamiento. Sustituye el comando de consola del lock-on de prueba por F7. HUD diferido; no se modifican assets ni Data Assets.

@@ -25,6 +25,8 @@ namespace
 	float TransitionDuration = 0.3f;
 	constexpr float UnlockedLookAheadTime = 0.5f;
 	constexpr float UnlockedAngularSpeed = 1.5f;
+	constexpr float UnlockedHeadingResponse = 0.4f;
+	constexpr float UnlockedHeadingTurnRate = 60.f;
 	const FName OccluderTag(TEXT("VampsCameraFade"));
 
 #if !UE_BUILD_SHIPPING
@@ -251,6 +253,14 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 	}
 	const FVector PlayerAnchor = ViewingFighter->GetActorLocation();
 	const FVector TravelVelocity = ViewingFighter->GetVelocity();
+	if (!LockedFighter && TravelVelocity.SizeSquared2D() > 1.f)
+	{
+		const double HeadingError = FMath::FindDeltaAngleDegrees(UnlockedHeadingYaw, TravelVelocity.Rotation().Yaw);
+		const double HeadingAlpha = 1.0 - FMath::Exp(-UnlockedHeadingResponse * DeltaTime);
+		const double HeadingLimit = UnlockedHeadingTurnRate * DeltaTime;
+		UnlockedHeadingYaw = FRotator::NormalizeAxis(
+		    UnlockedHeadingYaw + FMath::Clamp(HeadingError * HeadingAlpha, -HeadingLimit, HeadingLimit));
+	}
 	const FVector TravelLookAhead = (FVector(TravelVelocity.X, TravelVelocity.Y, 0.f) * UnlockedLookAheadTime)
 	                                    .GetClampedToMaxSize(FollowDistance * 0.5f);
 	const FVector TargetAnchor =
