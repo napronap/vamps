@@ -30,6 +30,7 @@
 *.xcworkspace/
 
 # Estado local de IDEs
+/.cache/
 .vs/
 .idea/
 .fleet/
