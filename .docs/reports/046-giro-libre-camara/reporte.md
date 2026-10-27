@@ -1,5 +1,7 @@
 # 046 — Giro progresivo de cámara sin lock-on
 
+Revisión posterior del avance general: [047 — Verificación del plan](../047-verificacion-avance-plan/reporte.md), con [guía de comprobaciones pendientes](../047-verificacion-avance-plan/editor.md). Esta carpeta conserva la implementación y evidencia del giro libre.
+
 ## Resultado
 
 Corrige la limitación de [044](../044-seguimiento-libre-f7/reporte.md), cuyo estado se revisó en [045](../045-estado-camara/reporte.md): el acompañamiento corto podía desviarse, pero su referencia seguía mirando siempre hacia el rumbo inicial. Ahora mantener desplazamiento lateral o hacia atrás permite girar progresivamente la vista hacia otras direcciones. Parche Live Coding aplicado y arranque PIE comprobado; sensación jugable pendiente de la [guía](editor.md).

@@ -4,9 +4,281 @@
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
 #include "Combat/VampsCombatMovementComponent.h"
+#include "Combat/VampsCombatLog.h"
 #include "Engine/Canvas.h"
 #include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 #include "GameModes/VampsCombatTestGameMode.h"
+
+#if !UE_BUILD_SHIPPING
+void AVampsCombatTestHUD::ToggleCombatHUD()
+{
+	bShowCombatDebug = !bShowCombatDebug;
+	UE_LOG(LogVampsCombat,
+	       Display,
+	       TEXT("%s: %s HUD (F9)."),
+	       *GetPathName(),
+	       bShowCombatDebug ? TEXT("debug") : TEXT("combat"));
+}
+#endif
+
+void AVampsCombatTestHUD::DrawCombatMeter(const TCHAR* MeterLabel,
+                                          float MeterValue,
+                                          float MeterCapacity,
+                                          FLinearColor MeterColor,
+                                          float MeterX,
+                                          float MeterY,
+                                          float ViewScale)
+{
+	if (!FMath::IsFinite(MeterValue) || !FMath::IsFinite(MeterCapacity) || MeterCapacity <= 0.f)
+	{
+		DrawText(FString::Printf(TEXT("%hs: %s requires finite values and positive capacity; %g / %g."),
+		                         __FUNCTION__,
+		                         MeterLabel,
+		                         MeterValue,
+		                         MeterCapacity),
+		         FLinearColor::Red,
+		         MeterX,
+		         MeterY,
+		         nullptr,
+		         ViewScale);
+		return;
+	}
+	DrawText(FString::Printf(TEXT("%s %.0f / %.0f"), MeterLabel, MeterValue, MeterCapacity),
+	         FLinearColor::White,
+	         MeterX,
+	         MeterY,
+	         nullptr,
+	         ViewScale);
+	DrawRect(FLinearColor(0.15f, 0.15f, 0.18f), MeterX, MeterY + 17.f * ViewScale, 276.f * ViewScale, 6.f * ViewScale);
+	DrawRect(MeterColor,
+	         MeterX,
+	         MeterY + 17.f * ViewScale,
+	         276.f * ViewScale * FMath::Clamp(MeterValue / MeterCapacity, 0.f, 1.f),
+	         6.f * ViewScale);
+}
+
+void AVampsCombatTestHUD::DrawCombatPanel(
+    AVampsCharacter* Fighter, const FString& PanelTitle, float PanelX, float PanelY, float ViewScale)
+{
+	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f), PanelX, PanelY, 300.f * ViewScale, 160.f * ViewScale);
+	const float ContentX = PanelX + 12.f * ViewScale;
+	DrawText(PanelTitle, FLinearColor::White, ContentX, PanelY + 8.f * ViewScale, nullptr, ViewScale);
+	if (!Fighter->Attributes)
+	{
+		DrawText(FString::Printf(TEXT("%hs: '%s' requires combat attributes."), __FUNCTION__, *Fighter->GetName()),
+		         FLinearColor::Red,
+		         ContentX,
+		         PanelY + 30.f * ViewScale,
+		         nullptr,
+		         ViewScale);
+		return;
+	}
+	const FVampsCombatState& FighterState = Fighter->CombatState;
+	DrawCombatMeter(TEXT("HP"),
+	                Fighter->Attributes->GetHealth(),
+	                Fighter->Attributes->GetMaxHealth(),
+	                FLinearColor(0.25f, 0.8f, 0.65f),
+	                ContentX,
+	                PanelY + 30.f * ViewScale,
+	                ViewScale);
+	DrawCombatMeter(TEXT("GUARD"),
+	                Fighter->Attributes->GetGuardLoad(),
+	                Fighter->Attributes->GetMaxGuardLoad(),
+	                FighterState.Reaction == EVampsCombatReaction::Stun ? FLinearColor::Red
+	                                                                    : FLinearColor(0.3f, 0.6f, 1.f),
+	                ContentX,
+	                PanelY + 56.f * ViewScale,
+	                ViewScale);
+	DrawCombatMeter(TEXT("ENERGY"),
+	                Fighter->Attributes->GetMobilityEnergy(),
+	                Fighter->Attributes->GetMaxMobilityEnergy(),
+	                FLinearColor(1.f, 0.75f, 0.15f),
+	                ContentX,
+	                PanelY + 82.f * ViewScale,
+	                ViewScale);
+	const double Now = GetWorld()->GetTimeSeconds();
+	FString StatusText;
+	if (!FighterState.bIsAlive)
+	{
+		StatusText = TEXT("DOWN");
+	}
+	else if (FighterState.Reaction != EVampsCombatReaction::None)
+	{
+		StatusText =
+		    FString::Printf(TEXT("%s %.1fs"),
+			                *StaticEnum<EVampsCombatReaction>()->GetNameStringByValue(int64(FighterState.Reaction)),
+			                FMath::Max(0.0, FighterState.ReactionEndsAt - Now));
+	}
+	else if (FighterState.bIsDashing || FighterState.bIsSprinting)
+	{
+		StatusText = FighterState.bIsDashing ? TEXT("DASH") : TEXT("SPRINT");
+	}
+	else if (FighterState.Phase == EVampsActionPhase::Preparation || FighterState.Phase == EVampsActionPhase::Contacts)
+	{
+		StatusText = FString::Printf(TEXT("ATTACK %d"), FighterState.ComboStep);
+	}
+	else if (FighterState.Phase == EVampsActionPhase::Recovery)
+	{
+		StatusText = TEXT("RECOVERY");
+	}
+	if (FighterState.bIsAlive &&
+	    (FighterState.Phase == EVampsActionPhase::NARecovery || FighterState.NARecoveryEndsAt > Now))
+	{
+		if (!StatusText.IsEmpty())
+		{
+			StatusText += TEXT(" | ");
+		}
+		StatusText += FString::Printf(TEXT("NA %.1fs"), FMath::Max(0.0, FighterState.NARecoveryEndsAt - Now));
+	}
+	if (StatusText.IsEmpty())
+	{
+		StatusText = TEXT("READY");
+	}
+	DrawText(StatusText,
+	         FighterState.bIsAlive ? FLinearColor::White : FLinearColor::Red,
+	         ContentX,
+	         PanelY + 111.f * ViewScale,
+	         nullptr,
+	         ViewScale);
+	if (FighterState.LastIncomingContact != EVampsContactResult::None)
+	{
+		const TCHAR* ResultText =
+		    FighterState.LastIncomingContact == EVampsContactResult::Blocked
+		        ? TEXT("BLOCK")
+		        : (FighterState.LastIncomingContact == EVampsContactResult::GuardBreak ? TEXT("GUARD BREAK")
+		                                                                               : TEXT("HIT"));
+		DrawText(FString::Printf(TEXT("LAST: %s -%.1f%s"),
+		                         ResultText,
+		                         FighterState.LastDamageReceived,
+		                         FighterState.bLastIncomingCritical ? TEXT(" CRITICAL") : TEXT("")),
+		         FighterState.bLastIncomingCritical ? FLinearColor::Yellow : FLinearColor::White,
+		         ContentX,
+		         PanelY + 135.f * ViewScale,
+		         nullptr,
+		         ViewScale);
+	}
+}
+
+void AVampsCombatTestHUD::DrawCombatEnemies(AVampsCharacter* ViewingFighter, float ListX, float ListY, float ViewScale)
+{
+	TArray<AVampsCharacter*> LivingEnemies;
+	for (const TWeakObjectPtr<AVampsCharacter>& Candidate : ViewingFighter->LockOn->GetCandidates())
+	{
+		AVampsCharacter* EnemyFighter = Candidate.Get();
+		if (IsValid(EnemyFighter) && EnemyFighter->HasActorBegunPlay() && !EnemyFighter->IsActorBeingDestroyed() &&
+		    EnemyFighter->CombatState.bIsAlive)
+		{
+			LivingEnemies.Add(EnemyFighter);
+		}
+	}
+	AVampsCharacter* SelectedFighter = ViewingFighter->LockOn->GetCurrentTarget();
+	const int32 VisibleRows =
+	    FMath::Max(1, FMath::FloorToInt((Canvas->SizeY - ListY - 60.f * ViewScale) / (26.f * ViewScale)));
+	const int32 SelectedRow = LivingEnemies.IndexOfByKey(SelectedFighter);
+	const int32 FirstRow = SelectedRow == INDEX_NONE ? 0 : (SelectedRow / VisibleRows) * VisibleRows;
+	const int32 EndRow = FMath::Min(FirstRow + VisibleRows, LivingEnemies.Num());
+	DrawText(FString::Printf(TEXT("ENEMIES %d-%d / %d | F next"),
+	                         LivingEnemies.IsEmpty() ? 0 : FirstRow + 1,
+	                         EndRow,
+	                         LivingEnemies.Num()),
+	         FLinearColor::White,
+	         ListX,
+	         ListY,
+	         nullptr,
+	         ViewScale);
+	const FRotationMatrix CameraAxes(FRotator(0.f, PlayerOwner->GetControlRotation().Yaw, 0.f));
+	const auto DrawDirection =
+	    [this, ViewScale](const FVector2D& ArrowOrigin, const FVector2D& ArrowDirection, FLinearColor ArrowColor)
+	{
+		if (ArrowDirection.IsNearlyZero())
+		{
+			return;
+		}
+		const FVector2D ArrowTip = ArrowOrigin + ArrowDirection * 8.f * ViewScale;
+		const FVector2D ArrowBase = ArrowOrigin - ArrowDirection * 6.f * ViewScale;
+		const FVector2D ArrowWing(-ArrowDirection.Y * 5.f * ViewScale, ArrowDirection.X * 5.f * ViewScale);
+		DrawLine(
+		    ArrowTip.X, ArrowTip.Y, ArrowBase.X + ArrowWing.X, ArrowBase.Y + ArrowWing.Y, ArrowColor, 2.f * ViewScale);
+		DrawLine(
+		    ArrowTip.X, ArrowTip.Y, ArrowBase.X - ArrowWing.X, ArrowBase.Y - ArrowWing.Y, ArrowColor, 2.f * ViewScale);
+	};
+	for (int32 EnemyIndex = 0; EnemyIndex < LivingEnemies.Num(); ++EnemyIndex)
+	{
+		const AVampsCharacter* EnemyFighter = LivingEnemies[EnemyIndex];
+		const FVampsCombatState& EnemyState = EnemyFighter->CombatState;
+		const bool bIncomingAttack =
+		    ViewingFighter->CombatState.bIsAlive && EnemyFighter->LockOn &&
+		    EnemyFighter->LockOn->GetCurrentTarget() == ViewingFighter &&
+		    (EnemyState.Phase == EVampsActionPhase::Preparation || EnemyState.Phase == EVampsActionPhase::Contacts);
+		const FVector OpponentOffset = EnemyFighter->GetActorLocation() - ViewingFighter->GetActorLocation();
+		const FVector2D ArrowDirection =
+		    FVector2D(FVector::DotProduct(OpponentOffset, CameraAxes.GetUnitAxis(EAxis::Y)),
+			          -FVector::DotProduct(OpponentOffset, CameraAxes.GetUnitAxis(EAxis::X)))
+		        .GetSafeNormal();
+		if (bIncomingAttack)
+		{
+			const FVector2D ThreatOrigin =
+			    FVector2D(Canvas->SizeX * 0.5f, Canvas->SizeY * 0.5f) + ArrowDirection * 100.f * ViewScale;
+			DrawDirection(ThreatOrigin, ArrowDirection, FLinearColor::Red);
+			DrawText(TEXT("!"),
+			         FLinearColor::Red,
+			         ThreatOrigin.X - 3.f * ViewScale,
+			         ThreatOrigin.Y + 10.f * ViewScale,
+			         nullptr,
+			         ViewScale);
+		}
+		if (EnemyIndex < FirstRow || EnemyIndex >= EndRow)
+		{
+			continue;
+		}
+		const double DistanceMeters = OpponentOffset.Size2D() / 100.0;
+		const bool bSelectedEnemy = EnemyFighter == SelectedFighter;
+		const FLinearColor RowColor =
+		    bIncomingAttack ? FLinearColor::Red : (bSelectedEnemy ? FLinearColor::Yellow : FLinearColor::White);
+		const float RowY = ListY + (24.f + (EnemyIndex - FirstRow) * 26.f) * ViewScale;
+		DrawText(FString::Printf(TEXT("%s %d | %.1fm%s%s"),
+		                         bSelectedEnemy ? TEXT(">") : TEXT(" "),
+		                         EnemyIndex + 1,
+		                         DistanceMeters,
+		                         DistanceMeters <= 15.0 ? TEXT(" NEAR") : TEXT(""),
+		                         bIncomingAttack ? TEXT(" ! INCOMING") : TEXT("")),
+		         RowColor,
+		         ListX,
+		         RowY,
+		         nullptr,
+		         ViewScale);
+		DrawDirection(FVector2D(ListX + 284.f * ViewScale, RowY + 8.f * ViewScale), ArrowDirection, RowColor);
+	}
+}
+
+void AVampsCombatTestHUD::DrawCombatHUD(AVampsCharacter* ViewingFighter, float ViewScale)
+{
+	if (!IsValid(ViewingFighter) || !ViewingFighter->LockOn)
+	{
+		DrawText(FString::Printf(TEXT("%hs: requires a VampsCharacter with LockOn; pawn='%s'."),
+		                         __FUNCTION__,
+		                         *GetNameSafe(PlayerOwner->GetPawn())),
+		         FLinearColor::Red,
+		         20.f * ViewScale,
+		         50.f * ViewScale,
+		         nullptr,
+		         ViewScale);
+		return;
+	}
+	DrawCombatPanel(ViewingFighter, TEXT("PLAYER"), 20.f * ViewScale, Canvas->SizeY - 186.f * ViewScale, ViewScale);
+	const float TargetX = Canvas->SizeX - 320.f * ViewScale;
+	AVampsCharacter* SelectedFighter = ViewingFighter->LockOn->GetCurrentTarget();
+	if (SelectedFighter)
+	{
+		DrawCombatPanel(SelectedFighter, TEXT("TARGET"), TargetX, 20.f * ViewScale, ViewScale);
+	}
+	else
+	{
+		DrawText(TEXT("NO TARGET"), FLinearColor::White, TargetX, 20.f * ViewScale, nullptr, ViewScale);
+	}
+	DrawCombatEnemies(ViewingFighter, TargetX, 200.f * ViewScale, ViewScale);
+}
 
 void AVampsCombatTestHUD::DrawFighter(
     AVampsCharacter* Fighter, const FString& Label, float X, float Y, float Width, bool bSelected)
@@ -149,8 +421,23 @@ void AVampsCombatTestHUD::DrawFighter(
 void AVampsCombatTestHUD::DrawHUD()
 {
 	Super::DrawHUD();
-	if (!Canvas || !PlayerOwner)
+	if (!Canvas || !PlayerOwner || Canvas->SizeX <= 0 || Canvas->SizeY <= 0)
 	{
+		return;
+	}
+
+	const float ViewScale = FMath::Min(Canvas->SizeX / 1280.f, Canvas->SizeY / 720.f);
+#if !UE_BUILD_SHIPPING
+	DrawText(bShowCombatDebug ? TEXT("F9 COMBAT HUD") : TEXT("F9 DEBUG HUD"),
+	         FLinearColor::White,
+	         20.f * ViewScale,
+	         Canvas->SizeY - 20.f * ViewScale,
+	         nullptr,
+	         ViewScale);
+#endif
+	if (!bShowCombatDebug)
+	{
+		DrawCombatHUD(Cast<AVampsCharacter>(PlayerOwner->GetPawn()), ViewScale);
 		return;
 	}
 

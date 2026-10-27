@@ -14,7 +14,24 @@ public:
 
 	virtual void DrawHUD() override;
 
+#if !UE_BUILD_SHIPPING
+	void ToggleCombatHUD();
+#endif
+
 private:
 
+	bool bShowCombatDebug = false;
+
+	void DrawCombatHUD(AVampsCharacter* ViewingFighter, float ViewScale);
+	void DrawCombatPanel(
+	    AVampsCharacter* Fighter, const FString& PanelTitle, float PanelX, float PanelY, float ViewScale);
+	void DrawCombatMeter(const TCHAR* MeterLabel,
+	                     float MeterValue,
+	                     float MeterCapacity,
+	                     FLinearColor MeterColor,
+	                     float MeterX,
+	                     float MeterY,
+	                     float ViewScale);
+	void DrawCombatEnemies(AVampsCharacter* ViewingFighter, float ListX, float ListY, float ViewScale);
 	void DrawFighter(AVampsCharacter* Fighter, const FString& Label, float X, float Y, float Width, bool bSelected);
 };

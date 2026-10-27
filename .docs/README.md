@@ -21,6 +21,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+Implementación posterior: [048 — HUD de combate simple y alternancia F9](reports/048-hud-combate-simple/reporte.md), con [guía de compilación y observación](reports/048-hud-combate-simple/editor.md). Usa la vista de combate por defecto y conserva debug; faltan build y comprobación visual en el editor.
+
+Revisión más reciente: [047 — Verificación del avance del plan](reports/047-verificacion-avance-plan/reporte.md), con [comprobaciones pendientes del editor](reports/047-verificacion-avance-plan/editor.md). Contrasta el estado del roadmap con movilidad 039–040 y cámara 042–046; conserva los cierres documentados y señala las descripciones anteriores a esas implementaciones.
+
 [Roadmap hacia la emulación FGOA](roadmap.md): consolidar contacto/cámara → botón compartido y fases → cadena/NA → daño/guardia → movilidad → presentación → equipos → red → calibración → extensiones propias. Incluye estado actual, decisiones previas y criterios de cierre; distingue combate local y base completa.
 
 **Avance:** etapas 0 y 1 cerradas por el usuario en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) y [021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). Etapa 2 completada el 2026-10-18 en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) y etapa 3 cerrada por confirmación del usuario el 2026-10-19 en [035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3). El estado se controla en el roadmap; la siguiente etapa es 4, acercamiento, evasión y sprint.

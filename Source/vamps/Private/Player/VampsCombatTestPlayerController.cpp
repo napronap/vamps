@@ -7,6 +7,7 @@
 #include "InputAction.h"
 #include "InputCoreTypes.h"
 #include "Combat/VampsCombatLog.h"
+#include "UI/VampsCombatTestHUD.h"
 
 void AVampsCombatTestPlayerController::SetupInputComponent()
 {
@@ -44,10 +45,28 @@ void AVampsCombatTestPlayerController::SetupInputComponent()
 #if !UE_BUILD_SHIPPING
 	Input->BindDebugKey(
 	    FInputChord(EKeys::F7), IE_Pressed, this, &AVampsCombatTestPlayerController::ToggleLockOnDebug, false);
+	Input->BindDebugKey(
+	    FInputChord(EKeys::F9), IE_Pressed, this, &AVampsCombatTestPlayerController::ToggleCombatHUD, false);
 #endif
 }
 
 #if !UE_BUILD_SHIPPING
+void AVampsCombatTestPlayerController::ToggleCombatHUD(FKey, FInputActionValue)
+{
+	AVampsCombatTestHUD* CombatHUD = Cast<AVampsCombatTestHUD>(GetHUD());
+	if (!CombatHUD)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': HUD toggle requires VampsCombatTestHUD; HUD='%s'."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(GetHUD()));
+		return;
+	}
+	CombatHUD->ToggleCombatHUD();
+}
+
 void AVampsCombatTestPlayerController::ToggleLockOnDebug(FKey, FInputActionValue)
 {
 	AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(GetPawn());
