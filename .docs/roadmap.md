@@ -1,6 +1,6 @@
 # Roadmap hacia la emulación de FGOA
 
-El objetivo es reproducir la **[base FGOA adaptada](game/functional.md#alcance-de-la-base)**: intercambio, movilidad, selección, cámara y partida por equipos con un único melee jugable. Después se incorporan las [extensiones propias de Vamps](extensions/functional.md). Emular significa conseguir los comportamientos acordados, no reconstruir algoritmos internos del original ni copiar sus números de balance.
+El objetivo es reproducir la **[base FGOA adaptada](game/functional.md#alcance-de-la-base)**: intercambio, movilidad, selección, cámara y partida por equipos, usando Executioner para todos en la primera entrega local. La selección de personaje se incorpora en la segunda parte de 6; después de cerrar la base se agregan las [extensiones propias de Vamps](extensions/functional.md). Emular significa conseguir los comportamientos acordados, no reconstruir algoritmos internos del original ni copiar sus números de balance.
 
 Las reglas viven en [combate](combat/functional.md), [jugador](player/functional.md) y [partida](game/functional.md), con sus documentos técnicos. El [análisis 016](reports/016-analisis-fgo-arcade/analisis.md) y sus [escenas](reports/016-analisis-fgo-arcade/escenas.md) sirven para comparar resultados. No hace falta reabrir la investigación ni pedir nuevas grabaciones para avanzar.
 
@@ -21,7 +21,7 @@ Las reglas viven en [combate](combat/functional.md), [jugador](player/functional
 
 Este archivo lleva el estado del plan; los reportes conservan la evidencia y quién confirmó cada cierre. Al completar una etapa se actualizan aquí su estado, fecha y referencia al reporte. No se mantiene otro archivo con una copia del avance.
 
-**Estado al 19 de octubre de 2026:** etapas 0, 1, 2 y 3 completadas por confirmación del usuario. El [cierre de 3 en 035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3) conserva las verificaciones MCP previas y registra la aprobación del usuario. Próxima etapa: 4, acercamiento, evasión y sprint.
+**Estado al 27 de octubre de 2026:** etapas 0–3 cerradas por el usuario. Movilidad y presentación tienen implementación posterior en 039–048, con los límites de verificación registrados allí. El trabajo actual define 6 en [050](reports/050-reglas-partida-local/reporte.md): ciclo local 2v2 primero y selección de personaje en una segunda parte. No se atribuyen nuevas comprobaciones del editor ni cierres de 4–5 a esta actualización.
 
 **Cierre de 3:** implementación en [033](reports/033-resultados-combate/reporte.md), montages independientes en [034](reports/034-montage-guardia/reporte.md) y configuración/intercambios revisados en [035](reports/035-revision-paso-3/reporte.md). El usuario aprobó el cierre el 2026-10-19; no se atribuye a una nueva ejecución de PIE o compilación por Codex.
 
@@ -31,9 +31,9 @@ Este archivo lleva el estado del plan; los reportes conservan la evidencia y qui
 | 1 | Completada | Botón compartido y fases de una acción | Cierre confirmado por el usuario el 2026-10-16; [registro 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1) |
 | 2 | Completada | Cadena de hasta tres pasos y NA | Cierre confirmado por el usuario el 2026-10-18; [registro 031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) |
 | 3 | Completada | Guardia, residual, reacción, stun y crítico | Cierre confirmado por el usuario el 2026-10-19; [registro 035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3) |
-| 4 | Pendiente | Acercamiento, evasión y sprint | Código y assets en 037; falta comprobar impacto final y movilidad en juego antes del cierre |
-| 5 | Pendiente | Cámara de acciones, oclusión y HUD de combate | Estados y movimiento de 1–4; presentación coherente con la referencia |
-| 6 | Pendiente | Equipos, baja, respawn, puntuación y portador | Decidir reglas de partida; ciclo local de partida completo |
+| 4 | Implementada; cierre pendiente | Acercamiento, evasión y sprint | Configuración vigente en 039–040; la revisión 049 conserva diferencias respecto de 037 |
+| 5 | Implementada; verificación pendiente | Cámara de acciones, oclusión y HUD de combate | Cámara 042–046 y HUD 048; conservar sus pendientes de compilación/observación |
+| 6 | En definición | Equipos, bajas, recompensa por racha, respawn, resultado y revancha local | Primera parte 2v2 con Executioner; segunda parte con selección de personaje; decisiones en 050 |
 | 7 | Pendiente | Integración de varios jugadores en red | Reglas locales de 1–6; clientes pueden jugar el mismo ciclo bajo autoridad |
 | 8 | Pendiente | Calibración y cierre de la base | Comparación integral local y en red; sin brechas de comportamiento acordadas |
 | 9 | Pendiente | Extensiones Vamps | Base cerrada en 8; identidades, dos skills, parry y ultimate propias |
@@ -79,17 +79,17 @@ El HUD presenta el resultado resuelto y AnimInstance expone las señales de reac
 
 ### 4. Movimiento integrado al combate
 
-Implementación y configuración en [037](reports/037-movilidad-combate/reporte.md), con [operaciones y pendientes del editor](reports/037-movilidad-combate/editor.md). La etapa permanece pendiente de cierre hasta completar su configuración y observación. Las reglas elegidas están en [jugador](player/functional.md#movimiento-y-evasión): energía de movilidad independiente, dash inmediato y sprint sostenido, salida de Guard tras impacto final y dash durante NA, sin invulnerabilidad.
+La implementación vigente está en [039](reports/039-simplificacion-movilidad/reporte.md) y [040](reports/040-giro-direccional-dash/reporte.md), con sus guías de observación. Usa dos montages con root motion, giro hacia la dirección capturada al aceptar el dash y energía independiente para dash/sprint. Guard conserva su duración ordinaria; se retiró el permiso por impacto final. La etapa mantiene los pendientes de observación registrados allí.
 
-El acercamiento se limita por paso y reemplaza la traslación de raíz ofensiva para no duplicar avance. Shift sin dirección se aleja del target. Se conservan cámara/lock-on y referencia de WASD. La continuación válida tiene prioridad sobre el dash al cerrar un paso; recuperación y NA mantienen sus plazos.
+El acercamiento se limita al primer paso y reemplaza la traslación de raíz ofensiva para no duplicar avance. Shift sin dirección se aleja del target. Se conservan cámara/lock-on y referencia de WASD. La continuación válida tiene prioridad sobre el dash al cerrar un paso; recuperación y NA mantienen sus plazos.
 
 **Cierre:** atacar a un objetivo lejano puede avanzar, quedar corto y ejecutar igualmente el golpe. No hay teletransporte ni acierto garantizado. Evasión cierra la cadena en su frontera, sin cancelación libre en cualquier frame; sprint y movimiento lateral conservan seguimiento. NA permite locomoción y reacción/stun aplican sus restricciones propias.
 
 ### 5. Presentación de combate y cámara de referencia
 
-Completar el manager de 019 con la relación visual jugador/target, variación de distancia aparente y planos de ataque/defensa. Calibrar distancia/FOV y transiciones con las acciones y el movimiento ya disponibles. Mantener seguimiento automático, tolerancia lateral y selección compartida; no imponer target clavado al centro ni histéresis no demostrada.
+La cámara de [042–046](reports/046-giro-libre-camara/reporte.md) incorpora seguimiento/combate, Eye/Interest, variación de distancia/FOV, transiciones, oclusión y rumbo progresivo sin target. Calibrar su presentación con las acciones y el movimiento disponibles, conservando selección compartida y los pendientes visuales de sus guías.
 
-Preparar los oclusores visibles y materiales que se desvanecen/restauran, coordinados con la colisión de cámara. Completar HUD de combate: vida, guardia, NA, reacción, stun, crítico, selección/lista, enemigos próximos y dirección de amenaza. La advertencia de amenaza debe existir antes del resultado de contacto y distinguirse de un bloqueo confirmado.
+Los oclusores y el material de fade preparados en 042 se coordinan con la colisión de cámara. El HUD simple de [048](reports/048-hud-combate-simple/reporte.md) presenta recursos, estados, selección/lista, proximidad y dirección de amenaza, con alternancia F9. Conservar su pendiente de compilación/observación: la advertencia previa al contacto debe distinguirse del bloqueo confirmado.
 
 **Cierre:** acercamiento, retirada, laterales, cambios por F y guardia, y planos de acción mantienen un combate legible. Un obstáculo preparado se desvanece y recupera su presentación sin perder su colisión de movimiento; un límite invisible continúa restringiendo sin requerir fade. Cámara y HUD siguen al mismo rival, incluida ausencia de target.
 
@@ -97,17 +97,19 @@ Preparar los oclusores visibles y materiales que se desvanecen/restauran, coordi
 
 ### 6. Partida por equipos
 
-Resolver tamaño de equipos, victoria/tiempo/empate, respawn y reglas del portador en [partida](game/functional.md#preguntas). Definir asignación, aparición, transferencia y efectos del portador sin asumir kill leader ni curación por analogía con el Grial.
+La [partida funcional](game/functional.md) define dos entregas. **6.1:** ciclo local 2v2, jugador y un bot en A contra dos bots en B, todos Executioner. **6.2:** selección de personaje y preparación de participantes. Las identidades/skills propias continúan en 9; no se anticipa ese sistema en 6.1.
 
-Implementar equipos y elegibilidad de enemigos tanto en selección como en contactos. Agregar baja, salida efectiva del combate, puntos, respawn del mismo personaje, portador y fin de partida. Conectar HUD de puntuación/portador y limpieza de acciones, trazas y selección al morir/reaparecer. Mantener R como control de debug, separado del ciclo de partida.
+Implementar autoridad de partida, equipos y elegibilidad enemiga en selección, HUD, IA y contactos. Conectar bajas únicas con su contexto, recompensa creciente por racha de la víctima, respawn por equipo, protección breve y resultado después del lote de contactos. Objetivo, fórmula inicial, recursos y plazos se definen en [partida](game/functional.md#puntuación). El portador se elimina del alcance.
 
-**Cierre:** aliados no figuran como objetivos enemigos; golpear a un enemigo ocupado con otro aliado sigue permitido. Una baja normal y la del portador conceden el valor definido; el personaje reaparece según la regla sin consumir reservas. Cámara/HUD dejan al eliminado y admiten al reaparecido. El resultado de equipo cierra la partida sin confundirlo con una derrota individual.
+El HUD presenta equipo, puntos, kills/muertes/K/D, countdown de preparación/respawn, tiempo restante y panel de ganador/empate con «Otra partida». Incorporar muerte normal/defensiva desde referencias del DA y cámara libre durante la espera. La protección de respawn termina al atacar. La revancha local requiere solo la aceptación local; esperar la aceptación de todos queda para una ampliación posterior. Mantener R como control de observación separado del ciclo de partida.
+
+**Cierre de 6.1:** aliados fuera de selección/contactos; dos aliados pueden atacar al mismo enemigo. La recompensa usa la racha anterior al lote y se registra una sola baja por vida. El mismo personaje reaparece en su equipo con sus recursos y protección; cámara/HUD limpian al eliminado y admiten al reaparecido. Si ambos equipos alcanzan el objetivo simultáneamente, decide K/D; si coincide, hay empate. El resultado detiene la partida y la revancha inicia un ciclo limpio. Resolver antes de implementar las [preguntas restantes](game/functional.md#preguntas). El cierre de 6.2 se especificará al abordar selección de personaje.
 
 ### 7. Varios jugadores y autoridad de red
 
 Diseñar la entrega de solicitudes y el estado compartido para las reglas ya jugables. Implementar autoridad de acciones, contactos, daño y partida; sincronizar animación, resultados, bajas/respawn y HUD. La selección que intervenga en combate debe ser coherente con la autoridad, manteniendo presentación de cámara local por jugador. Elegir el tratamiento de latencia necesario al abordar esta integración; el video no determina predicción ni compensación.
 
-**Cierre:** comprobar manualmente en PIE con servidor y clientes que ambos pueden solicitar ataque/defensa, encadenar y desplazarse, y que coinciden en resultados, puntuación, portador y cierre. Repetir bajo las condiciones de latencia elegidas para la verificación. Ningún cliente necesita autoridad local para que se entregue su solicitud, ni ejecuta daño/puntos duplicados. Replicar atributos o usar ServerOnly por sí solos no aprueba esta etapa.
+**Cierre:** comprobar manualmente en PIE con servidor y clientes que ambos pueden solicitar ataque/defensa, encadenar y desplazarse, y que coinciden en resultados, puntuación, rachas, bajas/respawn y cierre. Repetir bajo las condiciones de latencia elegidas para la verificación. Ningún cliente necesita autoridad local para que se entregue su solicitud, ni ejecuta daño/puntos duplicados. Replicar atributos o usar ServerOnly por sí solos no aprueba esta etapa.
 
 ### 8. Calibración y cierre de la base
 
@@ -121,6 +123,6 @@ Desarrollar [identidades y dos skills por personaje](extensions/characters/funct
 
 ## Límites y seguimiento
 
-La base excluye cartas/mano, Q/A/B, Extra Attack, reservas/sustitución, ranged inicial, SUPPORT y NP del original. Estas exclusiones no son tareas pendientes de emulación. Se conservan las adaptaciones elegidas: cadena/NA directas, guardia 360°, Shift sin dirección hacia atrás, respawn del mismo personaje y portador sin temática Grial. Parry, skills, perfiles y ultimate propias pertenecen a 9.
+La base excluye cartas/mano, Q/A/B, Extra Attack, reservas/sustitución, ranged inicial, SUPPORT, portador y NP del original. Estas exclusiones no son tareas pendientes de emulación. Se conservan las adaptaciones elegidas: cadena/NA directas, guardia 360°, Shift sin dirección hacia atrás, respawn del mismo personaje y recompensa creciente por racha. La selección de personaje pertenece a 6.2; parry, skills, perfiles y ultimate propias pertenecen a 9.
 
 Cada implementación actualiza su estado, código/assets afectados y comprobaciones en un par de reportes. Revisar código, compilar mediante MCP directo cuando corresponda y comprobar manualmente en el editor; no crear ni ejecutar tests automatizados. Las operaciones sin MCP directo quedan como pasos exactos para el usuario, sin automatización de UI. No marcar una etapa cerrada solo porque compila ni avanzar decisiones abiertas mediante fallbacks.

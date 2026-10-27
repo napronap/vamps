@@ -1,0 +1,171 @@
+{
+  "subclasses": [
+    {
+      "refPath": "/Script/vamps.VampsCombatSettings"
+    }
+  ],
+  "assets": {
+    "/Game/Vamps/Data/DA_VampsCombatSettings": {
+      "weapons": [
+        {
+          "weaponClass": {
+            "refPath": "/Game/Vamps/Blueprints/Weapons/BP_VampsGreatSword.BP_VampsGreatSword_C"
+          },
+          "attachSocket": "HandGrip_R",
+          "relativeTransform": {
+            "location": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "rotation": {
+              "pitch": 0,
+              "yaw": 0,
+              "roll": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            }
+          }
+        }
+      ],
+      "attackMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Combo.AM_Executioner_Combo"
+      },
+      "nARecoveryDuration": 0.5,
+      "comboSteps": [
+        {
+          "targetAlignmentDistance": 130,
+          "knockbackDistance": 100,
+          "contactReactionDuration": 1
+        },
+        {
+          "targetAlignmentDistance": 130,
+          "knockbackDistance": 100,
+          "contactReactionDuration": 1.2999999523162842
+        },
+        {
+          "targetAlignmentDistance": 150,
+          "knockbackDistance": 300,
+          "contactReactionDuration": 1
+        }
+      ],
+      "hitReactionMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Hit.AM_Executioner_Hit"
+      },
+      "guardReactionMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Block.AM_Executioner_Block"
+      },
+      "deathMontage": "None",
+      "guardDeathMontage": "None",
+      "criticalDamage": 24,
+      "criticalChancePercent": 10,
+      "blockDamageReduction": 10,
+      "guardCapacity": 100,
+      "guardLoadPerHit": 25,
+      "guardRecoveryDelay": 1,
+      "guardRecoveryPerSecond": 20,
+      "stunDuration": 2,
+      "defenseRequestDuration": 0.5,
+      "forwardDashMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Fw.AM_Executioner_Dash_Fw"
+      },
+      "backwardDashMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Bw.AM_Executioner_Dash_Bw"
+      },
+      "approachDistance": 250,
+      "approachDuration": 0.25,
+      "approachStopDistance": 130,
+      "mobilityEnergyCapacity": 100,
+      "dashEnergyCost": 25,
+      "sprintEnergyPerSecond": 20,
+      "mobilityRecoveryPerSecond": 25,
+      "mobilityRecoveryDelay": 1,
+      "sprintSpeed": 700
+    }
+  },
+  "blueprints": {
+    "/Game/Vamps/Blueprints/BP_VampsCharacter": {
+      "combatSettings": {
+        "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+      },
+      "attackDamage": 12,
+      "mesh": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter.Default__BP_VampsCharacter_C:CharacterMesh0"
+      }
+    },
+    "/Game/Vamps/Blueprints/BP_VampsCharacter_Player": {
+      "combatSettings": {
+        "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+      },
+      "attackDamage": 12,
+      "mesh": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.Default__BP_VampsCharacter_Player_C:CharacterMesh0"
+      }
+    },
+    "/Game/Vamps/Blueprints/BP_VampsCombatTestGameMode": {
+      "opponentClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter.BP_VampsCharacter_C"
+      },
+      "playerControllerClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCombatTestPlayerController.BP_VampsCombatTestPlayerController_C"
+      },
+      "defaultPawnClass": {
+        "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.BP_VampsCharacter_Player_C"
+      }
+    }
+  },
+  "animations": {
+    "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Fw": {
+      "blendIn": {
+        "customCurve": "None",
+        "blendTime": 0.05999999865889549,
+        "blendOption": "HermiteCubic"
+      },
+      "blendOut": {
+        "customCurve": "None",
+        "blendTime": 0.07999999821186066,
+        "blendOption": "HermiteCubic"
+      },
+      "slotAnimTracks": [
+        {
+          "slotName": "DefaultSlot",
+          "animTrack": {
+            "animSegments": [
+              {
+                "cachedPlayLength": 1,
+                "animReference": {
+                  "refPath": "/Game/Vamps/Animations/Executioner/A_Executioner_Dash_Fw.A_Executioner_Dash_Fw"
+                },
+                "startPos": 0,
+                "animStartTime": 0,
+                "animEndTime": 1,
+                "animPlayRate": 1,
+                "loopingCount": 1
+              }
+            ]
+          }
+        }
+      ],
+      "bEnableAutoBlendOut": true,
+      "sequenceLength": 1,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Death_RM": {
+      "sequenceLength": 0.8666666746139526,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    },
+    "/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Defence_Death_RM": {
+      "sequenceLength": 1.2666666507720947,
+      "skeleton": {
+        "refPath": "/Game/GreatSwordAnimV1/DEMO/Character_GreatSword/Mannequins/Meshes/SK_Mannequin.SK_Mannequin"
+      }
+    }
+  }
+}

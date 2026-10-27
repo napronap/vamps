@@ -1,0 +1,13 @@
+{
+	"jsonrpc": "2.0",
+	"id": 2,
+	"result":
+	{
+		"content": [
+			{
+				"type": "text",
+				"text": "{\"returnValue\":\"{\\\"originalSaved\\\": true, \\\"montages\\\": {\\\"/Game/Vamps/Animations/Executioner/AM_Executioner_Death\\\": {\\\"slotAnimTracks\\\": [{\\\"slotName\\\": \\\"DefaultSlot\\\", \\\"animTrack\\\": {\\\"animSegments\\\": [{\\\"cachedPlayLength\\\": 0.8666666746139526, \\\"animReference\\\": {\\\"refPath\\\": \\\"/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Death_RM.A_GreatSwordCombatAnimationV1_Death_RM\\\"}, \\\"startPos\\\": 0, \\\"animStartTime\\\": 0, \\\"animEndTime\\\": 0.8666666746139526, \\\"animPlayRate\\\": 1, \\\"loopingCount\\\": 1}]}}], \\\"rateScale\\\": 1, \\\"bEnableAutoBlendOut\\\": false, \\\"sequenceLength\\\": 1}, \\\"/Game/Vamps/Animations/Executioner/AM_Executioner_GuardDeath\\\": {\\\"slotAnimTracks\\\": [{\\\"slotName\\\": \\\"DefaultSlot\\\", \\\"animTrack\\\": {\\\"animSegments\\\": [{\\\"cachedPlayLength\\\": 1.2666666507720947, \\\"animReference\\\": {\\\"refPath\\\": \\\"/Game/GreatSwordAnimV1/Animation/RM/A_GreatSwordCombatAnimationV1_Defence_Death_RM.A_GreatSwordCombatAnimationV1_Defence_Death_RM\\\"}, \\\"startPos\\\": 0, \\\"animStartTime\\\": 0, \\\"animEndTime\\\": 1.2666666507720947, \\\"animPlayRate\\\": 1, \\\"loopingCount\\\": 1}]}}], \\\"rateScale\\\": 1, \\\"bEnableAutoBlendOut\\\": false, \\\"sequenceLength\\\": 1}}, \\\"montagesSaved\\\": true}\"}"
+			}
+		]
+	}
+}

@@ -44,4 +44,8 @@ private:
 	void CycleTarget();
 	void MobilityPressed();
 	void MobilityReleased();
+
+#if !UE_BUILD_SHIPPING
+	void ToggleCombatHUD(FKey Key, FInputActionValue Value);
+#endif
 };

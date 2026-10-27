@@ -9,6 +9,167 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GameModes/VampsCombatTestGameMode.h"
+#include "GameModes/VampsMatchGameMode.h"
+
+void AVampsCombatTestHUD::NotifyHitBoxClick(FName BoxName)
+{
+	Super::NotifyHitBoxClick(BoxName);
+	if (BoxName == FName(TEXT("RestartMatch")))
+	{
+		AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
+		if (!MatchMode)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': restart requires VampsMatchGameMode."),
+			       __FUNCTION__,
+			       *GetPathName());
+			return;
+		}
+		MatchMode->RestartLocalRound();
+	}
+}
+
+void AVampsCombatTestHUD::DrawMatchHUD(const AVampsMatchGameMode* MatchMode, float ViewScale)
+{
+	const double Now = GetWorld()->GetTimeSeconds();
+	const int32 SecondsRemaining = FMath::CeilToInt(FMath::Max(0.0, MatchMode->PhaseEndsAt - Now));
+	const float CenterX = Canvas->SizeX * 0.5f;
+	const float CenterY = Canvas->SizeY * 0.5f;
+	if (MatchMode->RoundPhase == EVampsMatchPhase::Unavailable)
+	{
+		DrawText(TEXT("MATCH UNAVAILABLE - See LogVampsCombat"),
+		         FLinearColor::Red,
+		         CenterX - 200.f * ViewScale,
+		         CenterY,
+		         nullptr,
+		         ViewScale);
+		return;
+	}
+	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.86f),
+	         CenterX - 240.f * ViewScale,
+	         16.f * ViewScale,
+	         480.f * ViewScale,
+	         36.f * ViewScale);
+	DrawText(FString::Printf(TEXT("A %d / %d  |  %02d:%02d  |  B %d / %d"),
+	                         MatchMode->TeamScores[0],
+	                         MatchMode->ScoreTarget,
+	                         SecondsRemaining / 60,
+	                         SecondsRemaining % 60,
+	                         MatchMode->TeamScores[1],
+	                         MatchMode->ScoreTarget),
+	         FLinearColor::White,
+	         CenterX - 220.f * ViewScale,
+	         25.f * ViewScale,
+	         nullptr,
+	         ViewScale);
+	if (MatchMode->RoundPhase == EVampsMatchPhase::Preparing)
+	{
+		DrawText(FString::Printf(TEXT("MATCH STARTS IN %d"), SecondsRemaining),
+		         FLinearColor::Yellow,
+		         CenterX - 100.f * ViewScale,
+		         CenterY,
+		         nullptr,
+		         ViewScale);
+	}
+	for (const FVampsMatchParticipant& Participant : MatchMode->Participants)
+	{
+		if (Participant.Fighter != PlayerOwner->GetPawn())
+		{
+			continue;
+		}
+		DrawText(Participant.TeamIndex == 0 ? TEXT("TEAM A") : TEXT("TEAM B"),
+		         FLinearColor::White,
+		         20.f * ViewScale,
+		         Canvas->SizeY - 235.f * ViewScale,
+		         nullptr,
+		         ViewScale);
+		if (Participant.RespawnAt > Now)
+		{
+			DrawText(FString::Printf(TEXT("RESPAWN IN %d - WASD / mouse: free camera"),
+			                         FMath::CeilToInt(Participant.RespawnAt - Now)),
+			         FLinearColor::Yellow,
+			         CenterX - 210.f * ViewScale,
+			         CenterY + 35.f * ViewScale,
+			         nullptr,
+			         ViewScale);
+		}
+		else if (Participant.ProtectionEndsAt > Now)
+		{
+			DrawText(FString::Printf(TEXT("SPAWN PROTECTION %.1fs"), Participant.ProtectionEndsAt - Now),
+			         FLinearColor::Yellow,
+			         20.f * ViewScale,
+			         Canvas->SizeY - 212.f * ViewScale,
+			         nullptr,
+			         ViewScale);
+		}
+	}
+	if (MatchMode->RoundPhase != EVampsMatchPhase::Finished)
+	{
+		return;
+	}
+	const float PanelX = CenterX - 240.f * ViewScale;
+	const float PanelY = CenterY - 140.f * ViewScale;
+	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 0.96f), PanelX, PanelY, 480.f * ViewScale, 280.f * ViewScale);
+	const FString ResultText = MatchMode->WinningTeamIndex == INDEX_NONE
+	                               ? TEXT("DRAW")
+	                               : (MatchMode->WinningTeamIndex == 0 ? TEXT("TEAM A WINS") : TEXT("TEAM B WINS"));
+	DrawText(ResultText,
+	         FLinearColor::Yellow,
+	         PanelX + 20.f * ViewScale,
+	         PanelY + 15.f * ViewScale,
+	         nullptr,
+	         ViewScale * 1.25f);
+	int32 TeamKills[2] = {};
+	int32 TeamDeaths[2] = {};
+	const auto FormatRatio = [](int32 KillCount, int32 DeathCount)
+	{
+		return DeathCount > 0 ? FString::Printf(TEXT("%.2f"), double(KillCount) / DeathCount)
+		                      : FString(KillCount > 0 ? TEXT("INF") : TEXT("0.00"));
+	};
+	for (int32 ParticipantIndex = 0; ParticipantIndex < MatchMode->Participants.Num(); ++ParticipantIndex)
+	{
+		const FVampsMatchParticipant& Participant = MatchMode->Participants[ParticipantIndex];
+		TeamKills[Participant.TeamIndex] += Participant.Kills;
+		TeamDeaths[Participant.TeamIndex] += Participant.Deaths;
+		DrawText(FString::Printf(TEXT("%s%d%s | K %d / D %d | K/D %s"),
+		                         Participant.TeamIndex == 0 ? TEXT("A") : TEXT("B"),
+		                         ParticipantIndex % 2 + 1,
+		                         ParticipantIndex == 0 ? TEXT(" YOU") : TEXT(" BOT"),
+		                         Participant.Kills,
+		                         Participant.Deaths,
+		                         *FormatRatio(Participant.Kills, Participant.Deaths)),
+		         FLinearColor::White,
+		         PanelX + 20.f * ViewScale,
+		         PanelY + (55.f + ParticipantIndex * 25.f) * ViewScale,
+		         nullptr,
+		         ViewScale);
+	}
+	for (int32 TeamIndex = 0; TeamIndex < 2; ++TeamIndex)
+	{
+		DrawText(FString::Printf(TEXT("TEAM %s | %d pts | K %d / D %d | K/D %s"),
+		                         TeamIndex == 0 ? TEXT("A") : TEXT("B"),
+		                         MatchMode->TeamScores[TeamIndex],
+		                         TeamKills[TeamIndex],
+		                         TeamDeaths[TeamIndex],
+		                         *FormatRatio(TeamKills[TeamIndex], TeamDeaths[TeamIndex])),
+		         FLinearColor::White,
+		         PanelX + 20.f * ViewScale,
+		         PanelY + (160.f + TeamIndex * 24.f) * ViewScale,
+		         nullptr,
+		         ViewScale);
+	}
+	const FVector2D ButtonPosition(PanelX + 120.f * ViewScale, PanelY + 225.f * ViewScale);
+	const FVector2D ButtonSize(240.f * ViewScale, 36.f * ViewScale);
+	DrawRect(FLinearColor(0.15f, 0.35f, 0.45f), ButtonPosition.X, ButtonPosition.Y, ButtonSize.X, ButtonSize.Y);
+	DrawText(TEXT("PLAY AGAIN"),
+	         FLinearColor::White,
+	         ButtonPosition.X + 65.f * ViewScale,
+	         ButtonPosition.Y + 8.f * ViewScale,
+	         nullptr,
+	         ViewScale);
+	AddHitBox(ButtonPosition, ButtonSize, FName(TEXT("RestartMatch")), true);
+}
 
 #if !UE_BUILD_SHIPPING
 void AVampsCombatTestHUD::ToggleCombatHUD()
@@ -166,8 +327,7 @@ void AVampsCombatTestHUD::DrawCombatEnemies(AVampsCharacter* ViewingFighter, flo
 	for (const TWeakObjectPtr<AVampsCharacter>& Candidate : ViewingFighter->LockOn->GetCandidates())
 	{
 		AVampsCharacter* EnemyFighter = Candidate.Get();
-		if (IsValid(EnemyFighter) && EnemyFighter->HasActorBegunPlay() && !EnemyFighter->IsActorBeingDestroyed() &&
-		    EnemyFighter->CombatState.bIsAlive)
+		if (ViewingFighter->CanEngageEnemy(EnemyFighter))
 		{
 			LivingEnemies.Add(EnemyFighter);
 		}
@@ -427,6 +587,7 @@ void AVampsCombatTestHUD::DrawHUD()
 	}
 
 	const float ViewScale = FMath::Min(Canvas->SizeX / 1280.f, Canvas->SizeY / 720.f);
+	const AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
 #if !UE_BUILD_SHIPPING
 	DrawText(bShowCombatDebug ? TEXT("F9 COMBAT HUD") : TEXT("F9 DEBUG HUD"),
 	         FLinearColor::White,
@@ -438,6 +599,10 @@ void AVampsCombatTestHUD::DrawHUD()
 	if (!bShowCombatDebug)
 	{
 		DrawCombatHUD(Cast<AVampsCharacter>(PlayerOwner->GetPawn()), ViewScale);
+		if (MatchMode)
+		{
+			DrawMatchHUD(MatchMode, ViewScale);
+		}
 		return;
 	}
 
@@ -466,6 +631,11 @@ void AVampsCombatTestHUD::DrawHUD()
 			            Fighter == PlayerCharacter->LockOn->GetCurrentTarget());
 			TargetY += 445;
 		}
+	}
+	if (MatchMode)
+	{
+		DrawMatchHUD(MatchMode, ViewScale);
+		return;
 	}
 	const AVampsCombatTestGameMode* TestGameMode = Cast<AVampsCombatTestGameMode>(GetWorld()->GetAuthGameMode());
 	if (!TestGameMode || !IsValid(TestGameMode->OpponentAI))

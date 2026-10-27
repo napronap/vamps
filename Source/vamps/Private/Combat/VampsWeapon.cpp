@@ -220,7 +220,7 @@ void AVampsWeapon::SweepWeaponSegment(const FVector& SweepStart,
 	for (const FHitResult& Hit : Hits)
 	{
 		AVampsCharacter* Target = Cast<AVampsCharacter>(Hit.GetActor());
-		if (!Target || !Target->CombatState.bIsAlive || HitActors.Contains(Target))
+		if (!Fighter->CanHitCombatTarget(Target) || HitActors.Contains(Target))
 		{
 			continue;
 		}

@@ -2,6 +2,40 @@
 #include "Animation/AnimMontage.h"
 #include "Combat/VampsCombatLog.h"
 
+bool UVampsCombatSettings::HasValidDeathMontages() const
+{
+	if (!DeathMontage || !GuardDeathMontage || DeathMontage == GuardDeathMontage)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': requires distinct DeathMontage and GuardDeathMontage; normal='%s', guard='%s'."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(DeathMontage),
+		       *GetPathNameSafe(GuardDeathMontage));
+		return false;
+	}
+	for (const UAnimMontage* DeathAnimation : {DeathMontage.Get(), GuardDeathMontage.Get()})
+	{
+		if (!FMath::IsFinite(DeathAnimation->RateScale) || DeathAnimation->RateScale <= 0.f ||
+		    DeathAnimation->GetPlayLength() <= 0.f || DeathAnimation->bEnableAutoBlendOut ||
+		    DeathAnimation == AttackMontage || DeathAnimation == HitReactionMontage ||
+		    DeathAnimation == GuardReactionMontage || DeathAnimation == ForwardDashMontage ||
+		    DeathAnimation == BackwardDashMontage)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': death montage '%s' requires positive length/rate, Auto Blend Out disabled and an "
+			            "independent animation."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       *GetPathNameSafe(DeathAnimation));
+			return false;
+		}
+	}
+	return true;
+}
+
 bool UVampsCombatSettings::HasValidMobilitySettings() const
 {
 	if (!FMath::IsFinite(MobilityEnergyCapacity) || MobilityEnergyCapacity <= 0.f || !FMath::IsFinite(DashEnergyCost) ||

@@ -135,6 +135,6 @@ bool UVampsLockOnComponent::IsEligible(const AVampsCharacter* Candidate) const
 		return false;
 	}
 #endif
-	return IsValid(Candidate) && Candidate != GetOwner() && Candidate->HasActorBegunPlay() &&
-	       !Candidate->IsActorBeingDestroyed() && Candidate->CombatState.bIsAlive;
+	const AVampsCharacter* OwningFighter = Cast<AVampsCharacter>(GetOwner());
+	return OwningFighter && OwningFighter->CanEngageEnemy(Candidate);
 }

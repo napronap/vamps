@@ -4,6 +4,7 @@
 #include "VampsCombatTestHUD.generated.h"
 
 class AVampsCharacter;
+class AVampsMatchGameMode;
 
 UCLASS()
 class VAMPS_API AVampsCombatTestHUD : public AHUD
@@ -13,6 +14,7 @@ class VAMPS_API AVampsCombatTestHUD : public AHUD
 public:
 
 	virtual void DrawHUD() override;
+	virtual void NotifyHitBoxClick(FName BoxName) override;
 
 #if !UE_BUILD_SHIPPING
 	void ToggleCombatHUD();
@@ -21,6 +23,7 @@ public:
 private:
 
 	bool bShowCombatDebug = false;
+	void DrawMatchHUD(const AVampsMatchGameMode* MatchMode, float ViewScale);
 
 	void DrawCombatHUD(AVampsCharacter* ViewingFighter, float ViewScale);
 	void DrawCombatPanel(

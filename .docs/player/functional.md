@@ -46,6 +46,6 @@ Los obstáculos visibles preparados para ello se desvanecen gradualmente cuando 
 
 ## HUD
 
-El HUD muestra vida, carga de guardia y energía de movilidad por separado, NA, reacción, stun y señal de crítico conforme al resultado de combate. Incluye selección, lista de rivales, enemigos próximos y dirección de amenaza entrante. Un aviso de amenaza se distingue de confirmar contacto o bloqueo. Puntuación y portador presentan el estado de [partida](../game/functional.md).
+El HUD muestra vida, carga de guardia y energía de movilidad por separado, NA, reacción, stun y señal de crítico conforme al resultado de combate. Incluye selección, lista de rivales, enemigos próximos y dirección de amenaza entrante. Un aviso de amenaza se distingue de confirmar contacto o bloqueo. Puntuación, kills/muertes/K/D, countdown de inicio/respawn, tiempo restante y resultado presentan el estado de [partida](../game/functional.md). La espera de respawn permite cámara libre separada del personaje eliminado. El panel final incluye el botón local «Otra partida».
 
 La selección inicial, el reemplazo al perder elegibilidad y el retorno de cámara sin target conservan el comportamiento implementado en 018–019; se conectan con equipos y respawn al incorporar esas etapas.

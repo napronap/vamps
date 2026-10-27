@@ -1,0 +1,12 @@
+   0.675          [  0.048]  +0.000 CreateDirectoriesForProducedItems
+[  0.684]  +0.086 GarbageCollect
+[  0.770] +10.308 <unknown>
+[ 11.079]  +0.000 Deploying targets
+[ 11.080]  +0.000 DisconnectCache
+[ 11.085]  +0.023 SaveCasTable
+[ 11.112]  +0.008 Saving caches
+[ 11.121]  +0.003 TelemetryService.FlushEvents
+[ 11.126]
+
+Result: Succeeded
+Total execution time: 11.13 seconds

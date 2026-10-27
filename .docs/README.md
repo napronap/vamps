@@ -21,15 +21,21 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+Implementación local actual: [051 — Partida 2v2](reports/051-partida-local/reporte.md), con [configuración y comprobaciones del editor](reports/051-partida-local/editor.md). Incluye ciclo 6.1, assets guardados, compilación y ronda observada hasta el resultado. Selección de personaje sigue en 6.2.
+
+Reglas vigentes de partida: [050 — Ciclo local 2v2 y recompensa por racha](reports/050-reglas-partida-local/reporte.md), con [guía de pendientes](reports/050-reglas-partida-local/editor.md). Integra las anotaciones, retira portador y separa 6.1 con Executioner de 6.2 con selección de personaje. Especificación principal: [partida](game/functional.md).
+
+Revisión para la próxima implementación: [049 — Partida por equipos del paso 6](reports/049-revision-paso-6/reporte.md), con [guía de preparación y pendientes](reports/049-revision-paso-6/editor.md). Detalla reglas ya elegidas, decisiones abiertas, conexiones necesarias y diferencias frente al roadmap; no implementa partida ni cierra etapas.
+
 Implementación posterior: [048 — HUD de combate simple y alternancia F9](reports/048-hud-combate-simple/reporte.md), con [guía de compilación y observación](reports/048-hud-combate-simple/editor.md). Usa la vista de combate por defecto y conserva debug; faltan build y comprobación visual en el editor.
 
 Revisión más reciente: [047 — Verificación del avance del plan](reports/047-verificacion-avance-plan/reporte.md), con [comprobaciones pendientes del editor](reports/047-verificacion-avance-plan/editor.md). Contrasta el estado del roadmap con movilidad 039–040 y cámara 042–046; conserva los cierres documentados y señala las descripciones anteriores a esas implementaciones.
 
 [Roadmap hacia la emulación FGOA](roadmap.md): consolidar contacto/cámara → botón compartido y fases → cadena/NA → daño/guardia → movilidad → presentación → equipos → red → calibración → extensiones propias. Incluye estado actual, decisiones previas y criterios de cierre; distingue combate local y base completa.
 
-**Avance:** etapas 0 y 1 cerradas por el usuario en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) y [021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). Etapa 2 completada el 2026-10-18 en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) y etapa 3 cerrada por confirmación del usuario el 2026-10-19 en [035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3). El estado se controla en el roadmap; la siguiente etapa es 4, acercamiento, evasión y sprint.
+**Cierres registrados:** etapas 0 y 1 aprobadas por el usuario en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) y [021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). Etapa 2 completada el 2026-10-18 en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) y etapa 3 cerrada el 2026-10-19 en [035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3). El estado actual y el orden de entregas se controlan en el roadmap.
 
-El paso 4 tiene implementación y configuración en [037 — Movilidad integrada al combate](reports/037-movilidad-combate/reporte.md). Conserva estado pendiente hasta completar autoría y observación de su [guía del editor](reports/037-movilidad-combate/editor.md).
+La movilidad vigente se documenta en [039](reports/039-simplificacion-movilidad/reporte.md) y [040](reports/040-giro-direccional-dash/reporte.md); 037 conserva su configuración anterior. Cámara y HUD continúan en 042–048, con los límites de verificación de sus reportes.
 
 1. Leer el [alcance y exclusiones](game/functional.md#alcance-de-la-base), seguido de combate y jugador.
 2. Consultar la [implementación del paso 3](reports/033-resultados-combate/reporte.md) y su [revisión y cierre 035](reports/035-revision-paso-3/reporte.md); la [revisión 028](reports/028-contraste-fgoa/analisis.md#10-evaluación-concreta-del-código-actual-de-vamps) y el prototipo conservan el punto de partida histórico.

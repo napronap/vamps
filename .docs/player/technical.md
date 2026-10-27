@@ -24,7 +24,7 @@ AVampsCharacter_Player aporta SpringArm de 400 cm y cámara ligada a ControlRota
 
 La selección de oclusores preparados para desvanecer modifica presentación/material local, sin alterar automáticamente colisión de personajes o límites. Su presentación se restaura al dejar de ocultar la vista relevante. El comportamiento de cámara frente a sólidos se define con el mapa; un límite invisible no requiere material de fade.
 
-El HUD actual `AVampsCombatTestHUD` sirve a observación. La presentación de partida necesita las señales de combate, target/amenaza y puntuación descritas en el funcional; no deduce bloqueo a partir de una flecha ni crítico a partir de la animación. `UVampsAnimInstance` recibe el estado resuelto para la pose, sin decidir disponibilidad.
+`AVampsCombatTestHUD` incorpora desde 048 la vista simple de combate y alternancia F9 con debug, con selección, proximidad y amenaza. El paso 6 conectará los datos y flujo de [partida](../game/technical.md#hud-resultado-y-nueva-partida): puntuación, estadísticas, countdown de inicio/respawn, tiempo restante y resultado con nueva partida. La [cámara de espera](../game/technical.md#montages-de-muerte-y-cámara-de-espera) se separará del pawn eliminado. No deduce bloqueo a partir de una flecha ni crítico a partir de la animación. `UVampsAnimInstance` recibe el estado resuelto para la pose, sin decidir disponibilidad.
 
 Las conexiones de input y animación `/Game/Vamps` se documentan en el [prototipo](../prototype/technical.md#blueprints-y-animación). Los assets futuros se crean/configuran mediante MCP directo soportado durante su implementación.
 

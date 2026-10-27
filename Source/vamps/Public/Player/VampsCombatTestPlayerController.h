@@ -25,6 +25,5 @@ private:
 
 #if !UE_BUILD_SHIPPING
 	void ToggleLockOnDebug(FKey Key, FInputActionValue Value);
-	void ToggleCombatHUD(FKey Key, FInputActionValue Value);
 #endif
 };

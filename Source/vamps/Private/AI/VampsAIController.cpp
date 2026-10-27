@@ -1,10 +1,12 @@
 #include "AI/VampsAIController.h"
 #include "Animation/AnimMontage.h"
 #include "Characters/VampsCharacter.h"
+#include "Characters/VampsLockOnComponent.h"
 #include "Combat/Data/VampsCombatSettings.h"
 #include "Combat/VampsCombatLog.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameModes/VampsMatchGameMode.h"
 
 void AVampsAIController::OnPossess(APawn* InPawn)
 {
@@ -103,6 +105,35 @@ void AVampsAIController::StopActions()
 void AVampsAIController::Decide()
 {
 	MoveDirection = FVector::ZeroVector;
+	if (const AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(GetPawn());
+		if (!ControlledFighter || !ControlledFighter->LockOn)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': match AI requires VampsCharacter with LockOn."),
+			       __FUNCTION__,
+			       *GetPathName());
+			GetWorldTimerManager().ClearTimer(DecisionTimer);
+			return;
+		}
+		if (!MatchMode->AllowsCombat(ControlledFighter))
+		{
+			return;
+		}
+		if (!ControlledFighter->LockOn->GetCurrentTarget())
+		{
+			ControlledFighter->LockOn->CycleTarget();
+		}
+		AVampsCharacter* EnemyFighter = ControlledFighter->LockOn->GetCurrentTarget();
+		if (!EnemyFighter)
+		{
+			ClearFocus(EAIFocusPriority::Gameplay);
+			return;
+		}
+		SetFocus(EnemyFighter);
+	}
 	AActor* FocusActor = GetFocusActor();
 	if (!IsValid(FocusActor))
 	{

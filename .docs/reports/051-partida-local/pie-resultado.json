@@ -1,0 +1,577 @@
+{
+  "running": true,
+  "modes": [
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsMatchGameMode_C_0"
+      },
+      "values": {
+        "roundPhase": "Finished",
+        "phaseEndsAt": 174.62691224738955,
+        "participants": [
+          {
+            "fighter": {
+              "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0"
+            },
+            "teamIndex": 0,
+            "kills": 3,
+            "deaths": 4,
+            "killStreak": 0,
+            "respawnAt": 0,
+            "protectionEndsAt": 0
+          },
+          {
+            "fighter": {
+              "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0"
+            },
+            "teamIndex": 0,
+            "kills": 5,
+            "deaths": 5,
+            "killStreak": 0,
+            "respawnAt": 0,
+            "protectionEndsAt": 0
+          },
+          {
+            "fighter": {
+              "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1"
+            },
+            "teamIndex": 1,
+            "kills": 5,
+            "deaths": 5,
+            "killStreak": 1,
+            "respawnAt": 0,
+            "protectionEndsAt": 0
+          },
+          {
+            "fighter": {
+              "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2"
+            },
+            "teamIndex": 1,
+            "kills": 4,
+            "deaths": 3,
+            "killStreak": 1,
+            "respawnAt": 0,
+            "protectionEndsAt": 0
+          }
+        ],
+        "teamScores": [
+          975,
+          1100
+        ],
+        "winningTeamIndex": 1
+      }
+    }
+  ],
+  "fighters": [
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0"
+      },
+      "values": {
+        "combatState": {
+          "phase": "Idle",
+          "bIsAlive": false,
+          "bCanRequestCombat": false,
+          "bCanStartAction": false,
+          "bCanDealDamage": false,
+          "bCanDefend": false,
+          "bIsRecovering": false,
+          "comboStep": 0,
+          "bComboWindowOpen": false,
+          "bContinuationRequested": false,
+          "bRecoveryVisualReleased": false,
+          "bOffenseRestricted": false,
+          "reactionEndsAt": 0,
+          "reaction": "None",
+          "bCanMove": false,
+          "bCanDash": false,
+          "bIsDashing": false,
+          "bIsSprinting": false,
+          "bDashRequested": false,
+          "bDefenseRequestArmed": false,
+          "defenseRequestEndsAt": 174.61019584909081,
+          "defendedAttacker": "None",
+          "defendedActionNumber": -1,
+          "reactionSource": "None",
+          "bLastIncomingCritical": false,
+          "lastDamageReceived": 12,
+          "nARecoveryEndsAt": 0,
+          "montageInstanceId": -1,
+          "lastRequest": "DefenseRearmed",
+          "lastOutgoingContact": "OpenHit",
+          "lastIncomingContact": "OpenHit",
+          "requestCount": 142,
+          "actionNumber": 22,
+          "bActionConnected": true,
+          "lastOutgoingContactFrame": 17204,
+          "lastIncomingContactFrame": 17998
+        },
+        "startingMaxHealth": 100,
+        "attackDamage": 12,
+        "combatSettings": {
+          "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+        },
+        "attributes": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0.Attributes"
+        },
+        "mesh": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0.CharacterMesh0"
+        },
+        "rootComponent": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0.CollisionCylinder"
+        },
+        "lockOn": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0.LockOn"
+        },
+        "characterMovement": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0.CharMoveComp"
+        },
+        "rootComponentValues": {
+          "relativeLocation": {
+            "x": 1089.62073251642,
+            "y": 153.14487449121043,
+            "z": 90.14999961853027
+          },
+          "relativeRotation": {
+            "pitch": 0,
+            "yaw": 112.6502151489258,
+            "roll": 0
+          }
+        },
+        "attributesValues": {
+          "health": {
+            "baseValue": 0,
+            "currentValue": 0
+          },
+          "maxHealth": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "guardLoad": {
+            "baseValue": 44.83181381225586,
+            "currentValue": 44.83181381225586
+          },
+          "maxGuardLoad": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "mobilityEnergy": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "maxMobilityEnergy": {
+            "baseValue": 100,
+            "currentValue": 100
+          }
+        },
+        "meshValues": {
+          "bPauseAnims": true
+        },
+        "characterMovementValues": {
+          "movementMode": "MOVE_None",
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "lockOnValues": {
+          "currentTarget": "None"
+        }
+      }
+    },
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0"
+      },
+      "values": {
+        "combatState": {
+          "phase": "Idle",
+          "bIsAlive": true,
+          "bCanRequestCombat": false,
+          "bCanStartAction": false,
+          "bCanDealDamage": false,
+          "bCanDefend": false,
+          "bIsRecovering": false,
+          "comboStep": 0,
+          "bComboWindowOpen": false,
+          "bContinuationRequested": false,
+          "bRecoveryVisualReleased": false,
+          "bOffenseRestricted": false,
+          "reactionEndsAt": 0,
+          "reaction": "None",
+          "bCanMove": false,
+          "bCanDash": false,
+          "bIsDashing": false,
+          "bIsSprinting": false,
+          "bDashRequested": false,
+          "bDefenseRequestArmed": false,
+          "defenseRequestEndsAt": 0,
+          "defendedAttacker": "None",
+          "defendedActionNumber": -1,
+          "reactionSource": {
+            "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1"
+          },
+          "bLastIncomingCritical": false,
+          "lastDamageReceived": 12,
+          "nARecoveryEndsAt": 0,
+          "montageInstanceId": -1,
+          "lastRequest": "ActionStarted",
+          "lastOutgoingContact": "None",
+          "lastIncomingContact": "OpenHit",
+          "requestCount": 1,
+          "actionNumber": 1,
+          "bActionConnected": false,
+          "lastOutgoingContactFrame": 0,
+          "lastIncomingContactFrame": 17997
+        },
+        "startingMaxHealth": 100,
+        "attackDamage": 12,
+        "combatSettings": {
+          "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+        },
+        "attributes": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0.Attributes"
+        },
+        "mesh": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0.CharacterMesh0"
+        },
+        "rootComponent": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0.CollisionCylinder"
+        },
+        "lockOn": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0.LockOn"
+        },
+        "characterMovement": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0.CharMoveComp"
+        },
+        "rootComponentValues": {
+          "relativeLocation": {
+            "x": 1181.589395286906,
+            "y": 86.11246354888976,
+            "z": 90.14999961853027
+          },
+          "relativeRotation": {
+            "pitch": 0,
+            "yaw": 17.646912016808965,
+            "roll": 0
+          }
+        },
+        "attributesValues": {
+          "health": {
+            "baseValue": 50,
+            "currentValue": 50
+          },
+          "maxHealth": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "guardLoad": {
+            "baseValue": 19.664735794067383,
+            "currentValue": 19.664735794067383
+          },
+          "maxGuardLoad": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "mobilityEnergy": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "maxMobilityEnergy": {
+            "baseValue": 100,
+            "currentValue": 100
+          }
+        },
+        "meshValues": {
+          "bPauseAnims": true
+        },
+        "characterMovementValues": {
+          "movementMode": "MOVE_None",
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "lockOnValues": {
+          "currentTarget": "None"
+        }
+      }
+    },
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1"
+      },
+      "values": {
+        "combatState": {
+          "phase": "Idle",
+          "bIsAlive": true,
+          "bCanRequestCombat": false,
+          "bCanStartAction": false,
+          "bCanDealDamage": false,
+          "bCanDefend": false,
+          "bIsRecovering": false,
+          "comboStep": 0,
+          "bComboWindowOpen": false,
+          "bContinuationRequested": false,
+          "bRecoveryVisualReleased": false,
+          "bOffenseRestricted": false,
+          "reactionEndsAt": 0,
+          "reaction": "None",
+          "bCanMove": false,
+          "bCanDash": false,
+          "bIsDashing": false,
+          "bIsSprinting": false,
+          "bDashRequested": false,
+          "bDefenseRequestArmed": false,
+          "defenseRequestEndsAt": 174.4185092486441,
+          "defendedAttacker": "None",
+          "defendedActionNumber": -1,
+          "reactionSource": "None",
+          "bLastIncomingCritical": false,
+          "lastDamageReceived": 0,
+          "nARecoveryEndsAt": 0,
+          "montageInstanceId": -1,
+          "lastRequest": "ComboAdvanced",
+          "lastOutgoingContact": "OpenHit",
+          "lastIncomingContact": "None",
+          "requestCount": 2,
+          "actionNumber": 2,
+          "bActionConnected": true,
+          "lastOutgoingContactFrame": 17998,
+          "lastIncomingContactFrame": 0
+        },
+        "startingMaxHealth": 100,
+        "attackDamage": 12,
+        "combatSettings": {
+          "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+        },
+        "attributes": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1.Attributes"
+        },
+        "mesh": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1.CharacterMesh0"
+        },
+        "rootComponent": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1.CollisionCylinder"
+        },
+        "lockOn": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1.LockOn"
+        },
+        "characterMovement": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1.CharMoveComp"
+        },
+        "rootComponentValues": {
+          "relativeLocation": {
+            "x": 978.552644740309,
+            "y": 90.5386082125456,
+            "z": 90.14999961853027
+          },
+          "relativeRotation": {
+            "pitch": 0,
+            "yaw": -1.4889870126920075,
+            "roll": 0
+          }
+        },
+        "attributesValues": {
+          "health": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "maxHealth": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "guardLoad": {
+            "baseValue": 0,
+            "currentValue": 0
+          },
+          "maxGuardLoad": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "mobilityEnergy": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "maxMobilityEnergy": {
+            "baseValue": 100,
+            "currentValue": 100
+          }
+        },
+        "meshValues": {
+          "bPauseAnims": true
+        },
+        "characterMovementValues": {
+          "movementMode": "MOVE_None",
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "lockOnValues": {
+          "currentTarget": "None"
+        }
+      }
+    },
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2"
+      },
+      "values": {
+        "combatState": {
+          "phase": "Idle",
+          "bIsAlive": true,
+          "bCanRequestCombat": false,
+          "bCanStartAction": false,
+          "bCanDealDamage": false,
+          "bCanDefend": false,
+          "bIsRecovering": false,
+          "comboStep": 0,
+          "bComboWindowOpen": false,
+          "bContinuationRequested": false,
+          "bRecoveryVisualReleased": false,
+          "bOffenseRestricted": false,
+          "reactionEndsAt": 0,
+          "reaction": "None",
+          "bCanMove": false,
+          "bCanDash": false,
+          "bIsDashing": false,
+          "bIsSprinting": false,
+          "bDashRequested": false,
+          "bDefenseRequestArmed": false,
+          "defenseRequestEndsAt": 173.11848844587803,
+          "defendedAttacker": "None",
+          "defendedActionNumber": -1,
+          "reactionSource": "None",
+          "bLastIncomingCritical": false,
+          "lastDamageReceived": 12,
+          "nARecoveryEndsAt": 0,
+          "montageInstanceId": -1,
+          "lastRequest": "ComboAdvanced",
+          "lastOutgoingContact": "OpenHit",
+          "lastIncomingContact": "OpenHit",
+          "requestCount": 10,
+          "actionNumber": 10,
+          "bActionConnected": true,
+          "lastOutgoingContactFrame": 17853,
+          "lastIncomingContactFrame": 17204
+        },
+        "startingMaxHealth": 100,
+        "attackDamage": 12,
+        "combatSettings": {
+          "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+        },
+        "attributes": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2.Attributes"
+        },
+        "mesh": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2.CharacterMesh0"
+        },
+        "rootComponent": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2.CollisionCylinder"
+        },
+        "lockOn": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2.LockOn"
+        },
+        "characterMovement": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2.CharMoveComp"
+        },
+        "rootComponentValues": {
+          "relativeLocation": {
+            "x": 1400.3763820492914,
+            "y": 82.10562915220345,
+            "z": 90.14999961853027
+          },
+          "relativeRotation": {
+            "pitch": 0,
+            "yaw": 178.94161722665953,
+            "roll": 0
+          }
+        },
+        "attributesValues": {
+          "health": {
+            "baseValue": 12,
+            "currentValue": 12
+          },
+          "maxHealth": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "guardLoad": {
+            "baseValue": 0,
+            "currentValue": 0
+          },
+          "maxGuardLoad": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "mobilityEnergy": {
+            "baseValue": 100,
+            "currentValue": 100
+          },
+          "maxMobilityEnergy": {
+            "baseValue": 100,
+            "currentValue": 100
+          }
+        },
+        "meshValues": {
+          "bPauseAnims": true
+        },
+        "characterMovementValues": {
+          "movementMode": "MOVE_None",
+          "velocity": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          }
+        },
+        "lockOnValues": {
+          "currentTarget": "None"
+        }
+      }
+    }
+  ],
+  "controllers": [
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsMatchPlayerController_C_0"
+      },
+      "values": {
+        "bShowMouseCursor": true,
+        "bEnableClickEvents": true,
+        "playerCameraManager": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsPlayerCameraManager_C_0"
+        }
+      }
+    }
+  ],
+  "ai": [
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.VampsAIController_0"
+      },
+      "values": {
+        "mode": "Attack"
+      }
+    },
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.VampsAIController_1"
+      },
+      "values": {
+        "mode": "Attack"
+      }
+    },
+    {
+      "actor": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.VampsAIController_2"
+      },
+      "values": {
+        "mode": "Attack"
+      }
+    }
+  ]
+}

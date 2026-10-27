@@ -5,6 +5,7 @@
 #include "Combat/VampsCombatLog.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
 #include "Engine/World.h"
+#include "GameModes/VampsMatchGameMode.h"
 
 void UVampsCombatResolver::Initialize(FSubsystemCollectionBase& Collection)
 {
@@ -41,6 +42,10 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker, AVampsC
 		       *GetPathNameSafe(Attacker),
 		       *GetPathNameSafe(Recipient),
 		       *GetPathNameSafe(GetWorld()));
+		return;
+	}
+	if (!Attacker->CanHitCombatTarget(Recipient))
+	{
 		return;
 	}
 	if (!Attacker->CombatSettings ||
@@ -179,10 +184,10 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 	    [](const FVampsPendingContact& Contact)
 	    {
 		    return !Contact.Attacker.IsValid() || !Contact.Recipient.IsValid() ||
-		           Contact.Attacker->IsActorBeingDestroyed() || Contact.Recipient->IsActorBeingDestroyed() ||
-		           !Contact.Attacker->CombatState.bIsAlive || !Contact.Recipient->CombatState.bIsAlive ||
-		           Contact.Attacker->CombatGeneration != Contact.AttackerGeneration ||
-		           Contact.Recipient->CombatGeneration != Contact.RecipientGeneration;
+			       Contact.Attacker->IsActorBeingDestroyed() || Contact.Recipient->IsActorBeingDestroyed() ||
+			       !Contact.Attacker->CombatState.bIsAlive || !Contact.Recipient->CombatState.bIsAlive ||
+			       Contact.Attacker->CombatGeneration != Contact.AttackerGeneration ||
+			       Contact.Recipient->CombatGeneration != Contact.RecipientGeneration;
 	    });
 	const auto ContactRank = [](const FVampsPendingContact& Contact)
 	{
@@ -208,7 +213,7 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 		    const int32 LeftRank = ContactRank(Left);
 		    const int32 RightRank = ContactRank(Right);
 		    return LeftRank != RightRank ? LeftRank < RightRank
-		                                 : Left.Attacker->GetPathName() < Right.Attacker->GetPathName();
+			                             : Left.Attacker->GetPathName() < Right.Attacker->GetPathName();
 	    });
 
 	for (int32 GroupStart = 0; GroupStart < Contacts.Num();)
@@ -330,5 +335,9 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 		{
 			Fighter->ResolveCombatLocomotion();
 		}
+	}
+	if (AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		MatchMode->CompleteCombatFrame();
 	}
 }

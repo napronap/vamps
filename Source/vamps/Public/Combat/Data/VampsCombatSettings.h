@@ -61,6 +61,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Reaction")
 	TObjectPtr<UAnimMontage> GuardReactionMontage;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death")
+	TObjectPtr<UAnimMontage> DeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death")
+	TObjectPtr<UAnimMontage> GuardDeathMontage;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage", meta = (ClampMin = "0"))
 	float CriticalDamage = 24.f;
 
@@ -123,4 +129,5 @@ public:
 
 	bool HasValidReactionSettings() const;
 	bool HasValidMobilitySettings() const;
+	bool HasValidDeathMontages() const;
 };

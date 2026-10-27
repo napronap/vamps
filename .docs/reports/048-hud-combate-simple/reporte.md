@@ -1,5 +1,7 @@
 # 048 — HUD de combate simple y alternancia de debug
 
+Continuación de planificación: [049 — Revisión del paso 6](../049-revision-paso-6/reporte.md), con [guía de pendientes](../049-revision-paso-6/editor.md). El HUD de esta iteración es la base de presentación; 049 no cambia su código.
+
 ## Resultado
 
 Agrega una vista de combate con barras y texto sobre el HUD nativo existente. Es la vista inicial; F9 alterna con el debug en builds de desarrollo. El cambio de vista solo afecta el dibujo, sin reiniciar combate, modificar selección ni pausar la IA.

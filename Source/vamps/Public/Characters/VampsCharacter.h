@@ -50,6 +50,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0"))
 	float AttackDamage = 12.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "1"))
+	float StartingMaxHealth = 100.f;
+
+	bool CanEngageEnemy(const AVampsCharacter* OtherFighter) const;
+	bool CanHitCombatTarget(const AVampsCharacter* OtherFighter) const;
+	void PresentCombatDeath(bool bBlockedDeath);
+	void StopMatchCombat();
+
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestCombatAction();
 
