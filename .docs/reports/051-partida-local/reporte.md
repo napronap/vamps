@@ -1,5 +1,9 @@
 # 051 — Implementación de la partida local 2v2
 
+Cierre posterior: [053 — Comprobación del usuario y documentación vigente](../053-cierre-local-y-documentacion/reporte.md). El usuario confirmó el funcionamiento el 2026-10-27; los pendientes de observación de esta implementación quedan cerrados con esa atribución.
+
+Revisión posterior del repositorio: [052 — Estado tras la partida local](../052-estado-repo-tras-partida/reporte.md), con [continuación en el editor](../052-estado-repo-tras-partida/editor.md). Conserva la evidencia de esta implementación y distingue sus pendientes de los desfases de documentación.
+
 ## Resultado
 
 Implementado 6.1: jugador y bot en A contra dos bots en B, todos Executioner; preparación, puntuación por racha, muerte, respawn, protección, cámara libre, resultado y botón de revancha. Selección de personaje queda en 6.2. Continúa [050](../050-reglas-partida-local/reporte.md); operaciones reproducibles en la [guía](editor.md).
@@ -56,8 +60,8 @@ MCP respondió en la URL configurada del proyecto. Se descubrieron herramientas 
 - Corrección final de retirada de pose de muerte al restaurar: Live Coding Success con parche real; [salida](live-coding-2.json). No se repitió una ronda completa después, atendiendo el pedido de terminar rápido.
 - Formateador aplicado y revisión de espacios. Sin tests automatizados ni inyección de inputs.
 
-## Pendientes y límites
+## Comprobación final y límites
 
-Comprobaciones manuales breves de F9, movimiento de cámara libre, muerte defensiva, fin de protección al atacar y click en PLAY AGAIN en la [guía](editor.md#comprobaciones-manuales-restantes). Cierre simultáneo y por tiempo revisados en código, sin provocar esos escenarios artificialmente ni declararlos observados.
+El usuario confirmó el funcionamiento tras la revisión 052 y cerró las comprobaciones de F9, cámara libre, muerte/respawn, protección y PLAY AGAIN; [registro 053](../053-cierre-local-y-documentacion/reporte.md). La [guía](editor.md#comprobación-manual-final) conserva los pasos reproducibles. Cierre simultáneo y por tiempo conservan su revisión de código y la aprobación general, sin nuevas trazas individuales de esos escenarios.
 
 El usuario indicó que parecía funcionar bien y pidió terminar rápido. PIE quedó detenido, con L_LocalMatch abierto y parche final aplicado. 6.2 y red mantienen su alcance posterior.

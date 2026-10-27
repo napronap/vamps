@@ -1,5 +1,7 @@
 # 048 — HUD de combate simple y alternancia de debug
 
+Cierre posterior en [053](../053-cierre-local-y-documentacion/reporte.md): compilación acreditada en 051 y funcionamiento confirmado por el usuario el 2026-10-27. Los pendientes descritos aquí conservan el estado histórico de esta implementación.
+
 Continuación de planificación: [049 — Revisión del paso 6](../049-revision-paso-6/reporte.md), con [guía de pendientes](../049-revision-paso-6/editor.md). El HUD de esta iteración es la base de presentación; 049 no cambia su código.
 
 ## Resultado

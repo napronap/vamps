@@ -21,21 +21,31 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
-Implementación local actual: [051 — Partida 2v2](reports/051-partida-local/reporte.md), con [configuración y comprobaciones del editor](reports/051-partida-local/editor.md). Incluye ciclo 6.1, assets guardados, compilación y ronda observada hasta el resultado. Selección de personaje sigue en 6.2.
+Diseño del siguiente paso: [056 — Servidor dedicado y alojamiento](reports/056-analisis-servidor-dedicado/reporte.md), con [guía de preparación](reports/056-analisis-servidor-dedicado/editor.md). Demo privada en Japón, equipos/bots, ready e inicio por creador; reconexión con IA temporal, traspaso de organizador y 30 s de revancha acordados. Prioriza una VM sencilla de proveedor global para hasta tres partidas; revisa regiones, costes y propuestas de compensación aún por acordar. No implementa red ni despliega servicios.
 
-Reglas vigentes de partida: [050 — Ciclo local 2v2 y recompensa por racha](reports/050-reglas-partida-local/reporte.md), con [guía de pendientes](reports/050-reglas-partida-local/editor.md). Integra las anotaciones, retira portador y separa 6.1 con Executioner de 6.2 con selección de personaje. Especificación principal: [partida](game/functional.md).
+Cierre vigente: [055 — Selector Executioner y START](reports/055-selector-executioner/reporte.md), con [compilación y comprobación final](reports/055-selector-executioner/editor.md). **6.2 completado:** el usuario confirmó compilación y funcionamiento el 2026-10-27. Etapas 0–6 cerradas; **sigue 7, multijugador y autoridad de red**, después calibración en 8 y extensiones en 9. El segundo personaje y su DA no bloquean ese avance.
 
-Revisión para la próxima implementación: [049 — Partida por equipos del paso 6](reports/049-revision-paso-6/reporte.md), con [guía de preparación y pendientes](reports/049-revision-paso-6/editor.md). Detalla reglas ya elegidas, decisiones abiertas, conexiones necesarias y diferencias frente al roadmap; no implementa partida ni cierra etapas.
+Diseño de la entrega: [054 — Selección de personaje, paso 6.2](reports/054-revision-seleccion-personaje/reporte.md), con [preparación del editor](reports/054-revision-seleccion-personaje/editor.md). Acordado: solo Executioner, selección propia + START sin confirmación adicional, bots del catálogo con repetidos y revancha al selector conservando preselección. Implementación en 055; el segundo personaje y su DA quedan para después.
 
-Implementación posterior: [048 — HUD de combate simple y alternancia F9](reports/048-hud-combate-simple/reporte.md), con [guía de compilación y observación](reports/048-hud-combate-simple/editor.md). Usa la vista de combate por defecto y conserva debug; faltan build y comprobación visual en el editor.
+Cierre local anterior: [053 — Movilidad, presentación y ciclo 6.1](reports/053-cierre-local-y-documentacion/reporte.md), con [guía y comprobación final](reports/053-cierre-local-y-documentacion/editor.md). El selector posterior y su cierre están en 055; la próxima entrega es 7.
 
-Revisión más reciente: [047 — Verificación del avance del plan](reports/047-verificacion-avance-plan/reporte.md), con [comprobaciones pendientes del editor](reports/047-verificacion-avance-plan/editor.md). Contrasta el estado del roadmap con movilidad 039–040 y cámara 042–046; conserva los cierres documentados y señala las descripciones anteriores a esas implementaciones.
+Revisión previa del checkout: [052 — Estado tras la partida local](reports/052-estado-repo-tras-partida/reporte.md), con [guía histórica](reports/052-estado-repo-tras-partida/editor.md). Sus pendientes y desfases documentales quedan resueltos en 053.
+
+Implementación local actual: [051 — Partida 2v2](reports/051-partida-local/reporte.md), con [configuración y comprobaciones del editor](reports/051-partida-local/editor.md). Incluye assets guardados, compilación y ronda observada hasta el resultado; comprobación final del usuario registrada en 053.
+
+Decisiones de partida: [050 — Ciclo local 2v2 y recompensa por racha](reports/050-reglas-partida-local/reporte.md), con [guía de planificación](reports/050-reglas-partida-local/editor.md). Retira portador y separa 6.1 con Executioner de 6.2 con selección. Especificación vigente: [partida](game/functional.md).
+
+Planificación anterior: [049 — Partida por equipos del paso 6](reports/049-revision-paso-6/reporte.md), con [guía histórica](reports/049-revision-paso-6/editor.md). La implementación posterior está en 051 y su cierre en 053.
+
+HUD vigente: [048 — HUD de combate simple y alternancia F9](reports/048-hud-combate-simple/reporte.md), con [guía reproducible](reports/048-hud-combate-simple/editor.md). Compilado en 051 y funcionamiento confirmado por el usuario en 053; F9 ahora se enlaza desde el controller común.
+
+Revisión histórica: [047 — Verificación del avance del plan](reports/047-verificacion-avance-plan/reporte.md), con [guía del editor](reports/047-verificacion-avance-plan/editor.md). Conserva el estado anterior a HUD y partida; el cierre vigente está en 053.
 
 [Roadmap hacia la emulación FGOA](roadmap.md): consolidar contacto/cámara → botón compartido y fases → cadena/NA → daño/guardia → movilidad → presentación → equipos → red → calibración → extensiones propias. Incluye estado actual, decisiones previas y criterios de cierre; distingue combate local y base completa.
 
-**Cierres registrados:** etapas 0 y 1 aprobadas por el usuario en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) y [021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1). Etapa 2 completada el 2026-10-18 en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) y etapa 3 cerrada el 2026-10-19 en [035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3). El estado actual y el orden de entregas se controlan en el roadmap.
+**Cierres registrados:** 0 y 1 en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0) y [021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1); 2 en [031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md), 3 en [035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3), 4/5/6.1 en [053](reports/053-cierre-local-y-documentacion/reporte.md) y 6.2 en [055](reports/055-selector-executioner/reporte.md). El estado y orden de entregas se controlan en el roadmap.
 
-La movilidad vigente se documenta en [039](reports/039-simplificacion-movilidad/reporte.md) y [040](reports/040-giro-direccional-dash/reporte.md); 037 conserva su configuración anterior. Cámara y HUD continúan en 042–048, con los límites de verificación de sus reportes.
+La movilidad vigente está en [039](reports/039-simplificacion-movilidad/reporte.md) y [040](reports/040-giro-direccional-dash/reporte.md); 037 conserva su configuración anterior. Cámara y HUD están en 042–048. Sus comprobaciones de implementación se complementan con la confirmación final del usuario en 053.
 
 1. Leer el [alcance y exclusiones](game/functional.md#alcance-de-la-base), seguido de combate y jugador.
 2. Consultar la [implementación del paso 3](reports/033-resultados-combate/reporte.md) y su [revisión y cierre 035](reports/035-revision-paso-3/reporte.md); la [revisión 028](reports/028-contraste-fgoa/analisis.md#10-evaluación-concreta-del-código-actual-de-vamps) y el prototipo conservan el punto de partida histórico.
@@ -56,27 +66,29 @@ La movilidad vigente se documenta en [039](reports/039-simplificacion-movilidad/
 
 ## Reportes de trabajo
 
-Giro libre vigente: [046 — Orientación progresiva sin lock-on](reports/046-giro-libre-camara/reporte.md). Mantener desplazamiento permite orientar la vista más allá del desvío corto, conservando el acompañamiento suave. Parche aplicado y arranque comprobado; [observación pendiente](reports/046-giro-libre-camara/editor.md).
+Mantenimiento de Git: [057 — Caché local fuera del seguimiento](reports/057-cache-fuera-de-git/reporte.md), con [operaciones y revisión del commit](reports/057-cache-fuera-de-git/editor.md). Ignora `/.cache/` y retira sus índices del repositorio conservando los archivos locales.
 
-Estado comprobado de cámara: [045 — Revisión de código, assets y arranque](reports/045-estado-camara/reporte.md). Incluye 042–044 y registros de F7 en la versión compilada; resta observación visual integrada y calibración. [Guía vigente](reports/045-estado-camara/editor.md).
+Giro libre vigente: [046 — Orientación progresiva sin lock-on](reports/046-giro-libre-camara/reporte.md). Mantener desplazamiento permite orientar la vista conservando el acompañamiento suave. [Guía reproducible](reports/046-giro-libre-camara/editor.md); cierre de presentación en 053.
+
+Revisión de cámara: [045 — Código, assets y arranque](reports/045-estado-camara/reporte.md). Incluye 042–044 y registros de F7. [Guía reproducible](reports/045-estado-camara/editor.md); observación integrada cerrada en 053 y calibración integral reservada a 8.
 
 Seguimiento libre vigente: [044 — Acompañamiento suave y F7](reports/044-seguimiento-libre-f7/reporte.md). Anticipación amortiguada de desplazamiento sin seguir el yaw corporal; F7 alterna el lock-on de prueba. [Guía y observación](reports/044-seguimiento-libre-f7/editor.md).
 
 Corrección anterior de cámara sin target: [043 — Referencia virtual y modo de observación](reports/043-camara-sin-target/reporte.md). El rumbo fijo y el comando de consola quedan sustituidos por 044. [Guía histórica](reports/043-camara-sin-target/editor.md).
 
-Implementación de cámara: [042 — Seguimiento, combate y oclusión](reports/042-camara-combate/reporte.md). Dos encuadres globales, historial Eye/Interest, entrada por ataque/bloqueo y salida por cierre de cadena, materiales por componente y obstáculos preparados. Parche aplicado y arranque PIE comprobados; [guía y observación jugable pendiente](reports/042-camara-combate/editor.md). HUD reservado para otro prompt.
+Implementación de cámara: [042 — Seguimiento, combate y oclusión](reports/042-camara-combate/reporte.md). Dos encuadres, Eye/Interest, entrada por ataque/bloqueo, salida por cierre de cadena y obstáculos preparados. [Guía reproducible](reports/042-camara-combate/editor.md); evolución en 043–046, HUD en 048 y cierre en 053.
 
 Revisión del paso 5: [041 — Cámara, oclusión y alcance posterior de HUD](reports/041-revision-paso-5/reporte.md). Incorpora las anotaciones: dos encuadres globales, ataque/bloqueo y salida por cierre de cadena, oclusión de ambos sujetos y HUD diferido. [Prompt de implementación de cámara](reports/041-revision-paso-5/prompt.md) y [lecturas/futura verificación](reports/041-revision-paso-5/editor.md). Solo análisis y preparación; sin implementación nueva.
 
-Control direccional vigente: [040 — Giro instantáneo solo al iniciar dash](reports/040-giro-direccional-dash/reporte.md). Captura WASD al pulsar Shift, conserva el giro gradual de locomoción y reutiliza los dos montages de 039. [Guía y comprobación visual pendiente](reports/040-giro-direccional-dash/editor.md).
+Control direccional vigente: [040 — Giro instantáneo solo al iniciar dash](reports/040-giro-direccional-dash/reporte.md). Captura WASD al pulsar Shift, conserva el giro gradual de locomoción y usa dos montages. [Guía reproducible](reports/040-giro-direccional-dash/editor.md); cierre de movilidad en 053.
 
-Implementación vigente de movilidad: [039 — Simplificación con GA_Dash y root motion](reports/039-simplificacion-movilidad/reporte.md). Dos montages, approach solo inicial y restricciones existentes; retira índices finales y desplazamiento programado del dash de 037. DA preservado y compilación/arranque comprobados. [Guía y observación pendiente](reports/039-simplificacion-movilidad/editor.md).
+Implementación vigente de movilidad: [039 — Simplificación con GA_Dash y root motion](reports/039-simplificacion-movilidad/reporte.md). Dos montages, approach inicial y restricciones de reacción; retira índices finales y desplazamiento programado del dash de 037. DA preservado y compilación/arranque comprobados. [Guía reproducible](reports/039-simplificacion-movilidad/editor.md); cierre en 053.
 
-Revisión actual: [038 — Estado del paso 4](reports/038-estado-paso-4/reporte.md), con lectura MCP del DA y los ocho montages recibidos. Implementación presente; quedan impacto final y observación jugable. [Guía de cierre](reports/038-estado-paso-4/editor.md). La implementación y evidencia previa se conservan en 037.
+Revisión histórica: [038 — Estado del paso 4](reports/038-estado-paso-4/reporte.md), con lectura MCP del DA y los ocho montages de aquella configuración. La simplificación 039 retiró impacto final y seis montages; el cierre vigente está en 053. [Guía histórica](reports/038-estado-paso-4/editor.md).
 
 Implementación anterior de movilidad: [037 — Acercamiento, dash y sprint](reports/037-movilidad-combate/reporte.md). Su configuración de ocho direcciones e impacto final queda sustituida por 039; conserva las capturas de preservación del DA y su [guía histórica](reports/037-movilidad-combate/editor.md).
 
-Revisión de la siguiente etapa: [036 — Paso 4: acercamiento, evasión y sprint](reports/036-revision-paso-4/reporte.md). Contrasta código/assets con 028 e incorpora recursos separados, dash tras impacto final de Guard, dash en NA, blending, prioridad de continuación y retroceso relativo al target. Solo análisis y preparación del prompt; etapa 4 pendiente. [Lecturas y guía del editor](reports/036-revision-paso-4/editor.md).
+Planificación histórica: [036 — Paso 4: acercamiento, evasión y sprint](reports/036-revision-paso-4/reporte.md), con [lecturas y guía](reports/036-revision-paso-4/editor.md). Su propuesta precede a la simplificación de 039–040; el estado actual es el cierre de movilidad en 053.
 
 Revisión y cierre vigente: [035 — Revisión del paso 3](reports/035-revision-paso-3/reporte.md). Montages Guard/Hit asignados y guardados, reacción de 1 s y 154 contactos previos con daños esperados verificados por MCP. Cierre aprobado por el usuario el 2026-10-19; [guía reproducible y conservación en Git](reports/035-revision-paso-3/editor.md).
 

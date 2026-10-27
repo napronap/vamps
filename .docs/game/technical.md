@@ -6,49 +6,59 @@ Se usa Unreal Engine 5.8 y GAS. Reglas: [juego y partida](functional.md). Depend
 
 Las clases y Blueprints propios heredan de clases nativas de Unreal. No se copia ni hereda lógica del ejemplo Third Person ni de sus variantes; solo se reutilizan sus recursos visuales. Los archivos propios se organizan por responsabilidad en `Source/vamps/Public/` y `Source/vamps/Private/`.
 
-`AVampsCharacter` aloja GAS y combate; `AVampsCharacter_Player` añade cámara; `AVampsPlayerController` interpreta entrada. `AVampsAIController` solicita acciones compartidas. `AVampsCombatTestGameMode`, su controller y HUD forman la escena local de observación, no la partida por equipos. Sus [relaciones y assets actuales](../prototype/technical.md) son el punto de partida.
+`AVampsCharacter` aloja GAS y combate; `AVampsCharacter_Player` añade componentes de cámara; `AVampsPlayerController` interpreta entrada y `AVampsAIController` solicita las mismas acciones. `AVampsMatchGameMode` administra la partida local. `AVampsCombatTestGameMode` y su controller conservan el escenario de observación con R/F6/F7. Ambos modos usan `AVampsCombatTestHUD`; F9 pertenece al controller común.
 
 ## Estado de partida y participantes
 
-La implementación del paso 6 incorporará una autoridad de partida propia, separada del GameMode de observación. Mantendrá equipos A/B, participantes, estados de preparación/activo/terminado, plazos autoritativos, puntuación y estadísticas por participante. Equipo, kills, muertes y racha pertenecen a la identidad del participante y sobreviven al reemplazo de su pawn. La primera configuración local es 2v2 con Executioner; no necesita un selector de personaje ni coordinación de aceptación entre clientes.
+`AVampsMatchGameMode`, derivado de AGameModeBase, conserva `FVampsMatchParticipant`: personaje, equipo, kills, muertes, racha y plazos de respawn/protección. `EVampsMatchPhase` distingue Unavailable, Selecting, Preparing, Active y Finished. `StartPlay` valida configuración, encuentra un `AVampsTeamSpawnPoint` por equipo, crea cuatro participantes y abre el selector: jugador y bot en A contra dos bots en B, todos Executioner. Las estadísticas sobreviven al respawn y se rehabilita el mismo actor. `AllowsCombat` limita acciones a participantes vivos durante la fase activa.
 
 La puntuación se deriva de la [recompensa por racha](functional.md#puntuación), sin estado de portador ni estadísticas duplicadas para calcularla. Los parámetros de partida conservan responsabilidad separada de las propiedades del personaje.
 
 ## Contactos, baja y puntuación
 
-Una regla compartida de elegibilidad distinguirá aliados, enemigos, eliminados y participantes fuera de una partida activa. Selección, lista/amenazas del HUD, foco de IA y trazas/resolver deberán usarla de forma coherente. La protección de respawn bloquea el contacto ofensivo, sin inferir un bloqueo de guardia ni dar continuación por un contacto rechazado.
+`AVampsCharacter::CanEngageEnemy` y `AVampsMatchGameMode::AreEnemies` comparten elegibilidad entre lock-on, HUD e IA. `CanHitCombatTarget` añade permiso de combate y protección del receptor; armas y resolver lo consultan antes de registrar el contacto o habilitar continuación.
 
-`UVampsCombatResolver` ya captura atacante, receptor y generaciones. `AVampsCharacter::ReceiveCombatHit` aplica el GameplayEffect con ese contexto; el callback de Health solo limpia el combate al morir y no conserva por sí solo el autor de la baja. La nueva notificación deberá registrar una baja única por vida del participante con el atacante válido del contacto letal.
+`UVampsCombatResolver` captura atacante, receptor y generaciones. `AVampsCharacter::ReceiveCombatHit` aplica el GameplayEffect y, si ese contacto causa la muerte, entrega atacante y `bBlocked` a `RegisterCombatDeath`. El callback de Health limpia combate; no decide autor ni variante de muerte. La comprobación de vida rechaza contactos posteriores contra el mismo eliminado.
 
-Las recompensas usan una captura de rachas anterior a las consecuencias del lote. Retirada/destrucción, cambio de generación y cierre de partida se materializan después de resolver sus contactos válidos, para conservar los intercambios letales simultáneos. Las kills/muertes y puntos se consolidan antes de evaluar objetivo y K/D; una víctima que también mata conserva la kill acumulada pero no una racha sobreviviente.
+`RegisterCombatDeath` guarda la recompensa con la racha de la víctima anterior a la consolidación. Al terminar contactos, continuación, dash y locomoción, el resolver llama a `CompleteCombatFrame`: contabiliza kills/muertes/puntos, reinicia rachas de eliminados y presenta muertes antes de evaluar resultado. Los intercambios letales del lote conservan sus recompensas y una víctima que también mata termina con racha cero.
 
-El K/D de equipo se calcula desde la suma de kills y muertes, sin promediar los ratios individuales. La comparación contempla explícitamente cero muertes y puede hacerse mediante productos cruzados para ratios finitos, sin redondear el valor del HUD para decidir el ganador.
+`FinishLocalRound` aplica las reglas de resultado. El K/D usa totales de equipo, productos cruzados y tratamiento explícito de cero muertes; no usa el redondeo mostrado por el HUD.
 
 ## Respawn y recursos del personaje
 
-La autoridad mantendrá los spawn points por equipo y los plazos de reaparición/protección del [funcional](functional.md#respawn-y-protección). La protección se valida en la ruta autoritativa de contacto antes de registrar daño, reacción, carga o continuación; el HUD solo muestra su estado. Se retira al aceptar el inicio de un ataque, antes de abrir sus contactos, no al recibir cualquier click. La baja/fin invalidan temporizadores que ya no correspondan.
+Cada `AVampsTeamSpawnPoint` identifica su equipo; el modo coloca a sus integrantes a ±100 cm de su eje derecho. `RespawnAt` y `ProtectionEndsAt` conservan los plazos del [funcional](functional.md#respawn-y-protección). `BeginCombatAction` retira la protección al aceptar el inicio del ataque. Baja y resultado cancelan los plazos que ya no correspondan.
 
-`UVampsAttributeSet` ya declara Health/MaxHealth, GuardLoad/MaxGuardLoad y MobilityEnergy/MaxMobilityEnergy. Su constructor inicializa capacidades en 100; `ResetCombatState` limpia guardia y restaura movilidad, y el reset de observación restaura Health desde MaxHealth. Eso no acredita que hoy exista una configuración de vida por personaje: el paso 6 debe permitir inicializar MaxHealth desde los stats propios del personaje y usar ese máximo al reaparecer, sin convertirlo en un valor global de partida.
+`StartingMaxHealth` configura el máximo inicial por personaje. `RestoreParticipant` detiene montages, llama a `ResetCombatState`, restaura Health desde MaxHealth, reposiciona y rehabilita colisión/movimiento. El reset limpia guardia y restaura energía desde la capacidad de movilidad del DA. La vida no es un parámetro global del GameMode.
 
-No se modificará una clase o estructura de DA existente sin la captura/restauración previa por MCP exigida en AGENTS.md. Esta especificación no implica haber editado ni preservado ya esos assets.
+Modificar una clase o estructura de DA requiere la captura/restauración previa por MCP exigida en AGENTS.md. La preservación realizada para los campos de muerte se conserva en [051](../reports/051-partida-local/reporte.md#preservación-del-da-y-mcp); futuros cambios requieren una captura nueva.
 
-`AVampsCombatTestGameMode::ResetCombat` restaura vida/posición para observar el prototipo; no implementa muerte ni respawn. Se conserva esa responsabilidad separada de las reglas de partida que se incorporen, sin duplicar la resolución del combate dentro del GameMode.
+`AVampsCombatTestGameMode::ResetCombat` conserva su función de restauración para observación; la partida usa su propio ciclo de bajas y respawn, sin duplicar la resolución de combate.
 
 ## Montages de muerte y cámara de espera
 
-`UVampsCombatSettings` deberá incorporar dos referencias requeridas a UAnimMontage: `DeathMontage` y `GuardDeathMontage`. Todavía no existen en su declaración. Se validarán antes de admitir al personaje a la partida; una referencia ausente/incompatible se diagnosticará sin sustituirla por otro montage ni por la variante de muerte restante.
+`UVampsCombatSettings` declara `DeathMontage` y `GuardDeathMontage`. `HasValidDeathMontages` valida las referencias antes de admitir participantes, con diagnóstico no fatal y sin sustitución de variantes. `/Game/Vamps/Data/DA_VampsCombatSettings` referencia `/Game/Vamps/Animations/Executioner/AM_Executioner_Death` y `AM_Executioner_GuardDeath`.
 
-La selección se capturará desde `FVampsPendingContact::bBlocked` del contacto que causa la baja, antes de aplicar el GameplayEffect: el callback actual de Health limpia la reacción y no conserva esa distinción. La presentación de muerte se iniciará una vez, después de cerrar los contactos válidos del lote y cancelar las acciones anteriores. No dependerá de `bCanDefend` ni del estado de guardia ya limpiado. La pose final debe mantenerse durante la espera y la cápsula eliminada dejar de bloquear movimiento.
+La variante se conserva desde `FVampsPendingContact::bBlocked` del contacto letal. Después del lote, `PresentCombatDeath` desactiva la cápsula y reproduce el montage correspondiente. Auto Blend Out desactivado conserva la pose durante la espera; el respawn la retira deteniendo montages. No se deduce desde el estado de guardia ya limpiado.
 
-La cámara libre de espera se controlará localmente y se separará del pawn eliminado y de su lock-on, manteniendo el HUD/countdown. El tipo de control de esa cámara está en las [preguntas funcionales](functional.md#preguntas); la implementación no cambiará la cámara ni los controles del personaje vivo. El respawn y el fin de partida cerrarán el control de espera según su transición correspondiente.
+`AVampsMatchPlayerController` crea un ACameraActor independiente con el punto de vista actual. Durante la espera, WASD lo desplaza a 800 cm/s y mouse controla yaw/pitch. El manager delega al comportamiento base para ese ViewTarget. `FinishRespawnCamera` devuelve la vista al pawn y destruye la cámara; el resultado detiene su control y la revancha restaura la vista del personaje.
 
-La ampliación del DA requiere buscar clase y derivadas, capturar propiedades completas y guardar assets antes de editar la clase. Esa operación está pendiente de MCP directo, no se reemplaza por leer defaults del código ni por las capturas históricas de otra iteración.
+Las lecturas, guardado y comparación del DA de 051 acreditan la incorporación de estas referencias sin diferencias en sus campos anteriores.
 
 ## HUD, resultado y nueva partida
 
-La vista de combate de `AVampsCombatTestHUD` y la alternancia F9 existen en 048. La implementación de partida añadirá puntuación/estadísticas, countdown de preparación y respawn, reloj restante y panel de resultado con botón local de nueva partida. Los contadores se derivarán de plazos de la autoridad, sin acumular tiempo desde el dibujo del HUD. El controller entregará la solicitud de revancha a la autoridad; el HUD no decidirá ganadores ni modificará estadísticas directamente.
+`AVampsCombatTestHUD::DrawMatchHUD` agrega marcador, equipo, plazos, protección y resultado sobre las vistas combate/debug. Los contadores se derivan de plazos del modo. `NotifyHitBoxClick` entrega selección a `SelectExecutioner`, START a `StartLocalRound` y PLAY AGAIN a `OpenCharacterSelection`; el HUD no calcula ganadores ni modifica estadísticas directamente.
 
-El resultado detendrá acciones, movimiento, IA y respawns por estado de partida, además de mostrar el panel. Una nueva partida limpiará datos y contexto de la anterior antes de crear/rehabilitar participantes. La futura aceptación de todos y la selección de personaje no se anticipan con bindings o infraestructura en esta entrega. El flujo de entrada del botón y su restitución al juego se resolverán dentro de esta implementación.
+El resultado bloquea combate/movimiento, pausa meshes y cancela respawns. Habilita cursor y entrada para el botón. PLAY AGAIN vuelve a Selecting sin iniciar preparación. `StartLocalRound` exige Selecting y personaje elegido; limpia puntuación, estadísticas, rachas y contactos pendientes, restaura participantes y entrada de juego, e inicia los 5 s de preparación. La acción local basta para esta entrega.
+
+`/Game/Vamps/Maps/L_LocalMatch` es el mapa de arranque/juego con override `BP_VampsMatchGameMode`. Este Blueprint hereda de VampsMatchGameMode y conecta `BP_VampsCharacter_Player`, `BP_VampsCharacter`, `BP_VampsMatchPlayerController` y HUD nativo VampsCombatTestHUD. El controller hereda de VampsMatchPlayerController y referencia IMC_Vamps, IA_Move, IA_Combat, IA_CycleTarget, IA_Mobility y BP_VampsPlayerCameraManager. Las rutas y parámetros completos están en [051](../reports/051-partida-local/editor.md).
+
+## Selección de personaje (6.2)
+
+`OpenCharacterSelection` implementa el [flujo de selección e inicio](functional.md#selección-de-personaje-e-inicio) antes de Preparing. Detiene personajes, cancela plazos, finaliza cualquier cámara libre y habilita mouse mediante `EnableMatchMenuInput`. Selecting no habilita combate, movimiento ni decisiones de IA. No avanza un contador hasta START.
+
+La única opción es Executioner, conectada a los Blueprints de personaje y DA existentes. `bExecutionerSelected` registra esa elección en el GameMode; `SelectExecutioner` solo actúa durante Selecting. Los bots reutilizan su clase configurada: con una opción todos son Executioner y no hace falta otro sorteo. Las referencias se validan al crear los participantes, sin sustituciones ni otro DA de combate.
+
+`DrawCharacterSelection` dibuja una vista opaca con EXECUTIONER y START. START no tiene hitbox hasta elegir el personaje. Selección y resultado usan GameAndUI con cursor/clicks habilitados; preparar la ronda devuelve GameOnly. Las guardas de fase rechazan acciones repetidas fuera del estado válido. PLAY AGAIN conserva la elección y START restaura participantes con las reglas existentes. Una sesión nueva empieza sin selección; no hay guardado entre sesiones ni otro mapa. Implementación y comprobación en [055](../reports/055-selector-executioner/reporte.md).
 
 ## Autoridad y red
 
@@ -58,8 +68,6 @@ Los videos no determinan predicción, compensación de latencia ni arbitraje. La
 
 ## Dependencias de implementación
 
-El [roadmap](../roadmap.md) prioriza núcleo, movilidad/presentación y partida antes de [extensiones Vamps](../extensions/technical.md). Equipos, recompensa por racha y respawn dependen de daño/muerte resueltos y selección coherente para cámara/HUD. La segunda parte de 6 añadirá selección de personaje; eso no adelanta skills ni perfiles de 9. Las comprobaciones se hacen mediante revisión de código, compilación por MCP directo cuando corresponda y observación manual del editor.
+El [roadmap](../roadmap.md) prioriza núcleo, movilidad/presentación y partida antes de [extensiones Vamps](../extensions/technical.md). Equipos, recompensa por racha y respawn dependen de daño/muerte resueltos y selección coherente para cámara/HUD. 6.2 incorpora el selector con Executioner; el segundo personaje se preparará después, sin adelantar skills ni perfiles de 9. Las comprobaciones se hacen mediante revisión de código, compilación por MCP directo cuando corresponda y observación manual del editor.
 
-## Decisiones pendientes
-
-El tipo de control de cámara libre está en las [preguntas funcionales](functional.md#preguntas). El detalle de sincronización entre clientes se aborda en 7, después del ciclo local.
+El detalle de sincronización entre clientes se aborda en 7, después del ciclo local y la selección de personaje de 6.2.

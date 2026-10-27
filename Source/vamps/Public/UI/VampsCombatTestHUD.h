@@ -23,6 +23,7 @@ public:
 private:
 
 	bool bShowCombatDebug = false;
+	void DrawCharacterSelection(const AVampsMatchGameMode* MatchMode, float ViewScale);
 	void DrawMatchHUD(const AVampsMatchGameMode* MatchMode, float ViewScale);
 
 	void DrawCombatHUD(AVampsCharacter* ViewingFighter, float ViewScale);

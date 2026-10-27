@@ -49,6 +49,6 @@ El cálculo de recompensa necesita rachas anteriores al lote, crédito único de
 
 ## Pendientes y límites
 
-Queda elegir el tipo de control de la cámara libre en las [preguntas funcionales](../../game/functional.md#preguntas). Los contadores, las variantes de muerte y el fin de protección al atacar ya se incorporaron. La ampliación del DA necesita primero la captura actual por MCP; no se presenta como implementada.
+Estos pendientes de planificación quedaron resueltos en [051](../051-partida-local/reporte.md): cámara libre con WASD/mouse, ampliación del DA con captura/preservación MCP y ciclo local implementado. La comprobación final del usuario y el cierre están en [053](../053-cierre-local-y-documentacion/reporte.md); las reglas vigentes de cámara figuran en [partida](../../game/functional.md#equipos-y-bajas).
 
 Se revisaron referencias locales y coherencia de los documentos afectados; `git diff --check` sin errores de espacios. No corresponde compilar una iteración documental. No se realizaron operaciones de Unreal, guardado de assets, automatización de UI ni creación/ejecución de tests. La [guía](editor.md) conserva lo necesario para continuar.

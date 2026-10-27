@@ -14,19 +14,76 @@
 void AVampsCombatTestHUD::NotifyHitBoxClick(FName BoxName)
 {
 	Super::NotifyHitBoxClick(BoxName);
-	if (BoxName == FName(TEXT("RestartMatch")))
+	if (BoxName != FName(TEXT("SelectExecutioner")) && BoxName != FName(TEXT("StartMatch")) &&
+	    BoxName != FName(TEXT("RestartMatch")))
 	{
-		AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
-		if (!MatchMode)
-		{
-			UE_LOG(LogVampsCombat,
-			       Error,
-			       TEXT("%hs: '%s': restart requires VampsMatchGameMode."),
-			       __FUNCTION__,
-			       *GetPathName());
-			return;
-		}
-		MatchMode->RestartLocalRound();
+		return;
+	}
+	AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
+	if (!MatchMode)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': menu action '%s' requires VampsMatchGameMode."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *BoxName.ToString());
+		return;
+	}
+	if (BoxName == FName(TEXT("SelectExecutioner")))
+	{
+		MatchMode->SelectExecutioner();
+	}
+	else if (BoxName == FName(TEXT("StartMatch")))
+	{
+		MatchMode->StartLocalRound();
+	}
+	else
+	{
+		MatchMode->OpenCharacterSelection();
+	}
+}
+
+void AVampsCombatTestHUD::DrawCharacterSelection(const AVampsMatchGameMode* MatchMode, float ViewScale)
+{
+	const float PanelX = Canvas->SizeX * 0.5f - 200.f * ViewScale;
+	const float PanelY = Canvas->SizeY * 0.5f - 120.f * ViewScale;
+	const FVector2D OptionPosition(PanelX + 40.f * ViewScale, PanelY + 65.f * ViewScale);
+	const FVector2D StartPosition(PanelX + 40.f * ViewScale, PanelY + 135.f * ViewScale);
+	const FVector2D ButtonSize(320.f * ViewScale, 48.f * ViewScale);
+	DrawRect(FLinearColor(0.025f, 0.025f, 0.04f, 1.f), 0.f, 0.f, Canvas->SizeX, Canvas->SizeY);
+	DrawText(TEXT("SELECT CHARACTER"),
+	         FLinearColor::White,
+	         PanelX + 40.f * ViewScale,
+	         PanelY + 15.f * ViewScale,
+	         nullptr,
+	         ViewScale * 1.25f);
+	DrawRect(MatchMode->bExecutionerSelected ? FLinearColor(0.15f, 0.4f, 0.5f) : FLinearColor(0.12f, 0.12f, 0.18f),
+	         OptionPosition.X,
+	         OptionPosition.Y,
+	         ButtonSize.X,
+	         ButtonSize.Y);
+	DrawText(MatchMode->bExecutionerSelected ? TEXT("EXECUTIONER  [SELECTED]") : TEXT("EXECUTIONER"),
+	         FLinearColor::White,
+	         OptionPosition.X + 16.f * ViewScale,
+	         OptionPosition.Y + 14.f * ViewScale,
+	         nullptr,
+	         ViewScale);
+	AddHitBox(OptionPosition, ButtonSize, FName(TEXT("SelectExecutioner")), true);
+	DrawRect(MatchMode->bExecutionerSelected ? FLinearColor(0.15f, 0.35f, 0.45f) : FLinearColor(0.08f, 0.08f, 0.1f),
+	         StartPosition.X,
+	         StartPosition.Y,
+	         ButtonSize.X,
+	         ButtonSize.Y);
+	DrawText(TEXT("START"),
+	         MatchMode->bExecutionerSelected ? FLinearColor::White : FLinearColor::Gray,
+	         StartPosition.X + 130.f * ViewScale,
+	         StartPosition.Y + 14.f * ViewScale,
+	         nullptr,
+	         ViewScale);
+	if (MatchMode->bExecutionerSelected)
+	{
+		AddHitBox(StartPosition, ButtonSize, FName(TEXT("StartMatch")), true);
 	}
 }
 
@@ -268,8 +325,8 @@ void AVampsCombatTestHUD::DrawCombatPanel(
 	{
 		StatusText =
 		    FString::Printf(TEXT("%s %.1fs"),
-			                *StaticEnum<EVampsCombatReaction>()->GetNameStringByValue(int64(FighterState.Reaction)),
-			                FMath::Max(0.0, FighterState.ReactionEndsAt - Now));
+		                    *StaticEnum<EVampsCombatReaction>()->GetNameStringByValue(int64(FighterState.Reaction)),
+		                    FMath::Max(0.0, FighterState.ReactionEndsAt - Now));
 	}
 	else if (FighterState.bIsDashing || FighterState.bIsSprinting)
 	{
@@ -374,7 +431,7 @@ void AVampsCombatTestHUD::DrawCombatEnemies(AVampsCharacter* ViewingFighter, flo
 		const FVector OpponentOffset = EnemyFighter->GetActorLocation() - ViewingFighter->GetActorLocation();
 		const FVector2D ArrowDirection =
 		    FVector2D(FVector::DotProduct(OpponentOffset, CameraAxes.GetUnitAxis(EAxis::Y)),
-			          -FVector::DotProduct(OpponentOffset, CameraAxes.GetUnitAxis(EAxis::X)))
+		              -FVector::DotProduct(OpponentOffset, CameraAxes.GetUnitAxis(EAxis::X)))
 		        .GetSafeNormal();
 		if (bIncomingAttack)
 		{
@@ -588,6 +645,19 @@ void AVampsCombatTestHUD::DrawHUD()
 
 	const float ViewScale = FMath::Min(Canvas->SizeX / 1280.f, Canvas->SizeY / 720.f);
 	const AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
+	if (MatchMode && (MatchMode->RoundPhase == EVampsMatchPhase::Selecting ||
+	                  MatchMode->RoundPhase == EVampsMatchPhase::Unavailable))
+	{
+		if (MatchMode->RoundPhase == EVampsMatchPhase::Selecting)
+		{
+			DrawCharacterSelection(MatchMode, ViewScale);
+		}
+		else
+		{
+			DrawMatchHUD(MatchMode, ViewScale);
+		}
+		return;
+	}
 #if !UE_BUILD_SHIPPING
 	DrawText(bShowCombatDebug ? TEXT("F9 COMBAT HUD") : TEXT("F9 DEBUG HUD"),
 	         FLinearColor::White,

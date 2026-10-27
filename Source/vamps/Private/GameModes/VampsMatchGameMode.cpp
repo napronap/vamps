@@ -122,7 +122,7 @@ void AVampsMatchGameMode::StartPlay()
 		}
 	}
 	RoundPhase = EVampsMatchPhase::Finished;
-	RestartLocalRound();
+	OpenCharacterSelection();
 }
 
 int32 AVampsMatchGameMode::FindParticipantIndex(const AVampsCharacter* Fighter) const
@@ -231,10 +231,67 @@ bool AVampsMatchGameMode::RestoreParticipant(int32 ParticipantIndex, bool bRespa
 	return true;
 }
 
-void AVampsMatchGameMode::RestartLocalRound()
+void AVampsMatchGameMode::OpenCharacterSelection()
 {
 	if (RoundPhase != EVampsMatchPhase::Finished)
 	{
+		return;
+	}
+	RoundPhase = EVampsMatchPhase::Selecting;
+	PhaseEndsAt = 0;
+	PendingDeaths.Reset();
+	for (FVampsMatchParticipant& Participant : Participants)
+	{
+		if (!IsValid(Participant.Fighter))
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': cannot open character selection; participant fighter '%s' is invalid."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       *GetPathNameSafe(Participant.Fighter));
+			RoundPhase = EVampsMatchPhase::Unavailable;
+			return;
+		}
+		Participant.RespawnAt = 0;
+		Participant.ProtectionEndsAt = 0;
+		Participant.Fighter->StopMatchCombat();
+		if (AVampsMatchPlayerController* MatchController =
+		        Cast<AVampsMatchPlayerController>(Participant.Fighter->GetController()))
+		{
+			MatchController->FinishRespawnCamera();
+		}
+	}
+	if (!EnableMatchMenuInput())
+	{
+		return;
+	}
+	UE_LOG(LogVampsCombat, Display, TEXT("%s: character selection opened."), *GetPathName());
+}
+
+void AVampsMatchGameMode::SelectExecutioner()
+{
+	if (RoundPhase == EVampsMatchPhase::Selecting)
+	{
+		bExecutionerSelected = true;
+	}
+}
+
+void AVampsMatchGameMode::StartLocalRound()
+{
+	if (RoundPhase != EVampsMatchPhase::Selecting || !bExecutionerSelected)
+	{
+		return;
+	}
+	APlayerController* LocalController = GetWorld()->GetFirstPlayerController();
+	if (!IsValid(LocalController))
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': cannot start the local round without a valid player controller."),
+		       __FUNCTION__,
+		       *GetPathName());
+		RoundPhase = EVampsMatchPhase::Unavailable;
 		return;
 	}
 	PendingDeaths.Reset();
@@ -254,12 +311,9 @@ void AVampsMatchGameMode::RestartLocalRound()
 			return;
 		}
 	}
-	if (APlayerController* LocalController = GetWorld()->GetFirstPlayerController())
-	{
-		LocalController->bShowMouseCursor = false;
-		LocalController->bEnableClickEvents = false;
-		LocalController->SetInputMode(FInputModeGameOnly());
-	}
+	LocalController->bShowMouseCursor = false;
+	LocalController->bEnableClickEvents = false;
+	LocalController->SetInputMode(FInputModeGameOnly());
 	UE_LOG(LogVampsCombat, Display, TEXT("%s: preparing local 2v2 round."), *GetPathName());
 }
 
@@ -363,13 +417,9 @@ void AVampsMatchGameMode::FinishLocalRound(bool bTimeExpired)
 		Participant.ProtectionEndsAt = 0;
 		Participant.Fighter->StopMatchCombat();
 	}
-	if (APlayerController* LocalController = GetWorld()->GetFirstPlayerController())
+	if (!EnableMatchMenuInput())
 	{
-		LocalController->bShowMouseCursor = true;
-		LocalController->bEnableClickEvents = true;
-		FInputModeGameAndUI ResultInput;
-		ResultInput.SetHideCursorDuringCapture(false);
-		LocalController->SetInputMode(ResultInput);
+		return;
 	}
 	UE_LOG(LogVampsCombat,
 	       Display,
@@ -378,4 +428,25 @@ void AVampsMatchGameMode::FinishLocalRound(bool bTimeExpired)
 	       WinningTeamIndex,
 	       TeamScores[0],
 	       TeamScores[1]);
+}
+
+bool AVampsMatchGameMode::EnableMatchMenuInput()
+{
+	APlayerController* LocalController = GetWorld()->GetFirstPlayerController();
+	if (!IsValid(LocalController))
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': match menu requires a valid local player controller."),
+		       __FUNCTION__,
+		       *GetPathName());
+		RoundPhase = EVampsMatchPhase::Unavailable;
+		return false;
+	}
+	LocalController->bShowMouseCursor = true;
+	LocalController->bEnableClickEvents = true;
+	FInputModeGameAndUI MenuInput;
+	MenuInput.SetHideCursorDuringCapture(false);
+	LocalController->SetInputMode(MenuInput);
+	return true;
 }

@@ -18,9 +18,9 @@ El lock-on permanece activo mientras exista un enemigo elegible. No requiere un 
 
 WASD permite acercamiento, retirada, laterales y diagonales y conserva su referencia al yaw de cámara. Cuerpo y dirección de viaje pueden cambiar conservando el lock-on. Shift solicita evasión inmediatamente; su dirección se fija al pulsar. Sin dirección, se aleja del target seleccionado. Sin target o con posiciones horizontales coincidentes, ese retroceso se rechaza con diagnóstico; una dirección explícita permite evadir sin target.
 
-Después del dash, mantener Shift con dirección permite sprint; soltarlo termina esa intención. La evasión mantiene el facing corporal de su inicio y usa una animación direccional acorde; el sprint conserva la orientación de locomoción existente. Cámara y selección continúan siguiendo al mismo rival. Ninguno concede invulnerabilidad.
+Después del dash, mantener Shift con dirección permite sprint; soltarlo termina esa intención. Con dirección explícita, el personaje gira hacia ella al iniciar y usa el dash frontal; sin dirección, mira al target y usa la retirada. La evasión mantiene esa orientación durante su recorrido; el sprint conserva el giro gradual de locomoción. Cámara y selección continúan siguiendo al mismo rival. Ninguno concede invulnerabilidad.
 
-NA permite locomoción, dash y sprint, conservando su plazo y prohibición de atacar/defender. Durante Guard el dash se habilita al registrar el impacto final enemigo definido en [combate](../combat/functional.md#guardia-daño-y-reacción), sin esperar el final de la reacción o del empuje. Entre subimpactos no se permite. Hit, Stun y muerte lo impiden. Fuera de esas restricciones previas, ataque/defensa se pueden iniciar durante movilidad con transiciones mezcladas; comenzar ataque sustituye el dash y recibir un contacto sustituye la movilidad por la reacción correspondiente.
+NA permite locomoción, dash y sprint, conservando su plazo y prohibición de atacar/defender. Guard, Hit, Stun y muerte impiden dash; la reacción de guardia debe terminar antes de evadir. Fuera de esas restricciones, ataque/defensa se pueden iniciar durante movilidad con transiciones mezcladas; comenzar ataque sustituye el dash y recibir un contacto sustituye la movilidad por la reacción correspondiente.
 
 Durante ataque se admite una solicitud de dash en su ventana de continuación o en Recovery. Se ejecuta después de cerrar contactos y ventana, conservando la recuperación del paso y la NA posterior. Una continuación ofensiva válida gana y descarta el dash solicitado. La solicitud pertenece al paso actual; interrupción, fin de acción, muerte o reset la eliminan. No se acumulan pulsaciones tempranas ni un dash tardío para otro paso.
 
@@ -28,7 +28,7 @@ Durante ataque se admite una solicitud de dash en su ventana de continuación o 
 
 La energía de dash/sprint es independiente de la carga de guardia. Un dash aceptado paga su coste una vez; sprint consume por segundo mientras existe intención direccional admitida. Sin energía suficiente se rechaza el dash. Al agotarse durante sprint, termina el sprint y sigue disponible la locomoción ordinaria; se necesita otra pulsación para solicitar nuevamente dash/sprint. El agotamiento no causa guard break ni stun.
 
-La energía se recupera después del retraso desde el último gasto y fuera del dash/sprint; puede recuperarse durante reacciones. Un contacto interrumpe la intención sostenida, que requiere otra pulsación. Reiniciar restaura su capacidad. Los parámetros iniciales elegidos para Vamps están en [037](../reports/037-movilidad-combate/reporte.md); no son mediciones de FGoA.
+La energía se recupera después del retraso desde el último gasto y fuera del dash/sprint; puede recuperarse durante reacciones. Un contacto interrumpe la intención sostenida, que requiere otra pulsación. Reiniciar restaura su capacidad. Los parámetros vigentes de Vamps están en [039](../reports/039-simplificacion-movilidad/reporte.md); no son mediciones de FGOA.
 
 ## Selección y seguimiento
 
@@ -48,4 +48,4 @@ Los obstáculos visibles preparados para ello se desvanecen gradualmente cuando 
 
 El HUD muestra vida, carga de guardia y energía de movilidad por separado, NA, reacción, stun y señal de crítico conforme al resultado de combate. Incluye selección, lista de rivales, enemigos próximos y dirección de amenaza entrante. Un aviso de amenaza se distingue de confirmar contacto o bloqueo. Puntuación, kills/muertes/K/D, countdown de inicio/respawn, tiempo restante y resultado presentan el estado de [partida](../game/functional.md). La espera de respawn permite cámara libre separada del personaje eliminado. El panel final incluye el botón local «Otra partida».
 
-La selección inicial, el reemplazo al perder elegibilidad y el retorno de cámara sin target conservan el comportamiento implementado en 018–019; se conectan con equipos y respawn al incorporar esas etapas.
+La selección excluye aliados y eliminados y readmite enemigos cuando reaparecen. Cámara y HUD conservan el mismo target y presentan su ausencia cuando no hay enemigos elegibles. F9 alterna combate/debug en desarrollo sin cambiar el estado de partida; R/F6/F7 pertenecen al escenario de observación.

@@ -4,24 +4,24 @@ El objetivo es reproducir la **[base FGOA adaptada](game/functional.md#alcance-d
 
 Las reglas viven en [combate](combat/functional.md), [jugador](player/functional.md) y [partida](game/functional.md), con sus documentos técnicos. El [análisis 016](reports/016-analisis-fgo-arcade/analisis.md) y sus [escenas](reports/016-analisis-fgo-arcade/escenas.md) sirven para comparar resultados. No hace falta reabrir la investigación ni pedir nuevas grabaciones para avanzar.
 
-## Punto de partida
+## Estado disponible
 
 | Área | Disponible | Brecha hacia la referencia |
 |---|---|---|
-| Personaje y GAS | Clases propias, vida/guardia, cadena de hasta tres secciones, ventanas, NA, armas independientes y reacciones; paso 3 cerrado por el usuario en 035 | Integrar movilidad de 4 y presentación de 5 |
+| Personaje y GAS | Clases propias, cadena/NA, armas, reacciones, movilidad y presentación integradas | Calibración integral en 8 |
 | Ataque y defensa | RMB compartido, memoria defensiva por paso, Guard que cancela ofensiva propia, residual, acumulación/ruptura/stun y crítico; cierre de 3 en 035 | Calibración integral en 8 |
-| Lock-on y HUD | Componente compartido, F según lista, selección inicial, reemplazo al perder elegibilidad y retarget por bloqueo; debug de fases y resultados | Incorporar equipos y respawn cuando existan |
-| Cámara | Manager local, seguimiento automático suave, tolerancia lateral y retorno detrás del jugador sin target ([019](reports/019-camara-lockon/reporte.md)); observación visual aprobada al cerrar 0 | Pitch fijo, sin variación de distancia por acción ni fade |
-| Escenario e IA | Mapa local, rival con modos de observación y solicitud compartida, F6/R y HUD de debug | R no representa muerte ni respawn |
-| Partida y red | Habilidades ServerOnly y atributos replicados | No hay partida por equipos ni entrega completa de solicitudes de clientes |
+| Lock-on y HUD | Selección enemiga compartida, F y retarget por bloqueo; recursos, amenazas, proximidad, marcador y resultado; F9 alterna debug | Integración de clientes en 7 |
+| Cámara | Seguimiento/combate, distancia/FOV, transiciones, oclusores y rumbo sin target; cámara libre durante respawn | Calibración integral en 8 |
+| Escenario e IA | L_LocalMatch con selector Executioner, START y jugador más tres bots; L_CharacterBasic conserva observación R/F6/F7 | Participantes humanos y bots en red en 7 |
+| Partida y red | Ciclo local 2v2 con bajas, rachas, respawn, protección, resultado y revancha; atributos replicados y habilidades ServerOnly | Entrega de solicitudes y estado compartido de clientes en 7 |
 
-018–019 y las fuentes actuales prevalecen para lock-on/cámara sobre la descripción anterior del [prototipo](prototype/technical.md). Sus comprobaciones MCP se complementan con el cierre manual de 0 registrado en [020](reports/020-roadmap-emulacion-fgoa/reporte.md#cierre-de-la-etapa-0).
+Los reportes 039–048, 051 y 055 describen movilidad, presentación, partida y selector vigentes. El [prototipo](prototype/technical.md) conserva el escenario de observación y su contexto histórico.
 
 ## Orden de ejecución
 
 Este archivo lleva el estado del plan; los reportes conservan la evidencia y quién confirmó cada cierre. Al completar una etapa se actualizan aquí su estado, fecha y referencia al reporte. No se mantiene otro archivo con una copia del avance.
 
-**Estado al 27 de octubre de 2026:** etapas 0–3 cerradas por el usuario. Movilidad y presentación tienen implementación posterior en 039–048, con los límites de verificación registrados allí. El trabajo actual define 6 en [050](reports/050-reglas-partida-local/reporte.md): ciclo local 2v2 primero y selección de personaje en una segunda parte. No se atribuyen nuevas comprobaciones del editor ni cierres de 4–5 a esta actualización.
+**Estado al 27 de octubre de 2026:** etapas 0–6 completadas, incluidas 6.1 y 6.2. Cierres locales anteriores en [053](reports/053-cierre-local-y-documentacion/reporte.md); selector implementado en [055](reports/055-selector-executioner/reporte.md), con compilación y funcionamiento confirmados por el usuario. **Siguiente etapa: 7, varios jugadores y autoridad de red**; calibración integral y extensiones siguen en 8–9. Este cierre no representa una nueva compilación o ejecución de PIE por Codex.
 
 **Cierre de 3:** implementación en [033](reports/033-resultados-combate/reporte.md), montages independientes en [034](reports/034-montage-guardia/reporte.md) y configuración/intercambios revisados en [035](reports/035-revision-paso-3/reporte.md). El usuario aprobó el cierre el 2026-10-19; no se atribuye a una nueva ejecución de PIE o compilación por Codex.
 
@@ -31,9 +31,10 @@ Este archivo lleva el estado del plan; los reportes conservan la evidencia y qui
 | 1 | Completada | Botón compartido y fases de una acción | Cierre confirmado por el usuario el 2026-10-16; [registro 021](reports/021-solicitud-compartida/reporte.md#cierre-de-la-etapa-1) |
 | 2 | Completada | Cadena de hasta tres pasos y NA | Cierre confirmado por el usuario el 2026-10-18; [registro 031](reports/031-cierre-paso-2-y-reglas-paso-3/reporte.md) |
 | 3 | Completada | Guardia, residual, reacción, stun y crítico | Cierre confirmado por el usuario el 2026-10-19; [registro 035](reports/035-revision-paso-3/reporte.md#cierre-del-paso-3) |
-| 4 | Implementada; cierre pendiente | Acercamiento, evasión y sprint | Configuración vigente en 039–040; la revisión 049 conserva diferencias respecto de 037 |
-| 5 | Implementada; verificación pendiente | Cámara de acciones, oclusión y HUD de combate | Cámara 042–046 y HUD 048; conservar sus pendientes de compilación/observación |
-| 6 | En definición | Equipos, bajas, recompensa por racha, respawn, resultado y revancha local | Primera parte 2v2 con Executioner; segunda parte con selección de personaje; decisiones en 050 |
+| 4 | Completada | Acercamiento, evasión y sprint | Configuración 039–040; cierre confirmado por el usuario el 2026-10-27 en 053 |
+| 5 | Completada | Cámara de acciones, oclusión y HUD de combate | Cámara 042–046 y HUD 048; cierre confirmado por el usuario el 2026-10-27 en 053 |
+| 6.1 | Completada | Equipos, bajas, rachas, respawn, resultado y revancha local 2v2 | Implementación/evidencia 051; comprobación final del usuario el 2026-10-27 en 053 |
+| 6.2 | Completada | Selector Executioner, START y revancha al selector | Compilación y funcionamiento confirmados por el usuario el 2026-10-27; cierre en 055 |
 | 7 | Pendiente | Integración de varios jugadores en red | Reglas locales de 1–6; clientes pueden jugar el mismo ciclo bajo autoridad |
 | 8 | Pendiente | Calibración y cierre de la base | Comparación integral local y en red; sin brechas de comportamiento acordadas |
 | 9 | Pendiente | Extensiones Vamps | Base cerrada en 8; identidades, dos skills, parry y ultimate propias |
@@ -79,7 +80,7 @@ El HUD presenta el resultado resuelto y AnimInstance expone las señales de reac
 
 ### 4. Movimiento integrado al combate
 
-La implementación vigente está en [039](reports/039-simplificacion-movilidad/reporte.md) y [040](reports/040-giro-direccional-dash/reporte.md), con sus guías de observación. Usa dos montages con root motion, giro hacia la dirección capturada al aceptar el dash y energía independiente para dash/sprint. Guard conserva su duración ordinaria; se retiró el permiso por impacto final. La etapa mantiene los pendientes de observación registrados allí.
+**Completada — usuario, 2026-10-27.** Comprobación general confirmada en [053](reports/053-cierre-local-y-documentacion/reporte.md). Implementación vigente en [039](reports/039-simplificacion-movilidad/reporte.md) y [040](reports/040-giro-direccional-dash/reporte.md): dos montages con root motion, giro hacia la dirección capturada y energía independiente para dash/sprint. Guard conserva su duración ordinaria; se retiró el permiso por impacto final. Las guías anteriores conservan sus pasos reproducibles; sus pendientes de cierre quedan resueltos por esta confirmación.
 
 El acercamiento se limita al primer paso y reemplaza la traslación de raíz ofensiva para no duplicar avance. Shift sin dirección se aleja del target. Se conservan cámara/lock-on y referencia de WASD. La continuación válida tiene prioridad sobre el dash al cerrar un paso; recuperación y NA mantienen sus plazos.
 
@@ -87,23 +88,27 @@ El acercamiento se limita al primer paso y reemplaza la traslación de raíz ofe
 
 ### 5. Presentación de combate y cámara de referencia
 
-La cámara de [042–046](reports/046-giro-libre-camara/reporte.md) incorpora seguimiento/combate, Eye/Interest, variación de distancia/FOV, transiciones, oclusión y rumbo progresivo sin target. Calibrar su presentación con las acciones y el movimiento disponibles, conservando selección compartida y los pendientes visuales de sus guías.
+**Completada — usuario, 2026-10-27.** El trabajo restante y la comprobación de funcionamiento están confirmados en [053](reports/053-cierre-local-y-documentacion/reporte.md). La cámara de [042–046](reports/046-giro-libre-camara/reporte.md) incorpora seguimiento/combate, Eye/Interest, distancia/FOV, transiciones, oclusión y rumbo progresivo sin target. La calibración integral continúa en 8.
 
-Los oclusores y el material de fade preparados en 042 se coordinan con la colisión de cámara. El HUD simple de [048](reports/048-hud-combate-simple/reporte.md) presenta recursos, estados, selección/lista, proximidad y dirección de amenaza, con alternancia F9. Conservar su pendiente de compilación/observación: la advertencia previa al contacto debe distinguirse del bloqueo confirmado.
+Los oclusores y el material de fade de 042 se coordinan con la colisión de cámara. El HUD de [048](reports/048-hud-combate-simple/reporte.md) presenta recursos, estados, selección/lista, proximidad y amenaza con alternancia F9. La compilación posterior de 051 y la confirmación del usuario resuelven sus pendientes anteriores; la advertencia previa al contacto sigue siendo distinta del bloqueo confirmado.
 
 **Cierre:** acercamiento, retirada, laterales, cambios por F y guardia, y planos de acción mantienen un combate legible. Un obstáculo preparado se desvanece y recupera su presentación sin perder su colisión de movimiento; un límite invisible continúa restringiendo sin requerir fade. Cámara y HUD siguen al mismo rival, incluida ausencia de target.
 
-**Hito A — Emulación local del combate:** etapas 0–5 comprobadas en el escenario de observación, con un melee y varios rivales. Cierra el intercambio y su presentación; todavía no representa una partida multijugador completa.
+**Hito A — Emulación local del combate: completado, 2026-10-27.** Etapas 0–5 aprobadas por el usuario; cierra intercambio y presentación local. La integración multijugador pertenece a 7.
 
 ### 6. Partida por equipos
 
-La [partida funcional](game/functional.md) define dos entregas. **6.1:** ciclo local 2v2, jugador y un bot en A contra dos bots en B, todos Executioner. **6.2:** selección de personaje y preparación de participantes. Las identidades/skills propias continúan en 9; no se anticipa ese sistema en 6.1.
+**Completada — usuario, 2026-10-27.** 6.1 tiene implementación/evidencia MCP en [051](reports/051-partida-local/reporte.md) y cierre en [053](reports/053-cierre-local-y-documentacion/reporte.md). 6.2 tiene diseño en [054](reports/054-revision-seleccion-personaje/reporte.md), implementación y cierre en [055](reports/055-selector-executioner/reporte.md). El usuario confirmó que compiló y probó el selector y que funciona todo; no quedan pendientes locales para cerrar esta etapa.
 
-Implementar autoridad de partida, equipos y elegibilidad enemiga en selección, HUD, IA y contactos. Conectar bajas únicas con su contexto, recompensa creciente por racha de la víctima, respawn por equipo, protección breve y resultado después del lote de contactos. Objetivo, fórmula inicial, recursos y plazos se definen en [partida](game/functional.md#puntuación). El portador se elimina del alcance.
+La [partida funcional](game/functional.md) define dos entregas. **6.1:** ciclo local 2v2, jugador y un bot en A contra dos bots en B, todos Executioner. **6.2:** [selección propia y START](game/functional.md#selección-de-personaje-e-inicio), bots asignados del catálogo con repetidos permitidos y PLAY AGAIN de vuelta al selector conservando la preselección. El único personaje disponible sigue siendo Executioner; el usuario preparará después el segundo personaje y su DA. Las identidades/skills propias continúan en 9.
 
-El HUD presenta equipo, puntos, kills/muertes/K/D, countdown de preparación/respawn, tiempo restante y panel de ganador/empate con «Otra partida». Incorporar muerte normal/defensiva desde referencias del DA y cámara libre durante la espera. La protección de respawn termina al atacar. La revancha local requiere solo la aceptación local; esperar la aceptación de todos queda para una ampliación posterior. Mantener R como control de observación separado del ciclo de partida.
+AVampsMatchGameMode administra equipos y elegibilidad enemiga en selección, HUD, IA y contactos. Las bajas conservan su contexto, recompensa por racha y respawn por equipo con protección; el resultado se decide después del lote de contactos. Objetivo, fórmula, recursos y plazos se definen en [partida](game/functional.md#puntuación). No existe portador.
 
-**Cierre de 6.1:** aliados fuera de selección/contactos; dos aliados pueden atacar al mismo enemigo. La recompensa usa la racha anterior al lote y se registra una sola baja por vida. El mismo personaje reaparece en su equipo con sus recursos y protección; cámara/HUD limpian al eliminado y admiten al reaparecido. Si ambos equipos alcanzan el objetivo simultáneamente, decide K/D; si coincide, hay empate. El resultado detiene la partida y la revancha inicia un ciclo limpio. Resolver antes de implementar las [preguntas restantes](game/functional.md#preguntas). El cierre de 6.2 se especificará al abordar selección de personaje.
+El HUD presenta equipo, puntos, kills/muertes/K/D, preparación/respawn, tiempo restante y ganador/empate con «Otra partida». El DA referencia muerte normal/defensiva; la espera admite cámara libre con WASD/mouse. La protección termina al atacar. La revancha requiere aceptación local; esperar a todos queda para una ampliación posterior. R conserva su función de observación fuera del ciclo de partida.
+
+**Cierre aceptado de 6.1:** aliados fuera de selección/contactos; dos aliados pueden atacar al mismo enemigo. La recompensa usa la racha anterior al lote y se registra una sola baja por vida. El mismo personaje reaparece con sus recursos y protección; cámara/HUD limpian al eliminado y admiten al reaparecido. Si ambos equipos alcanzan el objetivo simultáneamente, decide K/D; si coincide, hay empate. El resultado detiene la partida y la revancha inicia un ciclo limpio. La confirmación del usuario es general; no agrega trazas individuales de cada caso límite.
+
+**Cierre aceptado de 6.2:** abrir en selección sin iniciar combate, elegir Executioner y pulsar START para preparar los cuatro participantes y comenzar los 5 s existentes, sin confirmación adicional. Respawn conserva el personaje. PLAY AGAIN regresa al selector con la preselección propia y START inicia otra ronda limpia. La compilación y comprobación general se atribuyen al usuario; la validación de configuración conserva su revisión de código, sin afirmar nuevas capturas individuales de errores. El segundo personaje, retratos y preview 3D no son requisitos de este cierre.
 
 ### 7. Varios jugadores y autoridad de red
 

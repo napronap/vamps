@@ -20,7 +20,17 @@ Estas simplificaciones y adaptaciones son parte del primer alcance; reproducir l
 
 ## Entregas del paso 6
 
-La primera parte entrega el ciclo local 2v2: el jugador y un bot en A, dos bots en B, todos con Executioner. La segunda parte agrega selección de personaje y su flujo de preparación; sus opciones se especifican al abordarla. No se construye esa selección como requisito del primer ciclo.
+La primera parte entrega el ciclo local 2v2: el jugador y un bot en A, dos bots en B, todos con Executioner. La segunda parte agrega el selector y su flujo de inicio, conservando Executioner como única opción disponible. Incorporar otro personaje y preparar sus datos/animaciones es una entrega posterior.
+
+## Selección de personaje e inicio
+
+Al abrir la partida local se muestra un selector sencillo con nombres y botones manejados con mouse. La sesión comienza sin elección y **START** está inactivo hasta seleccionar Executioner. El jugador elige únicamente su personaje; START inicia la preparación de 5 s, sin confirmación adicional ni límite de tiempo para elegir. Durante selección no avanza la partida, no hay combate ni movimiento de participantes y la IA no actúa.
+
+El catálogo inicial contiene solo **Executioner**, con su configuración existente. No se crean variantes ni entradas para personajes que todavía no tienen datos completos. El selector no requiere retratos, comparación de estadísticas ni preview 3D para esta entrega.
+
+Los bots reciben personajes aleatorios del catálogo disponible y se permiten repetidos dentro del equipo y entre equipos. Con el catálogo actual, todos usan Executioner. El jugador no configura los tres puestos de bots.
+
+**PLAY AGAIN** vuelve al selector conservando la preselección propia. Al pulsar START se asignan otra vez los bots y se inicia una ronda con puntuación, estadísticas, rachas, recursos y posiciones reiniciados. La elección se conserva durante la partida y el respawn; no se guarda entre sesiones.
 
 ## Equipos y bajas
 
@@ -28,7 +38,7 @@ Los aliados no se seleccionan como enemigos ni reciben contactos ofensivos. Dos 
 
 Cada baja suma una kill al autor del contacto letal y una muerte a la víctima. Las estadísticas acumuladas sobreviven al respawn. La racha cuenta las kills obtenidas desde la última muerte y vuelve a cero al morir. Los contactos capturados válidamente pueden causar bajas recíprocas; un participante que muere termina ese lote con racha cero, aunque reciba una kill por el intercambio.
 
-La baja reproduce una animación de muerte propia del personaje: variante defensiva si el contacto letal fue bloqueado, incluida una ruptura letal, y variante normal si fue abierto. La selección usa el resultado del contacto letal, antes de limpiar reacción/guardia. El cuerpo permanece visible durante la espera y deja de bloquear movimiento; no vuelve a locomoción al terminar la animación. Durante el countdown de respawn, el jugador controla una cámara libre, separada del personaje eliminado.
+La baja reproduce una animación de muerte propia del personaje: variante defensiva si el contacto letal fue bloqueado, incluida una ruptura letal, y variante normal si fue abierto. La selección usa el resultado del contacto letal, antes de limpiar reacción/guardia. El cuerpo permanece visible durante la espera y deja de bloquear movimiento; no vuelve a locomoción al terminar la animación. Durante el countdown de respawn, el jugador controla una cámara libre separada del personaje eliminado: WASD la desplaza por el escenario y el mouse orienta la vista. Al reaparecer vuelve la cámara del personaje; el resultado detiene el control de la cámara libre.
 
 ## Puntuación
 
@@ -52,10 +62,6 @@ Si se agota el tiempo antes del cierre por objetivo, se consolidan los contactos
 
 El resultado detiene combate, movimiento de participantes, decisiones de IA, acumulación de puntos y respawns. Aparece un panel pequeño con «Equipo A ganador», «Equipo B ganador» o «Empate», puntuación y kills/muertes/K/D por participante y equipo.
 
-El botón «Otra partida» inicia un ciclo nuevo en la entrega local: basta la aceptación del jugador local y se reinician puntuación, estadísticas y rachas. La espera a que todos acepten pertenece a una ampliación posterior; no se implementa ahora.
+El botón «Otra partida» vuelve a la [selección local](#selección-de-personaje-e-inicio); START comienza el ciclo nuevo y reinicia puntuación, estadísticas y rachas. Basta la acción del jugador local. La espera a que todos acepten pertenece a una ampliación posterior.
 
 Se busca una partida más larga mediante la relación entre recompensa y objetivo. Bajar ambos proporcionalmente conserva esa relación; el balance inicial puede ajustarse manteniendo estas reglas.
-
-## Preguntas
-
-1. ¿La cámara libre durante la espera vuela por el escenario con WASD y mouse o gira alrededor del cuerpo con el mouse?

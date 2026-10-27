@@ -10,6 +10,7 @@ UENUM(BlueprintType)
 enum class EVampsMatchPhase : uint8
 {
 	Unavailable,
+	Selecting,
 	Preparing,
 	Active,
 	Finished
@@ -91,13 +92,18 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Match")
 	int32 WinningTeamIndex = INDEX_NONE;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Match")
+	bool bExecutionerSelected = false;
+
 	bool AllowsCombat(const AVampsCharacter* Fighter) const;
 	bool AreEnemies(const AVampsCharacter* FirstFighter, const AVampsCharacter* SecondFighter) const;
 	bool IsSpawnProtected(const AVampsCharacter* Fighter) const;
 	void EndSpawnProtection(AVampsCharacter* Fighter);
 	void RegisterCombatDeath(AVampsCharacter* Victim, AVampsCharacter* Attacker, bool bBlockedDeath);
 	void CompleteCombatFrame();
-	void RestartLocalRound();
+	void OpenCharacterSelection();
+	void SelectExecutioner();
+	void StartLocalRound();
 
 private:
 
@@ -117,4 +123,5 @@ private:
 	int32 FindParticipantIndex(const AVampsCharacter* Fighter) const;
 	bool RestoreParticipant(int32 ParticipantIndex, bool bRespawn);
 	void FinishLocalRound(bool bTimeExpired);
+	bool EnableMatchMenuInput();
 };

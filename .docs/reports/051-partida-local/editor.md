@@ -1,6 +1,6 @@
 # Editor — Partida local 2v2
 
-El mapa está configurado y guardado. No queda configuración obligatoria para arrancar. Quedan las comprobaciones manuales del final, especialmente PLAY AGAIN y la pose después del respawn con el último parche. El editor queda en L_LocalMatch, fuera de PIE.
+El mapa está configurado y guardado. El usuario confirmó el funcionamiento el 2026-10-27 y cerró las comprobaciones manuales en [053](../053-cierre-local-y-documentacion/reporte.md). No queda configuración ni observación obligatoria para cerrar 6.1. Esta guía conserva las operaciones de implementación y sus pasos reproducibles.
 
 ## 1. MCP y compilación
 
@@ -42,13 +42,13 @@ Maps & Modes: Editor Startup Map y Game Default Map L_LocalMatch; Default GameMo
 
 **Hecho — Codex por MCP, verificación parcial.** StartPIE, consultas de actores/propiedades y CaptureEditorImage verificaron cuatro participantes, tres bots, equipos, inicio, bajas, recompensas, respawns y HUD visible. Una ronda terminó con B ganador 1100–975; movimiento/combate detenidos y respawns cancelados. Luego StopPIE y parche final por Live Coding. Sin automatizar teclas o mouse.
 
-## Comprobaciones manuales restantes
+## Comprobación manual final
 
-**Pendiente — usuario.** Abrir L_LocalMatch y pulsar Play:
+**Hecho — usuario, 2026-10-27.** Confirmación general de funcionamiento registrada en 053, después de revisar los pendientes en 052. Para reproducirla, abrir L_LocalMatch y pulsar Play:
 
 1. Ver preparación de 5 s y reloj de 5 min. F9 alterna combate/debug conservando el overlay.
 2. Al morir, observar variante normal/defensiva y cuerpo sin bloqueo. Durante 5 s mover cámara con WASD/mouse. Al reaparecer debe volver la cámara propia y retirarse la pose de muerte; esta corrección final se compiló al cerrar la iteración.
 3. Confirmar vida máxima, guardia cero, energía máxima y protección hasta 2 s. Ataque aceptado la termina antes; solicitud rechazada no.
 4. Al finalizar, revisar estadísticas y pulsar PLAY AGAIN: puntos/K/D/rachas a cero, posiciones y recursos restaurados, otra preparación.
 
-Cierres simultáneo y por tiempo revisados en código, sin observación jugable de esos casos. No se requieren tests automatizados.
+Cierres simultáneo y por tiempo conservan revisión de código y aprobación general del usuario, sin nuevas trazas individuales de esos casos. No se requieren tests automatizados.

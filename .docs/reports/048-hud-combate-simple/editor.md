@@ -1,5 +1,7 @@
 # Editor — HUD de combate simple
 
+Guía histórica: compilación posterior en 051 y comprobación confirmada por el usuario en [053](../053-cierre-local-y-documentacion/editor.md). Los pasos siguientes son reproducibles; ya no son pendientes de cierre del paso 5. F9 ahora pertenece al controller común según la implementación de 051.
+
 **Para el usuario:** compilar con el editor cerrado, reabrir y comprobar el HUD en `/Game/Vamps/Maps/L_CharacterBasic`. La vista de combate es inicial y F9 alterna con debug. No hay assets ni mappings nuevos que crear/asignar. Codex modificó los fuentes; no realizó operaciones del editor porque el MCP directo de Unreal no está disponible en esta sesión.
 
 ## 1. Compilar y reabrir

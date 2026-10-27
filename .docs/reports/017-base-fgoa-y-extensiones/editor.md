@@ -21,6 +21,6 @@ No hubo pasos realizados por MCP del editor ni cambios de asignaciones, compilac
 
 ## 3. Decisiones antes de cada implementación
 
-**Pendiente — usuario, decisiones de diseño por etapa, según su avance posterior.** Las reglas de [solicitud defensiva, guardia/crítico y resolución](../../combat/functional.md#guardia-daño-y-reacción) ya se concretaron en [033](../033-resultados-combate/reporte.md). Las preguntas restantes de [target y movilidad](../../player/functional.md#preguntas) y [formato de partida, portador y respawn](../../game/functional.md#preguntas) se atienden en sus etapas. No es necesario responderlas todas para conservar esta integración documental. Las preguntas de extensiones se atienden después de reproducir la base.
+**Hecho — usuario, decisiones locales cerradas en 053.** Las reglas de [solicitud defensiva, guardia/crítico y resolución](../../combat/functional.md#guardia-daño-y-reacción), [target y movilidad](../../player/functional.md) y [partida/respawn](../../game/functional.md) están integradas en sus especificaciones. El avance posterior y el siguiente trabajo se controlan en el [roadmap](../../roadmap.md). Las preguntas de extensiones se atienden después de reproducir la base.
 
 Las futuras operaciones de Unreal se documentarán con assets, valores y verificaciones concretas en la iteración que implemente cada regla, usando MCP directo soportado. Esta guía no prescribe una migración de assets sin código que la sustente.

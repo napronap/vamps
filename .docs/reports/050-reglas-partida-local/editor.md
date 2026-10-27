@@ -4,7 +4,7 @@
 
 ## 1. Completar las precisiones de comportamiento
 
-**Pendiente — usuario.** Elegir entre cámara libre con vuelo WASD/mouse o giro alrededor del cuerpo, según la [pregunta restante](../../game/functional.md#preguntas). Ya están fijados contadores, muerte normal/defensiva y fin de la protección al empezar un ataque aceptado, además de las decisiones anteriores.
+**Hecho — usuario.** La cámara libre con vuelo WASD/mouse está implementada en 051 y su funcionamiento quedó confirmado en [053](../053-cierre-local-y-documentacion/editor.md). La regla se integra en [partida](../../game/functional.md#equipos-y-bajas); no queda una elección pendiente de cámara para 6.1.
 
 ## 2. Preservar el DA antes de agregar campos
 

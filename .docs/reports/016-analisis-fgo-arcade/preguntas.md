@@ -24,10 +24,10 @@ Las reglas vigentes de solicitud defensiva, acumulación/recuperación, break, r
 
 ### P03. Partida y portador de recompensa
 
-Las preguntas vigentes sobre equipos, final/empate, portador y respawn están en [partida](../../game/functional.md#preguntas). La hipótesis de kill leader y la curación observada del Grial permanecen en el análisis, sin convertirlas en decisiones para Vamps.
+Las reglas vigentes sobre equipos, final/empate y respawn están en [partida](../../game/functional.md). La hipótesis de kill leader y la curación observada del Grial permanecen en el análisis, sin convertirlas en decisiones para Vamps.
 
 ### P04. Pérdida del target y arbitraje técnico
 
-La selección inicial/pérdida/ausencia de target se resuelve en [jugador](../../player/functional.md#preguntas). Las decisiones posteriores sobre fases/contactos y desempate están en la [resolución de combate](../../combat/technical.md#contexto-y-resolución-del-contacto); esta sección conserva el contexto de R03. Los parámetros de encuadre, fade y movilidad se calibran con el prototipo.
+La selección inicial/pérdida/ausencia de target se resuelve en [jugador](../../player/functional.md#selección-y-seguimiento). Las decisiones posteriores sobre fases/contactos y desempate están en la [resolución de combate](../../combat/technical.md#contexto-y-resolución-del-contacto); esta sección conserva el contexto de R03. Los parámetros de encuadre, fade y movilidad se calibran con el prototipo.
 
 Estas precisiones se resuelven por funcionalidad según el [roadmap](../../roadmap.md); no reabren la revisión de videos. SUPPORT quedó excluido. Las preguntas propias de parry, ultimate y personajes están en [extensiones](../../extensions/functional.md#preguntas-para-esta-etapa), sin bloquear la base.
