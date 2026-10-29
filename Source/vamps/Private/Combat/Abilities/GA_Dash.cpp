@@ -85,7 +85,6 @@ void UGA_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
-	Fighter->ResolveCombatLocomotion();
 	Movement->StopVoluntaryMotion();
 	const FVector DashFacing = bBackwardDash
 	                               ? (TargetFighter->GetActorLocation() - Fighter->GetActorLocation()).GetSafeNormal2D()

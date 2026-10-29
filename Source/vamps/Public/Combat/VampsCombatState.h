@@ -82,9 +82,6 @@ struct VAMPS_API FVampsCombatState
 	bool bContinuationRequested = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	bool bRecoveryVisualReleased = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bOffenseRestricted = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")

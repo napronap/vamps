@@ -1,5 +1,7 @@
 # 042 — Cámara de seguimiento, combate y oclusión
 
+La salida de combat framing queda actualizada en [060 — Regreso antes de NA sin cortar combos](../060-salida-framing-antes-na/reporte.md). El encuadre general debe estar recuperado al comenzar NA, conservando su duración.
+
 Corrección posterior del seguimiento sin target: [043 — Referencia virtual y modo de observación](../043-camara-sin-target/reporte.md), con [guía de prueba sin lock-on](../043-camara-sin-target/editor.md). Sustituye el retorno hacia el frente corporal por la nueva referencia de vista independiente.
 
 ## Alcance — 2026-10-20

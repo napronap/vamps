@@ -227,11 +227,9 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 	{
 		const FVampsCombatState& ChainState = ChainSource->CombatState;
 		const bool bSameMontage = ChainState.MontageInstanceID == FramingMontageID && FramingMontageID != INDEX_NONE;
-		const bool bReleasedRecovery = ChainState.Phase == EVampsActionPhase::Recovery &&
-		                               ChainState.bRecoveryVisualReleased && ChainState.MontageInstanceID == INDEX_NONE;
 		if (!ChainState.bIsAlive || ChainSource->CombatGeneration != FramingGeneration ||
 		    ChainState.Phase == EVampsActionPhase::NARecovery || ChainState.Phase == EVampsActionPhase::Idle ||
-		    (!bSameMontage && !bReleasedRecovery))
+		    !bSameMontage)
 		{
 			FramingSource.Reset();
 		}

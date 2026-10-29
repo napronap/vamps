@@ -1,0 +1,47 @@
+{
+  "WBP_VampsFighter": {
+    "dependencies": [
+      "/Script/SlateCore",
+      "/Script/UMG",
+      "/Script/UMGEditor",
+      "/Script/vamps"
+    ]
+  },
+  "WBP_VampsEnemy": {
+    "dependencies": [
+      "/Script/SlateCore",
+      "/Script/UMG",
+      "/Script/UMGEditor",
+      "/Script/vamps"
+    ]
+  },
+  "WBP_VampsHUD": {
+    "dependencies": [
+      "/Script/SlateCore",
+      "/Script/UMG",
+      "/Script/UMGEditor",
+      "/Script/vamps",
+      "/Game/Vamps/UI/WBP_VampsFighter",
+      "/Game/Vamps/UI/WBP_VampsEnemy"
+    ],
+    "classes": {
+      "enemyWidgetClass": {
+        "refPath": "/Game/Vamps/UI/WBP_VampsEnemy.WBP_VampsEnemy_C"
+      },
+      "fighterWidgetClass": {
+        "refPath": "/Game/Vamps/UI/WBP_VampsFighter.WBP_VampsFighter_C"
+      }
+    }
+  },
+  "BP_VampsHUD": {
+    "dependencies": [
+      "/Script/vamps",
+      "/Game/Vamps/UI/WBP_VampsHUD"
+    ],
+    "classes": {
+      "hUDWidgetClass": {
+        "refPath": "/Game/Vamps/UI/WBP_VampsHUD.WBP_VampsHUD_C"
+      }
+    }
+  }
+}

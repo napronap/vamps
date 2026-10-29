@@ -20,7 +20,7 @@ void UVampsCombatResolver::Deinitialize()
 	PendingContacts.Reset();
 	PendingDashes.Reset();
 	PendingContinuations.Reset();
-	PendingLocomotion.Reset();
+	PendingRecoveryEnds.Reset();
 	Super::Deinitialize();
 }
 
@@ -133,22 +133,22 @@ void UVampsCombatResolver::QueueCombatContinuation(AVampsCharacter* Fighter)
 	PendingContinuations.AddUnique(Fighter);
 }
 
-void UVampsCombatResolver::QueueCombatLocomotion(AVampsCharacter* Fighter)
+void UVampsCombatResolver::QueueCombatRecoveryEnd(AVampsCharacter* Fighter)
 {
 	if (!IsValid(Fighter) || !Fighter->HasAuthority() || Fighter->GetWorld() != GetWorld())
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: locomotion request rejected for '%s'; expected a valid authoritative fighter in world '%s'."),
+		       TEXT("%hs: recovery end rejected for '%s'; expected a valid authoritative fighter in world '%s'."),
 		       __FUNCTION__,
 		       *GetPathNameSafe(Fighter),
 		       *GetPathNameSafe(GetWorld()));
 		return;
 	}
-	PendingLocomotion.AddUnique(Fighter);
+	PendingRecoveryEnds.Add(Fighter, Fighter->CombatState.ActionNumber);
 }
 
-void UVampsCombatResolver::DiscardContactsFor(const AVampsCharacter* Fighter)
+void UVampsCombatResolver::DiscardContactsFor(AVampsCharacter* Fighter)
 {
 	PendingDashes.RemoveAll(
 	    [Fighter](const TWeakObjectPtr<AVampsCharacter>& Candidate)
@@ -165,11 +165,7 @@ void UVampsCombatResolver::DiscardContactsFor(const AVampsCharacter* Fighter)
 	    {
 		    return Candidate.Get() == Fighter;
 	    });
-	PendingLocomotion.RemoveAll(
-	    [Fighter](const TWeakObjectPtr<AVampsCharacter>& Candidate)
-	    {
-		    return Candidate.Get() == Fighter;
-	    });
+	PendingRecoveryEnds.Remove(Fighter);
 }
 
 void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds)
@@ -184,10 +180,10 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 	    [](const FVampsPendingContact& Contact)
 	    {
 		    return !Contact.Attacker.IsValid() || !Contact.Recipient.IsValid() ||
-			       Contact.Attacker->IsActorBeingDestroyed() || Contact.Recipient->IsActorBeingDestroyed() ||
-			       !Contact.Attacker->CombatState.bIsAlive || !Contact.Recipient->CombatState.bIsAlive ||
-			       Contact.Attacker->CombatGeneration != Contact.AttackerGeneration ||
-			       Contact.Recipient->CombatGeneration != Contact.RecipientGeneration;
+		           Contact.Attacker->IsActorBeingDestroyed() || Contact.Recipient->IsActorBeingDestroyed() ||
+		           !Contact.Attacker->CombatState.bIsAlive || !Contact.Recipient->CombatState.bIsAlive ||
+		           Contact.Attacker->CombatGeneration != Contact.AttackerGeneration ||
+		           Contact.Recipient->CombatGeneration != Contact.RecipientGeneration;
 	    });
 	const auto ContactRank = [](const FVampsPendingContact& Contact)
 	{
@@ -213,7 +209,7 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 		    const int32 LeftRank = ContactRank(Left);
 		    const int32 RightRank = ContactRank(Right);
 		    return LeftRank != RightRank ? LeftRank < RightRank
-			                             : Left.Attacker->GetPathName() < Right.Attacker->GetPathName();
+		                                 : Left.Attacker->GetPathName() < Right.Attacker->GetPathName();
 	    });
 
 	for (int32 GroupStart = 0; GroupStart < Contacts.Num();)
@@ -320,20 +316,20 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 			Fighter->ResolveCombatContinuation();
 		}
 	}
+	const TMap<TWeakObjectPtr<AVampsCharacter>, int32> RecoveryEnds = MoveTemp(PendingRecoveryEnds);
+	for (const auto& RecoveryEnd : RecoveryEnds)
+	{
+		if (RecoveryEnd.Key.IsValid() && !RecoveryEnd.Key->IsActorBeingDestroyed())
+		{
+			RecoveryEnd.Key->ResolveCombatRecoveryEnd(RecoveryEnd.Value);
+		}
+	}
 	const TArray<TWeakObjectPtr<AVampsCharacter>> Dashes = MoveTemp(PendingDashes);
 	for (const TWeakObjectPtr<AVampsCharacter>& Fighter : Dashes)
 	{
 		if (Fighter.IsValid() && !Fighter->IsActorBeingDestroyed())
 		{
 			Fighter->ResolveCombatDash();
-		}
-	}
-	const TArray<TWeakObjectPtr<AVampsCharacter>> LocomotionRequests = MoveTemp(PendingLocomotion);
-	for (const TWeakObjectPtr<AVampsCharacter>& Fighter : LocomotionRequests)
-	{
-		if (Fighter.IsValid() && !Fighter->IsActorBeingDestroyed())
-		{
-			Fighter->ResolveCombatLocomotion();
 		}
 	}
 	if (AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode()))

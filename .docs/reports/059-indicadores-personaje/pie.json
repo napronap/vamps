@@ -1,0 +1,98 @@
+[
+  {
+    "configuration": {
+      "widgetClass": {
+        "refPath": "/Game/Vamps/UI/WBP_VampsCharacterIndicator.WBP_VampsCharacterIndicator_C"
+      },
+      "space": "Screen",
+      "drawSize": {
+        "x": 240,
+        "y": 80
+      },
+      "relativeLocation": {
+        "x": 0,
+        "y": 0,
+        "z": 128
+      }
+    },
+    "actor": {
+      "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0"
+    },
+    "component": {
+      "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_Player_C_0.CharacterIndicator"
+    },
+    "alive": true
+  },
+  {
+    "configuration": {
+      "widgetClass": {
+        "refPath": "/Game/Vamps/UI/WBP_VampsCharacterIndicator.WBP_VampsCharacterIndicator_C"
+      },
+      "space": "Screen",
+      "drawSize": {
+        "x": 240,
+        "y": 80
+      },
+      "relativeLocation": {
+        "x": 0,
+        "y": 0,
+        "z": 128
+      }
+    },
+    "actor": {
+      "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0"
+    },
+    "component": {
+      "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_0.CharacterIndicator"
+    },
+    "alive": true
+  },
+  {
+    "configuration": {
+      "widgetClass": {
+        "refPath": "/Game/Vamps/UI/WBP_VampsCharacterIndicator.WBP_VampsCharacterIndicator_C"
+      },
+      "space": "Screen",
+      "drawSize": {
+        "x": 240,
+        "y": 80
+      },
+      "relativeLocation": {
+        "x": 0,
+        "y": 0,
+        "z": 128
+      }
+    },
+    "actor": {
+      "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1"
+    },
+    "component": {
+      "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_1.CharacterIndicator"
+    },
+    "alive": true
+  },
+  {
+    "configuration": {
+      "widgetClass": {
+        "refPath": "/Game/Vamps/UI/WBP_VampsCharacterIndicator.WBP_VampsCharacterIndicator_C"
+      },
+      "space": "Screen",
+      "drawSize": {
+        "x": 240,
+        "y": 80
+      },
+      "relativeLocation": {
+        "x": 0,
+        "y": 0,
+        "z": 128
+      }
+    },
+    "actor": {
+      "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2"
+    },
+    "component": {
+      "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_LocalMatch.L_LocalMatch:PersistentLevel.BP_VampsCharacter_C_2.CharacterIndicator"
+    },
+    "alive": true
+  }
+]

@@ -21,6 +21,12 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+Fin de Recovery: [061 — Cierre por AN_EndRecovery](reports/061-fin-recovery-notify/reporte.md), con [compilación y configuración manual del montage](reports/061-fin-recovery-notify/editor.md). Un marcador por golpe libera movimiento, inicia NA de 0,5 s y solicita el regreso de cámara; sustituye la predicción temporal de [060](reports/060-salida-framing-antes-na/reporte.md). Código compilado; usuario recompiló/reabrió tras la recarga del struct y Codex verificó el arranque limpio. Pendientes los tres notifies y la comprobación de combate.
+
+Indicadores sobre personajes: [059 — Lock-on y barra de NA](reports/059-indicadores-personaje/reporte.md), con [configuración y observación del editor](reports/059-indicadores-personaje/editor.md). Componente de pantalla propio de cada personaje; arranque/configuración verificados por MCP y flecha del target local y NA descendente confirmados visualmente por el usuario el 2026-10-29.
+
+Presentación con widgets: [058 — UI con UMG](reports/058-ui-widgets/reporte.md), con [operaciones y comprobación del editor](reports/058-ui-widgets/editor.md). Conserva el flujo local y el aspecto de 048/051/055; migración compilada y assets conectados, con revisión interactiva final pendiente.
+
 Diseño del siguiente paso: [056 — Servidor dedicado y alojamiento](reports/056-analisis-servidor-dedicado/reporte.md), con [guía de preparación](reports/056-analisis-servidor-dedicado/editor.md). Demo privada en Japón, equipos/bots, ready e inicio por creador; reconexión con IA temporal, traspaso de organizador y 30 s de revancha acordados. Prioriza una VM sencilla de proveedor global para hasta tres partidas; revisa regiones, costes y propuestas de compensación aún por acordar. No implementa red ni despliega servicios.
 
 Cierre vigente: [055 — Selector Executioner y START](reports/055-selector-executioner/reporte.md), con [compilación y comprobación final](reports/055-selector-executioner/editor.md). **6.2 completado:** el usuario confirmó compilación y funcionamiento el 2026-10-27. Etapas 0–6 cerradas; **sigue 7, multijugador y autoridad de red**, después calibración en 8 y extensiones en 9. El segundo personaje y su DA no bloquean ese avance.

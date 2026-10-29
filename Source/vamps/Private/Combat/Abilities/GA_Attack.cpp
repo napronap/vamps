@@ -1,5 +1,6 @@
 #include "Combat/Abilities/GA_Attack.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "Animation/AN_EndRecovery.h"
 #include "Animation/AN_ResetWeaponHits.h"
 #include "Animation/ANS_AttackTrace.h"
 #include "Animation/ANS_ComboWindow.h"
@@ -84,14 +85,22 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 		}
 		const FAnimNotifyEvent* ContactNotify = nullptr;
 		const FAnimNotifyEvent* ComboNotify = nullptr;
+		const FAnimNotifyEvent* RecoveryNotify = nullptr;
 		for (const FAnimNotifyEvent& NotifyEvent : Montage->Notifies)
 		{
-			if (!NotifyEvent.NotifyStateClass ||
-			    Montage->GetSectionIndexFromPosition(NotifyEvent.GetTriggerTime()) != SectionIndex)
+			if (Montage->GetSectionIndexFromPosition(NotifyEvent.GetTriggerTime()) != SectionIndex)
 			{
 				continue;
 			}
-			if (NotifyEvent.NotifyStateClass->IsA<UANS_AttackTrace>())
+			if (NotifyEvent.Notify && NotifyEvent.Notify->IsA<UAN_EndRecovery>())
+			{
+				if (RecoveryNotify)
+				{
+					return SectionContext + TEXT(": duplicate AN_EndRecovery; keep exactly one notify per section.");
+				}
+				RecoveryNotify = &NotifyEvent;
+			}
+			if (NotifyEvent.NotifyStateClass && NotifyEvent.NotifyStateClass->IsA<UANS_AttackTrace>())
 			{
 				if (ContactNotify)
 				{
@@ -99,7 +108,7 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 				}
 				ContactNotify = &NotifyEvent;
 			}
-			if (NotifyEvent.NotifyStateClass->IsA<UANS_ComboWindow>())
+			if (NotifyEvent.NotifyStateClass && NotifyEvent.NotifyStateClass->IsA<UANS_ComboWindow>())
 			{
 				if (ComboNotify)
 				{
@@ -165,15 +174,15 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 		{
 			return SectionContext + TEXT(": missing ANS_ComboWindow before the final attack section.");
 		}
+		const float BlendOutLead =
+		    Montage->BlendOutTriggerTime >= 0.f ? Montage->BlendOutTriggerTime : Montage->BlendOut.GetBlendTime();
+		const float BlendOutStart = SectionEnd - BlendOutLead * Montage->RateScale;
 		if (ComboNotify)
 		{
-			const float BlendOutLead =
-			    Montage->BlendOutTriggerTime >= 0.f ? Montage->BlendOutTriggerTime : Montage->BlendOut.GetBlendTime();
 			const float ComboStart = ComboNotify->GetTriggerTime();
 			const float ComboEnd = ComboNotify->GetEndTriggerTime();
-			const float LatestComboEnd = SectionEnd - BlendOutLead * Montage->RateScale;
 			if (!(ComboStart > ContactStart && ComboEnd > ContactEnd && ComboEnd > ComboStart &&
-			      ComboEnd < LatestComboEnd))
+			      ComboEnd < BlendOutStart))
 			{
 				return FString::Printf(
 				    TEXT("%s: ANS_ComboWindow [%.6f, %.6f] must start after trace start %.6f, end after trace end "
@@ -183,8 +192,24 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 				    ComboEnd,
 				    ContactStart,
 				    ContactEnd,
-				    LatestComboEnd);
+				    BlendOutStart);
 			}
+		}
+		if (!RecoveryNotify)
+		{
+			return SectionContext +
+			       TEXT(": missing AN_EndRecovery. Add exactly one notify on the montage notify track.");
+		}
+		const float RecoveryEnd = RecoveryNotify->GetTriggerTime();
+		const float RecoveryStart = ComboNotify ? ComboNotify->GetEndTriggerTime() : ContactEnd;
+		if (!(RecoveryEnd > RecoveryStart && RecoveryEnd < BlendOutStart))
+		{
+			return FString::Printf(TEXT("%s: AN_EndRecovery at %.6f must follow contacts and combo window end %.6f, "
+			                            "and precede blend-out %.6f."),
+			                       *SectionContext,
+			                       RecoveryEnd,
+			                       RecoveryStart,
+			                       BlendOutStart);
 		}
 	}
 	return {};

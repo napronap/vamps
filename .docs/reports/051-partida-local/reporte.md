@@ -1,5 +1,7 @@
 # 051 — Implementación de la partida local 2v2
 
+La presentación de partida y resultado pasa a [058 — Widgets UMG](../058-ui-widgets/reporte.md). Sus reglas y configuración de combate se conservan.
+
 Cierre posterior: [053 — Comprobación del usuario y documentación vigente](../053-cierre-local-y-documentacion/reporte.md). El usuario confirmó el funcionamiento el 2026-10-27; los pendientes de observación de esta implementación quedan cerrados con esa atribución.
 
 Revisión posterior del repositorio: [052 — Estado tras la partida local](../052-estado-repo-tras-partida/reporte.md), con [continuación en el editor](../052-estado-repo-tras-partida/editor.md). Conserva la evidencia de esta implementación y distingue sus pendientes de los desfases de documentación.

@@ -12,6 +12,7 @@ class UVampsAttributeSet;
 class AVampsWeapon;
 class UVampsLockOnComponent;
 class UVampsCombatSettings;
+class UWidgetComponent;
 struct FBranchingPointNotifyPayload;
 struct FOnAttributeChangeData;
 struct FVampsPendingContact;
@@ -44,6 +45,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lock On")
 	TObjectPtr<UVampsLockOnComponent> LockOn;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<UWidgetComponent> CharacterIndicator;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UVampsCombatSettings> CombatSettings;
 
@@ -72,12 +76,12 @@ public:
 
 	bool BeginCombatAction(int32 PlaybackInstanceID);
 	void FinishCombatAction();
+	void EndCombatRecovery(const FBranchingPointNotifyPayload& Payload);
+	void ResolveCombatRecoveryEnd(int32 RecoveryActionNumber);
 	void SetCombatContacts(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
 	void ResetCombatWeaponHits(const FBranchingPointNotifyPayload& Payload, const TArray<int32>& WeaponIndices);
 	void SetCombatComboWindow(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
 	void ResolveCombatContinuation();
-	void ResolveCombatLocomotion();
-	bool TryCalculateCombatSectionDuration(float& SectionDuration) const;
 	bool MatchesDefendedContact(const FVampsPendingContact& Contact) const;
 	void RememberDefendedContact(const FVampsPendingContact& Contact);
 	void RegisterCombatContact(bool bBlocked);
@@ -92,8 +96,6 @@ private:
 	FGameplayAbilitySpecHandle AttackHandle;
 	FGameplayAbilitySpecHandle DashHandle;
 	FTimerHandle NARecoveryTimer;
-	FTimerHandle ActionRecoveryTimer;
-	double CombatStepEndsAt = 0;
 	double GuardRecoveryStartsAt = 0;
 	uint32 DefendedGeneration = 0;
 	int32 ReactionPlaybackInstanceID = INDEX_NONE;

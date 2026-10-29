@@ -188,8 +188,7 @@ void UVampsCombatMovementComponent::ApplyRootMotionToVelocity(float DeltaTime)
 	if (CombatMotion == EVampsCombatMotion::None || DeltaTime < MIN_TICK_TIME)
 	{
 		const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
-		if (Fighter && (!Fighter->CombatState.bCanMove || (Fighter->CombatState.MontageInstanceID != INDEX_NONE &&
-		                                                   !Fighter->CombatState.bRecoveryVisualReleased)))
+		if (Fighter && (!Fighter->CombatState.bCanMove || Fighter->CombatState.MontageInstanceID != INDEX_NONE))
 		{
 			Velocity.X = 0.f;
 			Velocity.Y = 0.f;
@@ -216,8 +215,7 @@ void UVampsCombatMovementComponent::PhysicsRotation(float DeltaTime)
 	if (CombatMotion == EVampsCombatMotion::None)
 	{
 		const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
-		if (Fighter && (Fighter->CombatState.bIsDashing || (Fighter->CombatState.MontageInstanceID != INDEX_NONE &&
-		                                                    !Fighter->CombatState.bRecoveryVisualReleased)))
+		if (Fighter && (Fighter->CombatState.bIsDashing || Fighter->CombatState.MontageInstanceID != INDEX_NONE))
 		{
 			return;
 		}

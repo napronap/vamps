@@ -38,8 +38,8 @@ public:
 	void QueueCombatContact(AVampsCharacter* Attacker, AVampsCharacter* Recipient);
 	void QueueCombatDash(AVampsCharacter* Fighter);
 	void QueueCombatContinuation(AVampsCharacter* Fighter);
-	void QueueCombatLocomotion(AVampsCharacter* Fighter);
-	void DiscardContactsFor(const AVampsCharacter* Fighter);
+	void QueueCombatRecoveryEnd(AVampsCharacter* Fighter);
+	void DiscardContactsFor(AVampsCharacter* Fighter);
 
 protected:
 
@@ -51,7 +51,7 @@ private:
 
 	TArray<FVampsPendingContact> PendingContacts;
 	TArray<TWeakObjectPtr<AVampsCharacter>> PendingContinuations;
-	TArray<TWeakObjectPtr<AVampsCharacter>> PendingLocomotion;
+	TMap<TWeakObjectPtr<AVampsCharacter>, int32> PendingRecoveryEnds;
 	FDelegateHandle PostActorTickHandle;
 
 	void ResolveCombatContacts(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds);

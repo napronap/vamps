@@ -1,5 +1,7 @@
 # 055 — Selector local de Executioner y START
 
+La presentación del selector pasa a [058 — Widgets UMG](../058-ui-widgets/reporte.md), manteniendo las acciones y el flujo aprobados aquí.
+
 ## Resultado
 
 **Paso 6.2 completado — usuario, 2026-10-27.** El usuario confirmó «listo lo compile y probe, funciona todo» y pidió registrar el cierre. Selección de Executioner, START sin otra confirmación y PLAY AGAIN de vuelta al selector conservando la elección quedan aprobados. Diseño en [054](../054-revision-seleccion-personaje/reporte.md) y operaciones reproducibles en la [guía](editor.md).

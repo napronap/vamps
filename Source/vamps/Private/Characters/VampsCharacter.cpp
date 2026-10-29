@@ -16,11 +16,13 @@
 #include "Combat/VampsCombatLog.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 #include "Player/VampsPlayerCameraManager.h"
 #include "GameModes/VampsMatchGameMode.h"
+#include "UI/VampsCharacterIndicatorWidget.h"
 
 namespace
 {
@@ -67,6 +69,13 @@ AVampsCharacter::AVampsCharacter(const FObjectInitializer& ObjectInitializer)
 	AbilitySystem->SetIsReplicated(true);
 	Attributes = CreateDefaultSubobject<UVampsAttributeSet>(TEXT("Attributes"));
 	LockOn = CreateDefaultSubobject<UVampsLockOnComponent>(TEXT("LockOn"));
+	CharacterIndicator = CreateDefaultSubobject<UWidgetComponent>(TEXT("CharacterIndicator"));
+	CharacterIndicator->SetupAttachment(GetRootComponent());
+	CharacterIndicator->SetRelativeLocation(FVector(0.f, 0.f, 128.f));
+	CharacterIndicator->SetWidgetSpace(EWidgetSpace::Screen);
+	CharacterIndicator->SetDrawSize(FVector2D(240.f, 80.f));
+	CharacterIndicator->SetPivot(FVector2D(0.5f, 1.f));
+	CharacterIndicator->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AVampsCharacter::BeginPlay()
@@ -114,6 +123,23 @@ void AVampsCharacter::BeginPlay()
 	}
 	SetCombatPhase(EVampsActionPhase::Idle);
 	Super::BeginPlay();
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		CharacterIndicator->InitWidget();
+		UVampsCharacterIndicatorWidget* IndicatorWidget =
+		    Cast<UVampsCharacterIndicatorWidget>(CharacterIndicator->GetUserWidgetObject());
+		if (!IndicatorWidget)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': CharacterIndicator requires a VampsCharacterIndicatorWidget; class='%s'."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       *GetPathNameSafe(CharacterIndicator->GetWidgetClass()));
+			return;
+		}
+		IndicatorWidget->ObserveFighter(this);
+	}
 }
 
 void AVampsCharacter::Tick(float DeltaSeconds)
@@ -208,7 +234,7 @@ void AVampsCharacter::SetMobilityHeld(bool bHeld, const FVector& DashDirection)
 
 void AVampsCharacter::ResolveCombatDash()
 {
-	if (!CombatState.bDashRequested || (CombatState.MontageInstanceID != INDEX_NONE && CombatState.bComboWindowOpen))
+	if (!CombatState.bDashRequested)
 	{
 		return;
 	}
@@ -237,8 +263,7 @@ void AVampsCharacter::UpdateMobilityEnergy(float DeltaSeconds)
 	const bool bSprinting = bMobilityHeld && !CombatState.bDashRequested && bHasMobilityInput &&
 	                        !CombatState.bIsDashing && CombatState.bCanMove && Movement->IsMovingOnGround() &&
 	                        Movement->CombatMotion == EVampsCombatMotion::None &&
-	                        (CombatState.MontageInstanceID == INDEX_NONE || CombatState.bRecoveryVisualReleased) &&
-	                        Attributes->GetMobilityEnergy() > 0.f;
+	                        CombatState.MontageInstanceID == INDEX_NONE && Attributes->GetMobilityEnergy() > 0.f;
 	CombatState.bIsSprinting = bSprinting;
 	const double Now = GetWorld()->GetTimeSeconds();
 	if (bSprinting)
@@ -259,7 +284,7 @@ void AVampsCharacter::UpdateMobilityEnergy(float DeltaSeconds)
 		AbilitySystem->SetNumericAttributeBase(
 		    UVampsAttributeSet::GetMobilityEnergyAttribute(),
 		    FMath::Min(Attributes->GetMaxMobilityEnergy(),
-			           Attributes->GetMobilityEnergy() + CombatSettings->MobilityRecoveryPerSecond * RecoverySeconds));
+		               Attributes->GetMobilityEnergy() + CombatSettings->MobilityRecoveryPerSecond * RecoverySeconds));
 	}
 }
 
@@ -390,11 +415,6 @@ void AVampsCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue,
 		return;
 	}
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
-	if (HasAuthority() && !WorldDirection.IsNearlyZero() && !FMath::IsNearlyZero(ScaleValue) &&
-	    CombatState.Phase == EVampsActionPhase::Recovery)
-	{
-		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatLocomotion(this);
-	}
 }
 
 void AVampsCharacter::RequestCombatAction()
@@ -483,7 +503,6 @@ void AVampsCharacter::StopMatchCombat()
 	ClearMobilityIntent();
 	CancelCombatOffense();
 	GetWorldTimerManager().ClearTimer(NARecoveryTimer);
-	GetWorldTimerManager().ClearTimer(ActionRecoveryTimer);
 	CombatState.NARecoveryEndsAt = 0;
 	CombatState.Reaction = EVampsCombatReaction::None;
 	CombatState.ReactionEndsAt = 0;
@@ -553,11 +572,6 @@ bool AVampsCharacter::BeginCombatAction(int32 PlaybackInstanceID)
 
 bool AVampsCharacter::BeginCombatStep()
 {
-	float SectionDuration;
-	if (!TryCalculateCombatSectionDuration(SectionDuration))
-	{
-		return false;
-	}
 	for (AVampsWeapon* EquippedWeapon : Weapons)
 	{
 		if (!IsValid(EquippedWeapon))
@@ -578,8 +592,6 @@ bool AVampsCharacter::BeginCombatStep()
 	CombatState.bActionConnected = false;
 	CombatState.bComboWindowOpen = false;
 	CombatState.bContinuationRequested = false;
-	CombatState.bRecoveryVisualReleased = false;
-	CombatStepEndsAt = GetWorld()->GetTimeSeconds() + SectionDuration;
 	CombatState.LastOutgoingContact = EVampsContactResult::None;
 	CombatState.LastOutgoingContactFrame = 0;
 	for (AVampsWeapon* EquippedWeapon : Weapons)
@@ -632,15 +644,64 @@ void AVampsCharacter::FinishCombatAction()
 		SetCombatPhase(EVampsActionPhase::Idle);
 		return;
 	}
-	const double RemainingRecovery = CombatStepEndsAt - GetWorld()->GetTimeSeconds();
-	if (CombatState.bRecoveryVisualReleased && RemainingRecovery > 0)
+	if (CombatState.Phase != EVampsActionPhase::NARecovery)
 	{
-		SetCombatPhase(EVampsActionPhase::Recovery);
-		GetWorldTimerManager().SetTimer(
-		    ActionRecoveryTimer, this, &AVampsCharacter::BeginNARecovery, float(RemainingRecovery));
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': attack montage '%s', step %d ended without AN_EndRecovery. Attack aborted."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(CombatSettings ? CombatSettings->AttackMontage.Get() : nullptr),
+		       CombatState.ComboStep);
+		CombatState.ComboStep = 0;
+		SetCombatPhase(EVampsActionPhase::Idle);
+		return;
+	}
+	SetCombatPhase(EVampsActionPhase::NARecovery);
+}
+
+void AVampsCharacter::EndCombatRecovery(const FBranchingPointNotifyPayload& Payload)
+{
+	if (!IsCurrentCombatNotify(Payload))
+	{
+		return;
+	}
+	if (CombatState.Phase != EVampsActionPhase::Recovery || CombatState.bComboWindowOpen)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': AN_EndRecovery in step %d requires Recovery and a closed combo window; phase=%d, "
+		            "window=%d."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       CombatState.ComboStep,
+		       int32(CombatState.Phase),
+		       CombatState.bComboWindowOpen);
+		return;
+	}
+	UAnimInstance* Animation = GetMesh()->GetAnimInstance();
+	if (!Animation)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': AN_EndRecovery requires an AnimInstance."),
+		       __FUNCTION__,
+		       *GetPathName());
+		return;
+	}
+	Animation->Montage_Pause(CombatSettings->AttackMontage);
+	GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatRecoveryEnd(this);
+}
+
+void AVampsCharacter::ResolveCombatRecoveryEnd(int32 RecoveryActionNumber)
+{
+	if (!CombatState.bIsAlive || CombatState.ActionNumber != RecoveryActionNumber ||
+	    CombatState.Phase != EVampsActionPhase::Recovery)
+	{
 		return;
 	}
 	BeginNARecovery();
+	AbilitySystem->CancelAbilityHandle(AttackHandle);
 }
 
 void AVampsCharacter::BeginNARecovery()
@@ -786,10 +847,6 @@ void AVampsCharacter::SetCombatComboWindow(const FBranchingPointNotifyPayload& P
 	{
 		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContinuation(this);
 	}
-	if (!bEnabled && CombatState.bDashRequested)
-	{
-		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatDash(this);
-	}
 }
 
 void AVampsCharacter::ResolveCombatContinuation()
@@ -846,76 +903,8 @@ void AVampsCharacter::ResolveCombatContinuation()
 		return;
 	}
 	Animation->Montage_JumpToSection(NextSection, Montage);
+	Animation->Montage_Resume(Montage);
 	CombatState.LastRequest = EVampsCombatRequest::ComboAdvanced;
-}
-
-void AVampsCharacter::ResolveCombatLocomotion()
-{
-	if (!CombatState.bIsAlive || CombatState.Phase != EVampsActionPhase::Recovery || CombatState.bComboWindowOpen ||
-	    CombatState.bRecoveryVisualReleased)
-	{
-		return;
-	}
-	CombatState.bRecoveryVisualReleased = true;
-	AbilitySystem->CancelAbilityHandle(AttackHandle);
-}
-
-bool AVampsCharacter::TryCalculateCombatSectionDuration(float& SectionDuration) const
-{
-	const UAnimMontage* Montage = CombatSettings ? CombatSettings->AttackMontage.Get() : nullptr;
-	if (!Montage || !Montage->IsValidSectionIndex(CombatState.ComboStep - 1))
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: cannot calculate step %d duration; CombatSettings '%s', montage '%s'."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       CombatState.ComboStep,
-		       *GetPathNameSafe(CombatSettings),
-		       *GetPathNameSafe(Montage));
-		return false;
-	}
-	UAnimInstance* Animation = GetMesh()->GetAnimInstance();
-	const FAnimMontageInstance* Playback =
-	    Animation ? Animation->GetMontageInstanceForID(CombatState.MontageInstanceID) : nullptr;
-	if (!Playback || Playback->Montage != Montage)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: cannot calculate duration; montage instance %d is missing or does not play '%s'."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       CombatState.MontageInstanceID,
-		       *Montage->GetPathName());
-		return false;
-	}
-	const float EffectivePlayRate = Playback->GetPlayRate() * Montage->RateScale;
-	if (!FMath::IsFinite(EffectivePlayRate) || EffectivePlayRate <= 0.f)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: montage '%s' requires a finite positive play rate; got %f."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *Montage->GetPathName(),
-		       EffectivePlayRate);
-		return false;
-	}
-	const float CalculatedDuration = Montage->GetSectionLength(CombatState.ComboStep - 1) / EffectivePlayRate;
-	if (!FMath::IsFinite(CalculatedDuration) || CalculatedDuration <= 0.f)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: montage '%s', step %d has invalid duration %f."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *Montage->GetPathName(),
-		       CombatState.ComboStep,
-		       CalculatedDuration);
-		return false;
-	}
-	SectionDuration = CalculatedDuration;
-	return true;
 }
 
 void AVampsCharacter::ArmDefenseRequest()
@@ -951,10 +940,7 @@ void AVampsCharacter::CancelCombatOffense()
 	CombatState.MontageInstanceID = INDEX_NONE;
 	CombatState.bComboWindowOpen = false;
 	CombatState.bContinuationRequested = false;
-	CombatState.bRecoveryVisualReleased = false;
 	CombatState.ComboStep = 0;
-	CombatStepEndsAt = 0;
-	GetWorldTimerManager().ClearTimer(ActionRecoveryTimer);
 	SetCombatPhase(CombatState.Phase == EVampsActionPhase::NARecovery ? EVampsActionPhase::NARecovery
 	                                                                  : EVampsActionPhase::Idle);
 	AbilitySystem->CancelAbilityHandle(AttackHandle);
@@ -1016,7 +1002,6 @@ void AVampsCharacter::ResetCombatState()
 	CombatState.MontageInstanceID = INDEX_NONE;
 	AbilitySystem->CancelAllAbilities();
 	GetWorldTimerManager().ClearTimer(NARecoveryTimer);
-	GetWorldTimerManager().ClearTimer(ActionRecoveryTimer);
 	ReactionPlaybackInstanceID = INDEX_NONE;
 	GuardRecoveryStartsAt = 0;
 	AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetGuardLoadAttribute(), 0.f);
@@ -1043,7 +1028,6 @@ void AVampsCharacter::ResetCombatState()
 		    *GetPathName(),
 		    *GetPathNameSafe(GetCharacterMovement()));
 	}
-	CombatStepEndsAt = 0;
 	CombatState = FVampsCombatState();
 	SetCombatPhase(EVampsActionPhase::Idle);
 }
@@ -1062,14 +1046,12 @@ void AVampsCharacter::SetCombatPhase(EVampsActionPhase NewPhase)
 	                             CombatState.Reaction != EVampsCombatReaction::Stun &&
 	                             (NewPhase != EVampsActionPhase::Recovery || bInReaction);
 	CombatState.bOffenseRestricted = bInReaction;
-	CombatState.bCanMove = CombatState.bIsAlive && bMatchAllowsCombat && !bInReaction;
+	CombatState.bCanMove = CombatState.bIsAlive && bMatchAllowsCombat && !bInReaction &&
+	                       (NewPhase == EVampsActionPhase::Idle || NewPhase == EVampsActionPhase::NARecovery);
 	const UVampsCombatMovementComponent* Mobility = Cast<UVampsCombatMovementComponent>(GetCharacterMovement());
-	CombatState.bCanDash = CombatState.bIsAlive && bMatchAllowsCombat && DashHandle.IsValid() && CombatSettings &&
+	CombatState.bCanDash = CombatState.bCanMove && DashHandle.IsValid() && CombatSettings &&
 	                       Attributes->GetMobilityEnergy() >= CombatSettings->DashEnergyCost && Mobility &&
-	                       !CombatState.bIsDashing &&
-	                       (CombatState.MontageInstanceID == INDEX_NONE || CombatState.bComboWindowOpen ||
-	                        NewPhase == EVampsActionPhase::Recovery) &&
-	                       GetCharacterMovement()->IsMovingOnGround() && !bInReaction;
+	                       !CombatState.bIsDashing && GetCharacterMovement()->IsMovingOnGround();
 	CombatState.bCanRequestCombat =
 	    CombatState.bIsAlive && bMatchAllowsCombat && AttackHandle.IsValid() &&
 	    NewPhase != EVampsActionPhase::NARecovery && CombatState.Reaction != EVampsCombatReaction::Stun &&
@@ -1080,7 +1062,7 @@ void AVampsCharacter::SetCombatPhase(EVampsActionPhase NewPhase)
 	CombatState.bCanDefend =
 	    bDefenseAllowed &&
 	    ((CombatState.bDefenseRequestArmed && GetWorld()->GetTimeSeconds() < CombatState.DefenseRequestEndsAt) ||
-		 (CombatState.Reaction == EVampsCombatReaction::Guard && CombatState.DefendedAttacker.IsValid()));
+	     (CombatState.Reaction == EVampsCombatReaction::Guard && CombatState.DefendedAttacker.IsValid()));
 
 	if (bWasDamageEnabled == CombatState.bCanDealDamage)
 	{
@@ -1185,7 +1167,7 @@ bool AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact)
 	}
 	CombatState.LastIncomingContact =
 	    Contact.bGuardBreak ? EVampsContactResult::GuardBreak
-		                    : (Contact.bBlocked ? EVampsContactResult::Blocked : EVampsContactResult::OpenHit);
+	                        : (Contact.bBlocked ? EVampsContactResult::Blocked : EVampsContactResult::OpenHit);
 	CombatState.LastIncomingContactFrame = GFrameCounter;
 	CombatState.bLastIncomingCritical = Contact.bCritical;
 	CombatState.LastDamageReceived = DamageAmount;

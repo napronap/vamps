@@ -3,8 +3,7 @@
 #include "GameFramework/HUD.h"
 #include "VampsCombatTestHUD.generated.h"
 
-class AVampsCharacter;
-class AVampsMatchGameMode;
+class UVampsHUDWidget;
 
 UCLASS()
 class VAMPS_API AVampsCombatTestHUD : public AHUD
@@ -13,8 +12,8 @@ class VAMPS_API AVampsCombatTestHUD : public AHUD
 
 public:
 
-	virtual void DrawHUD() override;
-	virtual void NotifyHitBoxClick(FName BoxName) override;
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
 #if !UE_BUILD_SHIPPING
 	void ToggleCombatHUD();
@@ -22,20 +21,9 @@ public:
 
 private:
 
-	bool bShowCombatDebug = false;
-	void DrawCharacterSelection(const AVampsMatchGameMode* MatchMode, float ViewScale);
-	void DrawMatchHUD(const AVampsMatchGameMode* MatchMode, float ViewScale);
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UVampsHUDWidget> HUDWidgetClass;
 
-	void DrawCombatHUD(AVampsCharacter* ViewingFighter, float ViewScale);
-	void DrawCombatPanel(
-	    AVampsCharacter* Fighter, const FString& PanelTitle, float PanelX, float PanelY, float ViewScale);
-	void DrawCombatMeter(const TCHAR* MeterLabel,
-	                     float MeterValue,
-	                     float MeterCapacity,
-	                     FLinearColor MeterColor,
-	                     float MeterX,
-	                     float MeterY,
-	                     float ViewScale);
-	void DrawCombatEnemies(AVampsCharacter* ViewingFighter, float ListX, float ListY, float ViewScale);
-	void DrawFighter(AVampsCharacter* Fighter, const FString& Label, float X, float Y, float Width, bool bSelected);
+	UPROPERTY(Transient)
+	TObjectPtr<UVampsHUDWidget> HUDWidget;
 };
