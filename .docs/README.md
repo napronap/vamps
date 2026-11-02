@@ -21,6 +21,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+Locomoción configurable: [063 — BlendSpace por DA y ABP compartido](reports/063-locomocion-configurable/reporte.md), con [asignaciones y comprobación visual](reports/063-locomocion-configurable/editor.md). `ABP_VampsCharacter` usa `LocomotionBlendSpace` del DA; Executioner conserva `BS_Executioner` y los otros tres campos quedan vacíos. Código y Blueprints compilados por MCP; arranque verificado y locomoción visual pendiente del usuario.
+
+Data Assets por personaje: [062 — Executioner, Dual Swords, Sword and Shield y Lancer](reports/062-data-assets-personajes/reporte.md), con [configuración y comprobación de GameModes](reports/062-data-assets-personajes/editor.md). El DA original se llama ahora `DA_ExecutionerCombatSettings`; los tres nuevos tienen parámetros iniciales y tres steps, con armas/montages pendientes. Los modos actuales conservan Executioner y se verificó el arranque de observación y 2v2 por MCP.
+
 Fin de Recovery: [061 — Cierre por AN_EndRecovery](reports/061-fin-recovery-notify/reporte.md), con [compilación y configuración manual del montage](reports/061-fin-recovery-notify/editor.md). Un marcador por golpe libera movimiento, inicia NA de 0,5 s y solicita el regreso de cámara; sustituye la predicción temporal de [060](reports/060-salida-framing-antes-na/reporte.md). Código compilado; usuario recompiló/reabrió tras la recarga del struct y Codex verificó el arranque limpio. Pendientes los tres notifies y la comprobación de combate.
 
 Indicadores sobre personajes: [059 — Lock-on y barra de NA](reports/059-indicadores-personaje/reporte.md), con [configuración y observación del editor](reports/059-indicadores-personaje/editor.md). Componente de pantalla propio de cada personaje; arranque/configuración verificados por MCP y flecha del target local y NA descendente confirmados visualmente por el usuario el 2026-10-29.

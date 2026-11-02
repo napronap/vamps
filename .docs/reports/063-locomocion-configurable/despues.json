@@ -1,0 +1,508 @@
+{
+  "assets": {
+    "/Game/Vamps/Data/DA_ExecutionerCombatSettings": {
+      "values": {
+        "locomotionBlendSpace": {
+          "refPath": "/Game/Vamps/Animations/Executioner/BS_Executioner.BS_Executioner"
+        },
+        "weapons": [
+          {
+            "weaponClass": {
+              "refPath": "/Game/Vamps/Blueprints/Weapons/BP_VampsGreatSword.BP_VampsGreatSword_C"
+            },
+            "attachSocket": "HandGrip_R",
+            "relativeTransform": {
+              "location": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              },
+              "rotation": {
+                "pitch": 0,
+                "yaw": 0,
+                "roll": 0
+              },
+              "scale": {
+                "x": 1,
+                "y": 1,
+                "z": 1
+              }
+            }
+          }
+        ],
+        "attackMontage": {
+          "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Combo.AM_Executioner_Combo"
+        },
+        "nARecoveryDuration": 0.5,
+        "comboSteps": [
+          {
+            "targetAlignmentDistance": 130,
+            "knockbackDistance": 100,
+            "contactReactionDuration": 1
+          },
+          {
+            "targetAlignmentDistance": 130,
+            "knockbackDistance": 100,
+            "contactReactionDuration": 1.2999999523162842
+          },
+          {
+            "targetAlignmentDistance": 150,
+            "knockbackDistance": 300,
+            "contactReactionDuration": 1
+          }
+        ],
+        "hitReactionMontage": {
+          "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Hit.AM_Executioner_Hit"
+        },
+        "guardReactionMontage": {
+          "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Block.AM_Executioner_Block"
+        },
+        "deathMontage": {
+          "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Death.AM_Executioner_Death"
+        },
+        "guardDeathMontage": {
+          "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_GuardDeath.AM_Executioner_GuardDeath"
+        },
+        "criticalDamage": 24,
+        "criticalChancePercent": 10,
+        "blockDamageReduction": 10,
+        "guardCapacity": 100,
+        "guardLoadPerHit": 25,
+        "guardRecoveryDelay": 1,
+        "guardRecoveryPerSecond": 20,
+        "stunDuration": 2,
+        "defenseRequestDuration": 0.5,
+        "forwardDashMontage": {
+          "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Fw.AM_Executioner_Dash_Fw"
+        },
+        "backwardDashMontage": {
+          "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Bw.AM_Executioner_Dash_Bw"
+        },
+        "approachDistance": 250,
+        "approachDuration": 0.25,
+        "approachStopDistance": 130,
+        "mobilityEnergyCapacity": 100,
+        "dashEnergyCost": 25,
+        "sprintEnergyPerSecond": 20,
+        "mobilityRecoveryPerSecond": 25,
+        "mobilityRecoveryDelay": 1,
+        "sprintSpeed": 700
+      },
+      "dirty": false
+    },
+    "/Game/Vamps/Data/DA_DualSwordsCombatSettings": {
+      "values": {
+        "locomotionBlendSpace": "None",
+        "weapons": [],
+        "attackMontage": "None",
+        "nARecoveryDuration": 0.3499999940395355,
+        "comboSteps": [
+          {
+            "targetAlignmentDistance": 90,
+            "knockbackDistance": 40,
+            "contactReactionDuration": 0.3499999940395355
+          },
+          {
+            "targetAlignmentDistance": 90,
+            "knockbackDistance": 50,
+            "contactReactionDuration": 0.4000000059604645
+          },
+          {
+            "targetAlignmentDistance": 100,
+            "knockbackDistance": 180,
+            "contactReactionDuration": 0.6000000238418579
+          }
+        ],
+        "hitReactionMontage": "None",
+        "guardReactionMontage": "None",
+        "deathMontage": "None",
+        "guardDeathMontage": "None",
+        "criticalDamage": 22,
+        "criticalChancePercent": 20,
+        "blockDamageReduction": 6,
+        "guardCapacity": 70,
+        "guardLoadPerHit": 18,
+        "guardRecoveryDelay": 0.800000011920929,
+        "guardRecoveryPerSecond": 25,
+        "stunDuration": 1.600000023841858,
+        "defenseRequestDuration": 0.4000000059604645,
+        "forwardDashMontage": "None",
+        "backwardDashMontage": "None",
+        "approachDistance": 280,
+        "approachDuration": 0.20000000298023224,
+        "approachStopDistance": 95,
+        "mobilityEnergyCapacity": 110,
+        "dashEnergyCost": 20,
+        "sprintEnergyPerSecond": 18,
+        "mobilityRecoveryPerSecond": 30,
+        "mobilityRecoveryDelay": 0.699999988079071,
+        "sprintSpeed": 760
+      },
+      "dirty": false
+    },
+    "/Game/Vamps/Data/DA_SwordAndShieldCombatSettings": {
+      "values": {
+        "locomotionBlendSpace": "None",
+        "weapons": [],
+        "attackMontage": "None",
+        "nARecoveryDuration": 0.5,
+        "comboSteps": [
+          {
+            "targetAlignmentDistance": 110,
+            "knockbackDistance": 60,
+            "contactReactionDuration": 0.5
+          },
+          {
+            "targetAlignmentDistance": 110,
+            "knockbackDistance": 70,
+            "contactReactionDuration": 0.550000011920929
+          },
+          {
+            "targetAlignmentDistance": 120,
+            "knockbackDistance": 220,
+            "contactReactionDuration": 0.699999988079071
+          }
+        ],
+        "hitReactionMontage": "None",
+        "guardReactionMontage": "None",
+        "deathMontage": "None",
+        "guardDeathMontage": "None",
+        "criticalDamage": 22,
+        "criticalChancePercent": 8,
+        "blockDamageReduction": 14,
+        "guardCapacity": 150,
+        "guardLoadPerHit": 24,
+        "guardRecoveryDelay": 0.800000011920929,
+        "guardRecoveryPerSecond": 30,
+        "stunDuration": 2,
+        "defenseRequestDuration": 0.6000000238418579,
+        "forwardDashMontage": "None",
+        "backwardDashMontage": "None",
+        "approachDistance": 220,
+        "approachDuration": 0.25,
+        "approachStopDistance": 110,
+        "mobilityEnergyCapacity": 100,
+        "dashEnergyCost": 25,
+        "sprintEnergyPerSecond": 22,
+        "mobilityRecoveryPerSecond": 24,
+        "mobilityRecoveryDelay": 0.8999999761581421,
+        "sprintSpeed": 650
+      },
+      "dirty": false
+    },
+    "/Game/Vamps/Data/DA_LancerCombatSettings": {
+      "values": {
+        "locomotionBlendSpace": "None",
+        "weapons": [],
+        "attackMontage": "None",
+        "nARecoveryDuration": 0.550000011920929,
+        "comboSteps": [
+          {
+            "targetAlignmentDistance": 190,
+            "knockbackDistance": 80,
+            "contactReactionDuration": 0.550000011920929
+          },
+          {
+            "targetAlignmentDistance": 200,
+            "knockbackDistance": 100,
+            "contactReactionDuration": 0.6000000238418579
+          },
+          {
+            "targetAlignmentDistance": 220,
+            "knockbackDistance": 280,
+            "contactReactionDuration": 0.800000011920929
+          }
+        ],
+        "hitReactionMontage": "None",
+        "guardReactionMontage": "None",
+        "deathMontage": "None",
+        "guardDeathMontage": "None",
+        "criticalDamage": 26,
+        "criticalChancePercent": 12,
+        "blockDamageReduction": 8,
+        "guardCapacity": 90,
+        "guardLoadPerHit": 28,
+        "guardRecoveryDelay": 1,
+        "guardRecoveryPerSecond": 20,
+        "stunDuration": 2,
+        "defenseRequestDuration": 0.5,
+        "forwardDashMontage": "None",
+        "backwardDashMontage": "None",
+        "approachDistance": 320,
+        "approachDuration": 0.30000001192092896,
+        "approachStopDistance": 200,
+        "mobilityEnergyCapacity": 100,
+        "dashEnergyCost": 25,
+        "sprintEnergyPerSecond": 20,
+        "mobilityRecoveryPerSecond": 25,
+        "mobilityRecoveryDelay": 1,
+        "sprintSpeed": 700
+      },
+      "dirty": false
+    }
+  },
+  "nodes": [
+    {
+      "output_pins": [],
+      "input_pins": [
+        {
+          "value": "(LinkID=-1,SourceLinkID=-1)",
+          "connected_pins": [
+            {
+              "direction": "EGPD_Output",
+              "index_id": 0,
+              "node": {
+                "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_Slot_1"
+              }
+            }
+          ],
+          "pin_id": {
+            "direction": "EGPD_Input",
+            "index_id": 0,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_Root_0"
+            }
+          },
+          "type_id": "Pose Link Structure",
+          "name": "Result"
+        }
+      ],
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "node": {
+        "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_Root_0"
+      },
+      "type_id": "Misc.|OutputPose"
+    },
+    {
+      "output_pins": [
+        {
+          "value": "0.0",
+          "connected_pins": [
+            {
+              "direction": "EGPD_Input",
+              "index_id": 0,
+              "node": {
+                "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_BlendSpacePlayer_1"
+              }
+            }
+          ],
+          "pin_id": {
+            "direction": "EGPD_Output",
+            "index_id": 0,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.K2Node_VariableGet_1"
+            }
+          },
+          "type_id": "Float (single-precision)",
+          "name": "Speed"
+        }
+      ],
+      "input_pins": [],
+      "position": {
+        "x": -832,
+        "y": 80
+      },
+      "node": {
+        "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.K2Node_VariableGet_1"
+      },
+      "type_id": "|GetSpeed"
+    },
+    {
+      "output_pins": [
+        {
+          "value": "",
+          "connected_pins": [
+            {
+              "direction": "EGPD_Input",
+              "index_id": 0,
+              "node": {
+                "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_Slot_1"
+              }
+            }
+          ],
+          "pin_id": {
+            "direction": "EGPD_Output",
+            "index_id": 0,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_BlendSpacePlayer_1"
+            }
+          },
+          "type_id": "Pose Link Structure",
+          "name": "Pose"
+        }
+      ],
+      "input_pins": [
+        {
+          "value": "0.000000",
+          "connected_pins": [
+            {
+              "direction": "EGPD_Output",
+              "index_id": 0,
+              "node": {
+                "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.K2Node_VariableGet_1"
+              }
+            }
+          ],
+          "pin_id": {
+            "direction": "EGPD_Input",
+            "index_id": 0,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_BlendSpacePlayer_1"
+            }
+          },
+          "type_id": "Float (single-precision)",
+          "name": "X"
+        },
+        {
+          "value": "0.000000",
+          "connected_pins": [],
+          "pin_id": {
+            "direction": "EGPD_Input",
+            "index_id": 1,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_BlendSpacePlayer_1"
+            }
+          },
+          "type_id": "Float (single-precision)",
+          "name": "Y"
+        },
+        {
+          "value": "",
+          "connected_pins": [
+            {
+              "direction": "EGPD_Output",
+              "index_id": 0,
+              "node": {
+                "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.K2Node_VariableGet_0"
+              }
+            }
+          ],
+          "pin_id": {
+            "direction": "EGPD_Input",
+            "index_id": 2,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_BlendSpacePlayer_1"
+            }
+          },
+          "type_id": "Blend Space Object Reference",
+          "name": "BlendSpace"
+        }
+      ],
+      "position": {
+        "x": -640,
+        "y": 48
+      },
+      "node": {
+        "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_BlendSpacePlayer_1"
+      },
+      "type_id": "Animation|BlendSpaces|BlendspacePlayer"
+    },
+    {
+      "output_pins": [
+        {
+          "value": "",
+          "connected_pins": [
+            {
+              "direction": "EGPD_Input",
+              "index_id": 0,
+              "node": {
+                "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_Root_0"
+              }
+            }
+          ],
+          "pin_id": {
+            "direction": "EGPD_Output",
+            "index_id": 0,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_Slot_1"
+            }
+          },
+          "type_id": "Pose Link Structure",
+          "name": "Pose"
+        }
+      ],
+      "input_pins": [
+        {
+          "value": "(LinkID=-1,SourceLinkID=-1)",
+          "connected_pins": [
+            {
+              "direction": "EGPD_Output",
+              "index_id": 0,
+              "node": {
+                "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_BlendSpacePlayer_1"
+              }
+            }
+          ],
+          "pin_id": {
+            "direction": "EGPD_Input",
+            "index_id": 0,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_Slot_1"
+            }
+          },
+          "type_id": "Pose Link Structure",
+          "name": "Source"
+        }
+      ],
+      "position": {
+        "x": -352,
+        "y": 48
+      },
+      "node": {
+        "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_Slot_1"
+      },
+      "type_id": "Animation|Montage|Slot'DefaultSlot'"
+    },
+    {
+      "output_pins": [
+        {
+          "value": "",
+          "connected_pins": [
+            {
+              "direction": "EGPD_Input",
+              "index_id": 2,
+              "node": {
+                "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.AnimGraphNode_BlendSpacePlayer_1"
+              }
+            }
+          ],
+          "pin_id": {
+            "direction": "EGPD_Output",
+            "index_id": 0,
+            "node": {
+              "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.K2Node_VariableGet_0"
+            }
+          },
+          "type_id": "Blend Space Object Reference",
+          "name": "LocomotionBlendSpace"
+        }
+      ],
+      "input_pins": [],
+      "position": {
+        "x": -960,
+        "y": 200
+      },
+      "node": {
+        "refPath": "/Game/Vamps/Animations/ABP_VampsCharacter.ABP_VampsCharacter:AnimGraph.K2Node_VariableGet_0"
+      },
+      "type_id": "|GetLocomotionBlendSpace"
+    }
+  ],
+  "abpDirty": false,
+  "abpDependencies": [
+    "/Script/AnimGraph",
+    "/Script/AnimGraphRuntime",
+    "/Script/vamps",
+    "/Game/Characters/Mannequins/Meshes/SK_Mannequin"
+  ],
+  "currentLevel": "/Game/Vamps/Maps/L_LocalMatch",
+  "previousValuesPreserved": {
+    "/Game/Vamps/Data/DA_ExecutionerCombatSettings": true,
+    "/Game/Vamps/Data/DA_DualSwordsCombatSettings": true,
+    "/Game/Vamps/Data/DA_SwordAndShieldCombatSettings": true,
+    "/Game/Vamps/Data/DA_LancerCombatSettings": true
+  }
+}

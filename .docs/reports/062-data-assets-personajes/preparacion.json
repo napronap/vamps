@@ -1,0 +1,23 @@
+{
+  "savedBefore": true,
+  "currentLevel": "/Game/Vamps/Maps/L_LocalMatch",
+  "currentLevelDirty": false,
+  "worldSettings": [
+    {
+      "instance": {
+        "refPath": "/Game/Vamps/Maps/L_LocalMatch.L_LocalMatch:PersistentLevel.WorldSettings_1"
+      },
+      "values": {
+        "defaultGameMode": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsMatchGameMode.BP_VampsMatchGameMode_C"
+        }
+      }
+    }
+  ],
+  "existingDestinations": [
+    "/Game/Vamps/Data/DA_VampsCombatSettings"
+  ],
+  "weaponBlueprints": [
+    "/Game/Vamps/Blueprints/Weapons/BP_VampsGreatSword"
+  ]
+}

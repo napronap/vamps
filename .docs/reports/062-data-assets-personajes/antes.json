@@ -1,0 +1,246 @@
+{
+  "settings": {
+    "/Game/Vamps/Data/DA_VampsCombatSettings": {
+      "weapons": [
+        {
+          "weaponClass": {
+            "refPath": "/Game/Vamps/Blueprints/Weapons/BP_VampsGreatSword.BP_VampsGreatSword_C"
+          },
+          "attachSocket": "HandGrip_R",
+          "relativeTransform": {
+            "location": {
+              "x": 0,
+              "y": 0,
+              "z": 0
+            },
+            "rotation": {
+              "pitch": 0,
+              "yaw": 0,
+              "roll": 0
+            },
+            "scale": {
+              "x": 1,
+              "y": 1,
+              "z": 1
+            }
+          }
+        }
+      ],
+      "attackMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Combo.AM_Executioner_Combo"
+      },
+      "nARecoveryDuration": 0.5,
+      "comboSteps": [
+        {
+          "targetAlignmentDistance": 130,
+          "knockbackDistance": 100,
+          "contactReactionDuration": 1
+        },
+        {
+          "targetAlignmentDistance": 130,
+          "knockbackDistance": 100,
+          "contactReactionDuration": 1.2999999523162842
+        },
+        {
+          "targetAlignmentDistance": 150,
+          "knockbackDistance": 300,
+          "contactReactionDuration": 1
+        }
+      ],
+      "hitReactionMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Hit.AM_Executioner_Hit"
+      },
+      "guardReactionMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Block.AM_Executioner_Block"
+      },
+      "deathMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Death.AM_Executioner_Death"
+      },
+      "guardDeathMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_GuardDeath.AM_Executioner_GuardDeath"
+      },
+      "criticalDamage": 24,
+      "criticalChancePercent": 10,
+      "blockDamageReduction": 10,
+      "guardCapacity": 100,
+      "guardLoadPerHit": 25,
+      "guardRecoveryDelay": 1,
+      "guardRecoveryPerSecond": 20,
+      "stunDuration": 2,
+      "defenseRequestDuration": 0.5,
+      "forwardDashMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Fw.AM_Executioner_Dash_Fw"
+      },
+      "backwardDashMontage": {
+        "refPath": "/Game/Vamps/Animations/Executioner/AM_Executioner_Dash_Bw.AM_Executioner_Dash_Bw"
+      },
+      "approachDistance": 250,
+      "approachDuration": 0.25,
+      "approachStopDistance": 130,
+      "mobilityEnergyCapacity": 100,
+      "dashEnergyCost": 25,
+      "sprintEnergyPerSecond": 20,
+      "mobilityRecoveryPerSecond": 25,
+      "mobilityRecoveryDelay": 1,
+      "sprintSpeed": 700
+    }
+  },
+  "derivedClasses": [
+    {
+      "refPath": "/Script/vamps.VampsCombatSettings"
+    }
+  ],
+  "references": [
+    "/Game/Vamps/Blueprints/BP_VampsCharacter_Player",
+    "/Game/Vamps/Blueprints/BP_VampsCharacter"
+  ],
+  "blueprints": {
+    "/Game/Vamps/Blueprints/BP_VampsMatchGameMode": {
+      "fields": [
+        "botCharacterClass",
+        "scoreTarget",
+        "baseKillScore",
+        "streakScoreBonus",
+        "preparationDuration",
+        "roundDuration",
+        "respawnDelay",
+        "spawnProtectionDuration",
+        "playerControllerClass",
+        "hUDClass",
+        "defaultPawnClass"
+      ],
+      "values": {
+        "botCharacterClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter.BP_VampsCharacter_C"
+        },
+        "scoreTarget": 1000,
+        "baseKillScore": 100,
+        "streakScoreBonus": 25,
+        "preparationDuration": 5,
+        "roundDuration": 300,
+        "respawnDelay": 5,
+        "spawnProtectionDuration": 2,
+        "playerControllerClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsMatchPlayerController.BP_VampsMatchPlayerController_C"
+        },
+        "hUDClass": {
+          "refPath": "/Game/Vamps/UI/BP_VampsHUD.BP_VampsHUD_C"
+        },
+        "defaultPawnClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.BP_VampsCharacter_Player_C"
+        }
+      }
+    },
+    "/Game/Vamps/Blueprints/BP_VampsCombatTestGameMode": {
+      "fields": [
+        "opponentClass",
+        "opponentControllerClass",
+        "initialAIMode",
+        "playerSpawn",
+        "opponentSpawn",
+        "playerControllerClass",
+        "hUDClass",
+        "defaultPawnClass"
+      ],
+      "values": {
+        "opponentClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter.BP_VampsCharacter_C"
+        },
+        "opponentControllerClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsAIController.BP_VampsAIController_C"
+        },
+        "initialAIMode": "Passive",
+        "playerSpawn": {
+          "location": {
+            "x": -220,
+            "y": 0,
+            "z": 100
+          },
+          "rotation": {
+            "pitch": 0,
+            "yaw": 0,
+            "roll": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },
+        "opponentSpawn": {
+          "location": {
+            "x": 220,
+            "y": 0,
+            "z": 100
+          },
+          "rotation": {
+            "pitch": 0,
+            "yaw": 180,
+            "roll": 0
+          },
+          "scale": {
+            "x": 1,
+            "y": 1,
+            "z": 1
+          }
+        },
+        "playerControllerClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsCombatTestPlayerController.BP_VampsCombatTestPlayerController_C"
+        },
+        "hUDClass": {
+          "refPath": "/Game/Vamps/UI/BP_VampsHUD.BP_VampsHUD_C"
+        },
+        "defaultPawnClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.BP_VampsCharacter_Player_C"
+        }
+      }
+    },
+    "/Game/Vamps/Blueprints/BP_VampsGameMode": {
+      "fields": [
+        "playerControllerClass",
+        "hUDClass",
+        "defaultPawnClass"
+      ],
+      "values": {
+        "playerControllerClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsPlayerController.BP_VampsPlayerController_C"
+        },
+        "hUDClass": {
+          "refPath": "/Script/Engine.HUD"
+        },
+        "defaultPawnClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.BP_VampsCharacter_Player_C"
+        }
+      }
+    },
+    "/Game/Vamps/Blueprints/BP_VampsCharacter_Player": {
+      "fields": [
+        "combatSettings",
+        "attackDamage",
+        "startingMaxHealth"
+      ],
+      "values": {
+        "combatSettings": {
+          "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+        },
+        "attackDamage": 12,
+        "startingMaxHealth": 100
+      }
+    },
+    "/Game/Vamps/Blueprints/BP_VampsCharacter": {
+      "fields": [
+        "combatSettings",
+        "attackDamage",
+        "startingMaxHealth"
+      ],
+      "values": {
+        "combatSettings": {
+          "refPath": "/Game/Vamps/Data/DA_VampsCombatSettings.DA_VampsCombatSettings"
+        },
+        "attackDamage": 12,
+        "startingMaxHealth": 100
+      }
+    }
+  },
+  "pieRunning": false
+}

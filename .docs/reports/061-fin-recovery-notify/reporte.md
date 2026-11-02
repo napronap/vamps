@@ -8,6 +8,14 @@ Hasta ese cierre, Preparation, Contacts y Recovery bloquean caminar, sprint y da
 
 El código está implementado y compiló por Live Coding. Tras un cierre del editor al intentar PIE sobre una recarga estructural, el usuario realizó compilación y reapertura limpias; el nuevo arranque por MCP fue correcto. Queda colocar los notifies y comprobar su respuesta en combate. Los pasos se consolidan en [editor.md](editor.md). La colocación de notifies es manual porque MCP no expone esa operación.
 
+## Diagnóstico del ataque bloqueado
+
+Revisión del 2026-11-01: el clic derecho alcanza `UGA_Attack::ActivateAbility`, pero la validación cancela el ataque antes de reproducir el montage. El log de la sesión registra `missing AN_EndRecovery` para `BP_VampsCharacter_Player_C_0` y los bots que comparten `DA_VampsCombatSettings`. La primera sección rechazada es `Default`, de 0 a 1,933333 s; la validación se detiene ahí y no confirma el estado de los marcadores de las otras secciones.
+
+La configuración manual pendiente sigue siendo la causa observada. `ObjectTools.list_properties` confirmó nuevamente que los eventos del montage no están expuestos; el catálogo MCP no dispone de edición de notifies. La lectura por `ObjectTools.get_properties` confirmó `BlendOut=0.25`, `BlendOutTriggerTime=-1`, `RateScale=1` y auto blend out activo. En `Default`, el marcador debe quedar después del cierre de contactos/combo y estrictamente antes de 1,683333 s. Los tiempos de esos cierres no se pueden leer por MCP; deben verse en la pista del editor.
+
+No se modificaron código ni assets para este diagnóstico, ni se recompiló o inició una sesión de juego. Se conserva el contrato de cierre por notify; la solución pendiente y su comprobación están en [editor.md](editor.md#3-colocar-los-marcadores).
+
 ## Código y conexiones
 
 | Clase / archivos | Cambio y relación |
@@ -39,3 +47,5 @@ No se modifican clases ni estructuras pertenecientes a propiedades de Data Asset
 - No se automatizaron inputs ni se agregaron o ejecutaron tests. La revisión de código no demuestra todavía la respuesta visual en combate.
 
 Esta implementación sustituye la anticipación temporal de [060](../060-salida-framing-antes-na/reporte.md). Se mantienen los indicadores de [059](../059-indicadores-personaje/reporte.md).
+
+La configuración de personajes continúa en [062 — Data Assets por personaje](../062-data-assets-personajes/reporte.md): el DA pasó a llamarse `DA_ExecutionerCombatSettings`, conservando sus valores y el mismo montage. Las referencias al nombre anterior de esta iteración documentan el estado previo al renombrado; el pendiente de `End Recovery` continúa vigente.

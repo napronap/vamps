@@ -1,0 +1,131 @@
+{
+  "gameModes": [
+    {
+      "instance": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCombatTestGameMode_C_0"
+      },
+      "values": {
+        "opponentClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter.BP_VampsCharacter_C"
+        },
+        "initialAIMode": "Passive",
+        "opponent": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0"
+        },
+        "opponentAI": {
+          "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsAIController_C_0"
+        },
+        "defaultPawnClass": {
+          "refPath": "/Game/Vamps/Blueprints/BP_VampsCharacter_Player.BP_VampsCharacter_Player_C"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "instance": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0"
+      },
+      "values": {
+        "weapons": [
+          {
+            "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsGreatSword_C_0"
+          }
+        ],
+        "combatSettings": {
+          "refPath": "/Game/Vamps/Data/DA_ExecutionerCombatSettings.DA_ExecutionerCombatSettings"
+        },
+        "combatState": {
+          "phase": "Idle",
+          "bIsAlive": true,
+          "bCanRequestCombat": true,
+          "bCanStartAction": true,
+          "bCanDealDamage": false,
+          "bCanDefend": false,
+          "bIsRecovering": false,
+          "comboStep": 0,
+          "bComboWindowOpen": false,
+          "bContinuationRequested": false,
+          "bOffenseRestricted": false,
+          "reactionEndsAt": 0,
+          "reaction": "None",
+          "bCanMove": true,
+          "bCanDash": true,
+          "bIsDashing": false,
+          "bIsSprinting": false,
+          "bDashRequested": false,
+          "bDefenseRequestArmed": false,
+          "defenseRequestEndsAt": 0,
+          "defendedAttacker": "None",
+          "defendedActionNumber": -1,
+          "reactionSource": "None",
+          "bLastIncomingCritical": false,
+          "lastDamageReceived": 0,
+          "nARecoveryEndsAt": 0,
+          "montageInstanceId": -1,
+          "lastRequest": "None",
+          "lastOutgoingContact": "None",
+          "lastIncomingContact": "None",
+          "requestCount": 0,
+          "actionNumber": 0,
+          "bActionConnected": false,
+          "lastOutgoingContactFrame": 0,
+          "lastIncomingContactFrame": 0
+        }
+      }
+    },
+    {
+      "instance": {
+        "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_C_0"
+      },
+      "values": {
+        "weapons": [
+          {
+            "refPath": "/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsGreatSword_C_1"
+          }
+        ],
+        "combatSettings": {
+          "refPath": "/Game/Vamps/Data/DA_ExecutionerCombatSettings.DA_ExecutionerCombatSettings"
+        },
+        "combatState": {
+          "phase": "Idle",
+          "bIsAlive": true,
+          "bCanRequestCombat": true,
+          "bCanStartAction": true,
+          "bCanDealDamage": false,
+          "bCanDefend": false,
+          "bIsRecovering": false,
+          "comboStep": 0,
+          "bComboWindowOpen": false,
+          "bContinuationRequested": false,
+          "bOffenseRestricted": false,
+          "reactionEndsAt": 0,
+          "reaction": "None",
+          "bCanMove": true,
+          "bCanDash": true,
+          "bIsDashing": false,
+          "bIsSprinting": false,
+          "bDashRequested": false,
+          "bDefenseRequestArmed": false,
+          "defenseRequestEndsAt": 0,
+          "defendedAttacker": "None",
+          "defendedActionNumber": -1,
+          "reactionSource": "None",
+          "bLastIncomingCritical": false,
+          "lastDamageReceived": 0,
+          "nARecoveryEndsAt": 0,
+          "montageInstanceId": -1,
+          "lastRequest": "None",
+          "lastOutgoingContact": "None",
+          "lastIncomingContact": "None",
+          "requestCount": 0,
+          "actionNumber": 0,
+          "bActionConnected": false,
+          "lastOutgoingContactFrame": 0,
+          "lastIncomingContactFrame": 0
+        }
+      }
+    }
+  ],
+  "pieRunningAfter": false
+}

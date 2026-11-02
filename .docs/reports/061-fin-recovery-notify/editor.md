@@ -1,6 +1,10 @@
 # AN_EndRecovery — operaciones del editor
 
+**Ruta actual del DA:** `/Game/Vamps/Data/DA_ExecutionerCombatSettings`, renombrado y verificado en [062](../062-data-assets-personajes/reporte.md). Las capturas de esta guía conservan el nombre anterior; el montage a editar sigue siendo `AM_Executioner_Combo`.
+
 **Queda para el usuario:** agregar un notify `End Recovery` en cada una de las tres secciones de `AM_Executioner_Combo`, guardar y comprobar el combate. La compilación completa y reapertura ya las realizó el usuario; Codex verificó el nuevo arranque y dejó PIE detenido. Hasta configurar los tres, la validación rechaza iniciar ataques e indica la sección que requiere el notify. MCP no dispone de edición de esos eventos; se deja ese paso manual conforme a `AGENTS.md`.
+
+**Diagnóstico confirmado el 2026-11-01:** los intentos del jugador y los bots llegan a `UGA_Attack`, pero se cancelan por `missing AN_EndRecovery` en `Default`. Completar el paso 3 para habilitar los ataques. La validación recorre todas las secciones antes de iniciar el montage, por lo que hay que revisar los tres marcadores aunque el primer error solo nombre `Default`.
 
 ## 1. Preparación
 
@@ -31,7 +35,9 @@
 4. Elegir visualmente cuánto Recovery conservar antes del marcador. Ese instante libera movimiento, inicia NA y solicita el regreso de cámara. Colocarlo antes del blend out automático de la sección; con la configuración actual de 0,25 s y velocidad 1×, dejar más de 0,25 s hasta su final. No usar el último frame ni superponerlo con el cierre de otro notify.
 5. Guardar el montage. No cambiar `NA Recovery Duration` del Data Asset, ni las secciones, clips, contactos o ventanas para aplicar este cambio.
 
-Los tiempos exactos de contactos y ventanas no están expuestos por MCP; esta guía no inventa posiciones numéricas. Los mensajes de `LogVampsCombat` identifican la sección y los límites si un marcador falta, está duplicado o queda fuera del intervalo permitido.
+**Lectura actual confirmada por Codex por MCP, 2026-11-01:** `BlendOut=0.25`, `BlendOutTriggerTime=-1`, `RateScale=1` y auto blend out activo. El error sitúa `Default` entre 0 y 1,933333 s: su `End Recovery` debe quedar estrictamente antes de 1,683333 s y después del cierre de contactos y combo. No es una posición sugerida para el marcador, sino su límite superior de validación. Revisar los intervalos de las otras dos secciones en el montage.
+
+Los tiempos exactos de contactos y ventanas no están expuestos por MCP; esta guía no inventa posiciones numéricas. Los mensajes de `LogVampsCombat` identifican la sección y los límites si un marcador falta, está duplicado o queda fuera del intervalo permitido. Después de guardarlo, repetir el ataque y comprobar que desaparece `attack rejected`; si el mensaje señala otra sección, corregir el marcador de esa sección antes de evaluar el flujo de combate.
 
 ## 4. Comprobar el flujo
 

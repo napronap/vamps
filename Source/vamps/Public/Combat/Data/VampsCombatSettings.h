@@ -4,6 +4,7 @@
 #include "VampsCombatSettings.generated.h"
 
 class UAnimMontage;
+class UBlendSpace;
 class AVampsWeapon;
 
 USTRUCT(BlueprintType)
@@ -42,6 +43,9 @@ class VAMPS_API UVampsCombatSettings : public UDataAsset
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	TObjectPtr<UBlendSpace> LocomotionBlendSpace;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	TArray<FVampsWeaponSettings> Weapons;

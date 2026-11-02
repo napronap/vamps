@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "line 11: RuntimeError: Script error in editor_toolset.toolsets.object.ObjectTools.get_properties:\nGetObjectProperties on '/Game/Vamps/Maps/UEDPIE_0_L_CharacterBasic.L_CharacterBasic:PersistentLevel.BP_VampsCharacter_Player_C_0.CharacterMesh0' (SkeletalMeshComponent): the following properties could not be read: AnimScriptInstance\nTraceback (script frames only):\n  File \"<script>\", line 34, in run\n    data=values(mesh,[\"animClass\",\"AnimScriptInstance\"])\n         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<script>\", line 11, in values\n    return json.loads(execute_tool(\"editor_toolset.toolsets.object.ObjectTools.get_properties\",json.dumps({\"instance\":instance,\"properties\":names}))[\"returnValue\"])\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^"
+    }
+  ],
+  "isError": true
+}

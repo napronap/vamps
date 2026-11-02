@@ -1,8 +1,39 @@
 #include "Animation/VampsAnimInstance.h"
+#include "Animation/BlendSpace.h"
 #include "Characters/VampsCharacter.h"
+#include "Combat/Data/VampsCombatSettings.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Combat/VampsCombatLog.h"
+
+void UVampsAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+
+	LocomotionBlendSpace = nullptr;
+	APawn* OwningPawn = TryGetPawnOwner();
+	if (!OwningPawn || !GetWorld()->IsGameWorld())
+	{
+		return;
+	}
+
+	const AVampsCharacter* OwningCharacter = Cast<AVampsCharacter>(OwningPawn);
+	const UVampsCombatSettings* Settings = OwningCharacter ? OwningCharacter->CombatSettings.Get() : nullptr;
+	if (!Settings || !Settings->LocomotionBlendSpace)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': locomotion initialization requires a VampsCharacter with CombatSettings and "
+		            "LocomotionBlendSpace; pawn='%s', settings='%s'."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(OwningPawn),
+		       *GetPathNameSafe(Settings));
+		return;
+	}
+
+	LocomotionBlendSpace = Settings->LocomotionBlendSpace;
+}
 
 void UVampsAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {

@@ -3,6 +3,8 @@
 #include "Animation/AnimInstance.h"
 #include "VampsAnimInstance.generated.h"
 
+class UBlendSpace;
+
 UCLASS(Transient, Blueprintable)
 class VAMPS_API UVampsAnimInstance : public UAnimInstance
 {
@@ -10,7 +12,11 @@ class VAMPS_API UVampsAnimInstance : public UAnimInstance
 
 public:
 
+	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "Animation")
+	TObjectPtr<UBlendSpace> LocomotionBlendSpace;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Animation")
 	float Speed = 0;
