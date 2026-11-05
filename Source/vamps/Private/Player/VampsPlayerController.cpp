@@ -209,6 +209,10 @@ void AVampsPlayerController::CycleTarget()
 
 void AVampsPlayerController::MobilityPressed()
 {
+	if (!GetPawn())
+	{
+		return;
+	}
 	AVampsCharacter* ControlledFighter = Cast<AVampsCharacter>(GetPawn());
 	const UEnhancedPlayerInput* EnhancedPlayerInput = Cast<UEnhancedPlayerInput>(PlayerInput);
 	if (!ControlledFighter || !EnhancedPlayerInput || !MoveAction)

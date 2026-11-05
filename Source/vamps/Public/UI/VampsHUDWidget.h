@@ -9,6 +9,7 @@ class UCanvasPanel;
 class UScaleBox;
 class UTextBlock;
 class UVerticalBox;
+class UVampsCharacterOptionWidget;
 class UVampsEnemyWidget;
 class UVampsFighterWidget;
 
@@ -32,6 +33,8 @@ private:
 	TSubclassOf<UVampsEnemyWidget> EnemyWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UVampsFighterWidget> FighterWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UVampsCharacterOptionWidget> CharacterOptionWidgetClass;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UScaleBox> LayoutScale;
 	UPROPERTY(meta = (BindWidget))
@@ -47,13 +50,11 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UWidget> ResultView;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UButton> SelectButton;
+	TObjectPtr<UVerticalBox> CharacterOptions;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> StartButton;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> RestartButton;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> SelectedText;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> ScoreText;
 	UPROPERTY(meta = (BindWidget))
@@ -96,8 +97,6 @@ private:
 	void RefreshFighters(float LayoutHeight);
 	void RefreshResults();
 
-	UFUNCTION()
-	void SelectExecutioner();
 	UFUNCTION()
 	void StartRound();
 	UFUNCTION()

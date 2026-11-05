@@ -1,5 +1,7 @@
 # 061 — Fin de Recovery por Anim Notify
 
+Continuación: [065 — Combos sin límite fijo de secciones](../065-combos-sin-limite-fijo/reporte.md), con [configuración y comprobaciones](../065-combos-sin-limite-fijo/editor.md). Conserva un `End Recovery` por golpe y valida el cierre en todas las N secciones del montage.
+
 ## Resultado
 
 `AN_EndRecovery` define el cierre normal de cada golpe. Al recibirlo se termina Recovery, empieza NA con su duración configurada de 0,5 s, se libera el movimiento y la cámara inicia su transición normal al plano general. El instante se elige manualmente en el montage; la cámara ya no anticipa NA ni calcula recuperación restante.

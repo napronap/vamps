@@ -36,9 +36,10 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 	{
 		return TEXT("CombatSettings must define AttackMontage.");
 	}
-	if (Montage->GetNumSections() < 1 || Montage->GetNumSections() > 3)
+	const int32 AttackSectionCount = Montage->GetNumSections();
+	if (AttackSectionCount < 1)
 	{
-		return TEXT("AttackMontage must contain one to three ordered attack sections.");
+		return TEXT("AttackMontage must contain at least one attack section.");
 	}
 	if (!FMath::IsFinite(Montage->RateScale) || !(Montage->RateScale > 0.f) || Montage->TimeStretchCurve.IsValid())
 	{
@@ -48,19 +49,14 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 	{
 		return TEXT("AttackMontage requires automatic blend-out to finish.");
 	}
-	if (Settings->ComboSteps.Num() < Montage->GetNumSections())
+	if (Settings->ComboSteps.Num() < AttackSectionCount)
 	{
-		return TEXT("CombatSettings must define distances for every attack section.");
+		return FString::Printf(TEXT("AttackMontage contains %d attack sections, but ComboSteps defines %d entries. "
+		                            "Configure alignment, knockback and reaction duration for every section."),
+		                       AttackSectionCount,
+		                       Settings->ComboSteps.Num());
 	}
-	if (Montage->GetNumSections() == 3)
-	{
-		const TArray<FVampsCombatStepSettings>& Steps = Settings->ComboSteps;
-		if (!(Steps[2].KnockbackDistance > FMath::Max(Steps[0].KnockbackDistance, Steps[1].KnockbackDistance)))
-		{
-			return TEXT("The third combo step must have the largest knockback distance.");
-		}
-	}
-	for (int32 SectionIndex = 0; SectionIndex < Montage->GetNumSections(); ++SectionIndex)
+	for (int32 SectionIndex = 0; SectionIndex < AttackSectionCount; ++SectionIndex)
 	{
 		float SectionStart;
 		float SectionEnd;
@@ -170,7 +166,7 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 				}
 			}
 		}
-		if (!ComboNotify && SectionIndex != Montage->GetNumSections() - 1)
+		if (!ComboNotify && SectionIndex != AttackSectionCount - 1)
 		{
 			return SectionContext + TEXT(": missing ANS_ComboWindow before the final attack section.");
 		}

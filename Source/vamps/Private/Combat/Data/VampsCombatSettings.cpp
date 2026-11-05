@@ -4,11 +4,11 @@
 
 bool UVampsCombatSettings::HasValidDeathMontages() const
 {
-	if (!DeathMontage || !GuardDeathMontage || DeathMontage == GuardDeathMontage)
+	if (!DeathMontage || !GuardDeathMontage)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: '%s': requires distinct DeathMontage and GuardDeathMontage; normal='%s', guard='%s'."),
+		       TEXT("%hs: '%s': requires DeathMontage and GuardDeathMontage; normal='%s', guard='%s'."),
 		       __FUNCTION__,
 		       *GetPathName(),
 		       *GetPathNameSafe(DeathMontage),

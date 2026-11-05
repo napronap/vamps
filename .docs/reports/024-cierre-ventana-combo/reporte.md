@@ -1,5 +1,7 @@
 # 024 — Continuación al cerrar la ventana de combo
 
+Continuación: [065 — Combos sin límite fijo de secciones](../065-combos-sin-limite-fijo/reporte.md), con [configuración del montage y comprobaciones](../065-combos-sin-limite-fijo/editor.md). Mantiene el cierre de ventana como momento de continuación y permite cualquier N de secciones desde una.
+
 Diagnóstico de configuración vigente: [025 — Validación del montage](../025-validacion-montage/reporte.md), con su [guía](../025-validacion-montage/editor.md). Sustituye los cierres por validación de UGA_Attack por rechazo explícito y mensajes detallados.
 
 ## Resultado — 2026-10-17

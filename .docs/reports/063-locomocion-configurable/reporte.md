@@ -1,5 +1,7 @@
 # 063 — BlendSpace configurable y ABP compartido
 
+Continúa en [064 — Selector y reparto desde DAs](../064-selector-desde-data-assets/reporte.md), con [guía del editor](../064-selector-desde-data-assets/editor.md). Conecta los cuatro perfiles al selector y al 2v2 sin repetidos; conserva los recursos pendientes de esta iteración.
+
 ## Resultado
 
 Cada `UVampsCombatSettings` tiene ahora `LocomotionBlendSpace`. `UVampsAnimInstance` lo toma del DA del personaje al inicializarse y `/Game/Vamps/Animations/ABP_VampsCharacter` lo usa como entrada de su BlendSpace Player. Jugador y bots usan ese mismo ABP, manteniendo `DefaultSlot` para los montages.

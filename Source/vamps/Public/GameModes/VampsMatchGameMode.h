@@ -4,7 +4,9 @@
 #include "VampsMatchGameMode.generated.h"
 
 class AVampsCharacter;
+class AVampsMatchPlayerController;
 class AVampsTeamSpawnPoint;
+class UVampsCombatSettings;
 
 UENUM(BlueprintType)
 enum class EVampsMatchPhase : uint8
@@ -56,6 +58,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Match")
 	TSubclassOf<AVampsCharacter> BotCharacterClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Match")
+	TArray<TObjectPtr<UVampsCombatSettings>> AvailableCharacters;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Match", meta = (ClampMin = "1"))
 	int32 ScoreTarget = 1000;
 
@@ -92,8 +97,8 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Match")
 	int32 WinningTeamIndex = INDEX_NONE;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Match")
-	bool bExecutionerSelected = false;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Transient, Category = "Match")
+	TObjectPtr<UVampsCombatSettings> SelectedCharacter;
 
 	bool AllowsCombat(const AVampsCharacter* Fighter) const;
 	bool AreEnemies(const AVampsCharacter* FirstFighter, const AVampsCharacter* SecondFighter) const;
@@ -102,7 +107,7 @@ public:
 	void RegisterCombatDeath(AVampsCharacter* Victim, AVampsCharacter* Attacker, bool bBlockedDeath);
 	void CompleteCombatFrame();
 	void OpenCharacterSelection();
-	void SelectExecutioner();
+	void SelectCharacter(UVampsCombatSettings* CharacterSettings);
 	void StartLocalRound();
 
 private:
@@ -121,6 +126,10 @@ private:
 	TArray<FPendingMatchDeath> PendingDeaths;
 
 	int32 FindParticipantIndex(const AVampsCharacter* Fighter) const;
+	bool ValidateCharacterCatalog() const;
+	bool CreateParticipants(const TArray<TObjectPtr<UVampsCombatSettings>>& RoundCharacters,
+	                        AVampsMatchPlayerController* LocalController);
+	void ClearParticipants();
 	bool RestoreParticipant(int32 ParticipantIndex, bool bRespawn);
 	void FinishLocalRound(bool bTimeExpired);
 	bool EnableMatchMenuInput();

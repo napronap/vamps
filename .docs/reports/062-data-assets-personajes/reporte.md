@@ -1,5 +1,7 @@
 # 062 — Data Assets por personaje
 
+El catálogo y la selección continúan en [064 — Selector y reparto desde DAs](../064-selector-desde-data-assets/reporte.md), con [guía del editor](../064-selector-desde-data-assets/editor.md). Reemplaza el uso exclusivo de Executioner por cuatro perfiles distintos; no completa las armas ni animaciones pendientes.
+
 La locomoción continúa en [063 — BlendSpace configurable y ABP compartido](../063-locomocion-configurable/reporte.md), con [operaciones del editor](../063-locomocion-configurable/editor.md). Agrega el BS por DA conservando todos los parámetros y referencias de esta iteración.
 
 ## Resultado

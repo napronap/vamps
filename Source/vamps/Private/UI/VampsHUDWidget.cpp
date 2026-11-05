@@ -1,4 +1,5 @@
 #include "UI/VampsHUDWidget.h"
+#include "UI/VampsCharacterOptionWidget.h"
 #include "UI/VampsEnemyWidget.h"
 #include "UI/VampsFighterWidget.h"
 #include "AI/VampsAIController.h"
@@ -6,6 +7,7 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/VampsCombatLog.h"
+#include "Combat/Data/VampsCombatSettings.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -36,25 +38,42 @@ void UVampsHUDWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
-	SelectButton->OnClicked.AddDynamic(this, &UVampsHUDWidget::SelectExecutioner);
 	StartButton->OnClicked.AddDynamic(this, &UVampsHUDWidget::StartRound);
 	RestartButton->OnClicked.AddDynamic(this, &UVampsHUDWidget::ReturnToSelection);
-	if (!EnemyWidgetClass || !FighterWidgetClass)
+	if (!EnemyWidgetClass || !FighterWidgetClass || !CharacterOptionWidgetClass)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: '%s' requires EnemyWidgetClass and FighterWidgetClass."),
+		       TEXT("%hs: '%s' requires EnemyWidgetClass, FighterWidgetClass and CharacterOptionWidgetClass."),
 		       __FUNCTION__,
 		       *GetPathName());
 		SetVisibility(ESlateVisibility::Collapsed);
+		return;
 	}
-}
-
-void UVampsHUDWidget::SelectExecutioner()
-{
 	if (MatchMode.IsValid())
 	{
-		MatchMode->SelectExecutioner();
+		for (UVampsCombatSettings* CharacterSettings : MatchMode->AvailableCharacters)
+		{
+			UVampsCharacterOptionWidget* CharacterOption =
+			    CreateWidget<UVampsCharacterOptionWidget>(GetOwningPlayer(), CharacterOptionWidgetClass);
+			if (!CharacterOption)
+			{
+				UE_LOG(LogVampsCombat,
+				       Error,
+				       TEXT("%hs: '%s' could not create a character option for '%s'."),
+				       __FUNCTION__,
+				       *GetPathName(),
+				       *GetPathNameSafe(CharacterSettings));
+				SetVisibility(ESlateVisibility::Collapsed);
+				return;
+			}
+			if (!CharacterOption->ConfigureCharacter(CharacterSettings, MatchMode.Get()))
+			{
+				SetVisibility(ESlateVisibility::Collapsed);
+				return;
+			}
+			CharacterOptions->AddChildToVerticalBox(CharacterOption)->SetPadding(FMargin(0.f, 0.f, 0.f, 8.f));
+		}
 	}
 }
 
@@ -120,13 +139,15 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 #endif
 	if (bSelecting)
 	{
-		StartButton->SetIsEnabled(MatchMode->bExecutionerSelected);
-		StartButton->SetBackgroundColor(MatchMode->bExecutionerSelected ? FLinearColor(0.15f, 0.35f, 0.45f)
-		                                                                : FLinearColor(0.08f, 0.08f, 0.1f));
-		SelectButton->SetBackgroundColor(MatchMode->bExecutionerSelected ? FLinearColor(0.15f, 0.4f, 0.5f)
-		                                                                 : FLinearColor(0.12f, 0.12f, 0.18f));
-		SelectedText->SetText(
-		    FText::FromString(MatchMode->bExecutionerSelected ? TEXT("EXECUTIONER  [SELECTED]") : TEXT("EXECUTIONER")));
+		const bool bCharacterSelected = MatchMode->SelectedCharacter != nullptr;
+		StartButton->SetIsEnabled(bCharacterSelected);
+		StartButton->SetBackgroundColor(bCharacterSelected ? FLinearColor(0.15f, 0.35f, 0.45f)
+		                                                   : FLinearColor(0.08f, 0.08f, 0.1f));
+		for (int32 CharacterIndex = 0; CharacterIndex < CharacterOptions->GetChildrenCount(); ++CharacterIndex)
+		{
+			Cast<UVampsCharacterOptionWidget>(CharacterOptions->GetChildAt(CharacterIndex))
+			    ->RefreshSelection(MatchMode->SelectedCharacter);
+		}
 		return;
 	}
 	if (bUnavailable)

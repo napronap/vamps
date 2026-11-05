@@ -1,0 +1,8 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\"returnValue\":\"Result: Success\\n\\nCompile Output:\\nStarting Live Coding compile.\\nUbaCli v5.8.1-Uba_v1.0.0-56050371 (Rootdir: \\\"C:\\\\ProgramData\\\\Epic\\\\UbaCli\\\", StoreCapacity: 0Gb)\\r\\n\\r\\n---- Starting trace: Debug275a3ec5-9663-4883-8981-f1ba73dd1613 ----\\r\\nRunning C:\\\\Program Files\\\\Microsoft Visual Studio\\\\18\\\\Insiders\\\\VC\\\\Tools\\\\MSVC\\\\14.51.36231\\\\bin\\\\Hostx64\\\\x64\\\\link.exe @C:\\\\Users\\\\student\\\\AppData\\\\Local\\\\Temp\\\\ADDA.tmp\\r\\n   \\r\\nDetoured run took 756ms\\nLive coding succeeded, data type changes may cause packaging to fail if assets reference the new or updated data types\"}"
+    }
+  ]
+}

@@ -2,10 +2,13 @@
 #include "AbilitySystemComponent.h"
 #include "AI/VampsAIController.h"
 #include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
+#include "Animation/BlendSpace.h"
 #include "Characters/VampsCharacter.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
 #include "Combat/Data/VampsCombatSettings.h"
 #include "Combat/VampsCombatLog.h"
+#include "Combat/VampsWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
@@ -19,11 +22,13 @@ AVampsMatchGameMode::AVampsMatchGameMode()
 {
 	PlayerControllerClass = AVampsMatchPlayerController::StaticClass();
 	HUDClass = AVampsCombatTestHUD::StaticClass();
+	bStartPlayersAsSpectators = true;
 	TeamScores.Init(0, 2);
 }
 
 void AVampsMatchGameMode::StartPlay()
 {
+	bStartPlayersAsSpectators = true;
 	Super::StartPlay();
 	const float Durations[] = {PreparationDuration, RoundDuration, RespawnDelay, SpawnProtectionDuration};
 	for (float MatchDuration : Durations)
@@ -41,19 +46,23 @@ void AVampsMatchGameMode::StartPlay()
 	}
 	AVampsMatchPlayerController* LocalController =
 	    Cast<AVampsMatchPlayerController>(GetWorld()->GetFirstPlayerController());
-	AVampsCharacter* LocalFighter = LocalController ? Cast<AVampsCharacter>(LocalController->GetPawn()) : nullptr;
-	if (!LocalFighter || !BotCharacterClass || BotCharacterClass->HasAnyClassFlags(CLASS_Abstract) ||
-	    ScoreTarget <= 0 || BaseKillScore <= 0 || StreakScoreBonus < 0 || PreparationDuration <= 0.f ||
-	    RoundDuration <= 0.f || RespawnDelay <= 0.f)
+	if (!LocalController || !DefaultPawnClass || !DefaultPawnClass->IsChildOf(AVampsCharacter::StaticClass()) ||
+	    DefaultPawnClass->HasAnyClassFlags(CLASS_Abstract) || !BotCharacterClass ||
+	    BotCharacterClass->HasAnyClassFlags(CLASS_Abstract) || ScoreTarget <= 0 || BaseKillScore <= 0 ||
+	    StreakScoreBonus < 0 || PreparationDuration <= 0.f || RoundDuration <= 0.f || RespawnDelay <= 0.f)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: '%s': requires match controller/player, concrete BotCharacterClass and valid match settings; "
+		       TEXT("%hs: '%s': requires match controller, concrete player/bot classes and valid match settings; "
 		            "player='%s', bot='%s'."),
 		       __FUNCTION__,
 		       *GetPathName(),
-		       *GetPathNameSafe(LocalFighter),
+		       *GetPathNameSafe(DefaultPawnClass.Get()),
 		       *GetPathNameSafe(BotCharacterClass.Get()));
+		return;
+	}
+	if (!ValidateCharacterCatalog())
+	{
 		return;
 	}
 	TeamSpawnPoints.Init(nullptr, 2);
@@ -79,50 +88,204 @@ void AVampsMatchGameMode::StartPlay()
 		UE_LOG(LogVampsCombat, Error, TEXT("%hs: '%s': missing team A/B spawn point."), __FUNCTION__, *GetPathName());
 		return;
 	}
-	Participants.SetNum(4);
-	Participants[0].Fighter = LocalFighter;
+	RoundPhase = EVampsMatchPhase::Finished;
+	OpenCharacterSelection();
+}
+
+bool AVampsMatchGameMode::ValidateCharacterCatalog() const
+{
+	if (AvailableCharacters.Num() < 4)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': AvailableCharacters requires at least four distinct assets; received %d."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       AvailableCharacters.Num());
+		return false;
+	}
+	TSet<const UVampsCombatSettings*> RegisteredCharacters;
+	for (int32 CharacterIndex = 0; CharacterIndex < AvailableCharacters.Num(); ++CharacterIndex)
+	{
+		const UVampsCombatSettings* CharacterSettings = AvailableCharacters[CharacterIndex];
+		if (!IsValid(CharacterSettings) || CharacterSettings->CharacterName.IsEmptyOrWhitespace() ||
+		    RegisteredCharacters.Contains(CharacterSettings))
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': AvailableCharacters[%d] '%s' requires a valid asset, nonempty CharacterName and "
+			            "a unique asset reference."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       CharacterIndex,
+			       *GetPathNameSafe(CharacterSettings));
+			return false;
+		}
+		RegisteredCharacters.Add(CharacterSettings);
+	}
+	return true;
+}
+
+bool AVampsMatchGameMode::CreateParticipants(const TArray<TObjectPtr<UVampsCombatSettings>>& RoundCharacters,
+                                             AVampsMatchPlayerController* LocalController)
+{
+	for (int32 ParticipantIndex = 0; ParticipantIndex < RoundCharacters.Num(); ++ParticipantIndex)
+	{
+		const UVampsCombatSettings* CharacterSettings = RoundCharacters[ParticipantIndex];
+		UClass* FighterClass = ParticipantIndex == 0 ? DefaultPawnClass.Get() : BotCharacterClass.Get();
+		const AVampsCharacter* FighterDefaults =
+		    FighterClass ? Cast<AVampsCharacter>(FighterClass->GetDefaultObject()) : nullptr;
+		if (!FighterDefaults || FighterClass->HasAnyClassFlags(CLASS_Abstract) || !FighterDefaults->GetMesh() ||
+		    !FighterDefaults->GetMesh()->GetSkeletalMeshAsset() || !FighterDefaults->GetMesh()->GetAnimClass() ||
+		    !FMath::IsFinite(FighterDefaults->StartingMaxHealth) || FighterDefaults->StartingMaxHealth <= 0.f)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': participant %d requires a concrete VampsCharacter class with mesh, animation "
+			            "class and positive finite health; class='%s'."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       ParticipantIndex,
+			       *GetPathNameSafe(FighterClass));
+			return false;
+		}
+		if (!CharacterSettings->LocomotionBlendSpace || !CharacterSettings->AttackMontage ||
+		    CharacterSettings->Weapons.IsEmpty() || !CharacterSettings->HasValidReactionSettings() ||
+		    !CharacterSettings->HasValidDeathMontages() || !CharacterSettings->HasValidMobilitySettings())
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': participant %d asset '%s' is incomplete; requires LocomotionBlendSpace, "
+			            "AttackMontage, weapons and valid reaction, death and mobility settings; blendSpace='%s', "
+			            "attack='%s', weapons=%d. Round remains in character selection."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       ParticipantIndex,
+			       *GetPathNameSafe(CharacterSettings),
+			       *GetPathNameSafe(CharacterSettings->LocomotionBlendSpace),
+			       *GetPathNameSafe(CharacterSettings->AttackMontage),
+			       CharacterSettings->Weapons.Num());
+			return false;
+		}
+		for (const FVampsWeaponSettings& WeaponSettings : CharacterSettings->Weapons)
+		{
+			if (!WeaponSettings.WeaponClass || WeaponSettings.WeaponClass->HasAnyClassFlags(CLASS_Abstract) ||
+			    WeaponSettings.AttachSocket.IsNone() ||
+			    !FighterDefaults->GetMesh()->DoesSocketExist(WeaponSettings.AttachSocket))
+			{
+				UE_LOG(LogVampsCombat,
+				       Error,
+				       TEXT("%hs: '%s': participant %d asset '%s' requires a concrete weapon class and an existing "
+				            "mesh socket; weapon='%s', socket='%s', fighterClass='%s'."),
+				       __FUNCTION__,
+				       *GetPathName(),
+				       ParticipantIndex,
+				       *CharacterSettings->GetPathName(),
+				       *GetPathNameSafe(WeaponSettings.WeaponClass.Get()),
+				       *WeaponSettings.AttachSocket.ToString(),
+				       *GetPathNameSafe(FighterClass));
+				return false;
+			}
+		}
+	}
+	ClearParticipants();
+	Participants.SetNum(RoundCharacters.Num());
 	for (int32 ParticipantIndex = 0; ParticipantIndex < Participants.Num(); ++ParticipantIndex)
 	{
 		FVampsMatchParticipant& Participant = Participants[ParticipantIndex];
 		Participant.TeamIndex = ParticipantIndex / 2;
-		if (ParticipantIndex > 0)
+		UClass* FighterClass = ParticipantIndex == 0 ? DefaultPawnClass.Get() : BotCharacterClass.Get();
+		const FTransform SpawnTransform = TeamSpawnPoints[Participant.TeamIndex]->GetActorTransform();
+		Participant.Fighter = GetWorld()->SpawnActorDeferred<AVampsCharacter>(
+		    FighterClass, SpawnTransform, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		AVampsCharacter* Fighter = Participant.Fighter;
+		if (Fighter)
 		{
-			FActorSpawnParameters SpawnParameters;
-			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			Participant.Fighter = GetWorld()->SpawnActor<AVampsCharacter>(
-			    BotCharacterClass, TeamSpawnPoints[Participant.TeamIndex]->GetActorTransform(), SpawnParameters);
-			AVampsAIController* BotController = GetWorld()->SpawnActor<AVampsAIController>();
-			if (!Participant.Fighter || !BotController)
+			Fighter->CombatSettings = RoundCharacters[ParticipantIndex];
+			Fighter->FinishSpawning(SpawnTransform);
+			if (IsValid(Fighter))
 			{
-				UE_LOG(LogVampsCombat,
-				       Error,
-				       TEXT("%hs: '%s': failed to create participant %d or its AI."),
-				       __FUNCTION__,
-				       *GetPathName(),
-				       ParticipantIndex);
-				return;
+				Fighter->GetMesh()->InitAnim(true);
 			}
-			BotController->Possess(Participant.Fighter);
-			BotController->SetMode(EVampsAIMode::Attack);
 		}
-		const AVampsCharacter* Fighter = Participant.Fighter;
-		if (!Fighter->Attributes || !Fighter->AbilitySystem || !Fighter->CombatSettings ||
-		    !Fighter->CombatSettings->HasValidDeathMontages() || !Fighter->CombatSettings->HasValidReactionSettings() ||
-		    !Fighter->CombatSettings->HasValidMobilitySettings() ||
-		    Fighter->AbilitySystem->GetActivatableAbilities().Num() < 2 || !Fighter->GetMesh()->GetAnimInstance())
+		if (!IsValid(Fighter) || Fighter->CombatSettings != RoundCharacters[ParticipantIndex] || !Fighter->Attributes ||
+		    !Fighter->AbilitySystem || Fighter->AbilitySystem->GetActivatableAbilities().Num() < 2 ||
+		    Fighter->Weapons.Num() != RoundCharacters[ParticipantIndex]->Weapons.Num() ||
+		    !Fighter->GetMesh()->GetAnimInstance())
 		{
 			UE_LOG(LogVampsCombat,
 			       Error,
-			       TEXT("%hs: '%s': participant '%s' requires attributes, abilities, settings, death montages and "
-			            "animation."),
+			       TEXT("%hs: '%s': participant %d failed initialization; class='%s', asset='%s', fighter='%s'. "
+			            "Cancelling participant creation."),
 			       __FUNCTION__,
 			       *GetPathName(),
+			       ParticipantIndex,
+			       *GetPathNameSafe(FighterClass),
+			       *GetPathNameSafe(RoundCharacters[ParticipantIndex]),
 			       *GetPathNameSafe(Fighter));
-			return;
+			ClearParticipants();
+			return false;
+		}
+		AController* ParticipantController = LocalController;
+		if (ParticipantIndex > 0)
+		{
+			AVampsAIController* BotController = GetWorld()->SpawnActor<AVampsAIController>();
+			ParticipantController = BotController;
+			if (BotController)
+			{
+				BotController->SetMode(EVampsAIMode::Attack);
+			}
+		}
+		if (ParticipantController)
+		{
+			ParticipantController->Possess(Fighter);
+		}
+		if (!ParticipantController || Fighter->GetController() != ParticipantController)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': participant %d '%s' could not be possessed by '%s'."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       ParticipantIndex,
+			       *Fighter->GetPathName(),
+			       *GetPathNameSafe(ParticipantController));
+			if (ParticipantIndex > 0 && ParticipantController)
+			{
+				ParticipantController->Destroy();
+			}
+			ClearParticipants();
+			return false;
 		}
 	}
-	RoundPhase = EVampsMatchPhase::Finished;
-	OpenCharacterSelection();
+	return true;
+}
+
+void AVampsMatchGameMode::ClearParticipants()
+{
+	for (const FVampsMatchParticipant& Participant : Participants)
+	{
+		AVampsCharacter* Fighter = Participant.Fighter;
+		if (IsValid(Fighter))
+		{
+			AController* ParticipantController = Fighter->GetController();
+			if (AVampsMatchPlayerController* MatchController = Cast<AVampsMatchPlayerController>(ParticipantController))
+			{
+				MatchController->FinishRespawnCamera();
+			}
+			if (ParticipantController)
+			{
+				ParticipantController->UnPossess();
+				if (Cast<AVampsAIController>(ParticipantController))
+				{
+					ParticipantController->Destroy();
+				}
+			}
+			Fighter->Destroy();
+		}
+	}
+	Participants.Reset();
+	PendingDeaths.Reset();
 }
 
 int32 AVampsMatchGameMode::FindParticipantIndex(const AVampsCharacter* Fighter) const
@@ -269,21 +432,47 @@ void AVampsMatchGameMode::OpenCharacterSelection()
 	UE_LOG(LogVampsCombat, Display, TEXT("%s: character selection opened."), *GetPathName());
 }
 
-void AVampsMatchGameMode::SelectExecutioner()
+void AVampsMatchGameMode::SelectCharacter(UVampsCombatSettings* CharacterSettings)
 {
-	if (RoundPhase == EVampsMatchPhase::Selecting)
+	if (RoundPhase != EVampsMatchPhase::Selecting)
 	{
-		bExecutionerSelected = true;
+		return;
 	}
+	if (!IsValid(CharacterSettings) || !AvailableCharacters.Contains(CharacterSettings))
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': cannot select asset '%s'; it must belong to AvailableCharacters."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(CharacterSettings));
+		return;
+	}
+	SelectedCharacter = CharacterSettings;
 }
 
 void AVampsMatchGameMode::StartLocalRound()
 {
-	if (RoundPhase != EVampsMatchPhase::Selecting || !bExecutionerSelected)
+	if (RoundPhase != EVampsMatchPhase::Selecting || !SelectedCharacter)
 	{
 		return;
 	}
-	APlayerController* LocalController = GetWorld()->GetFirstPlayerController();
+	if (!ValidateCharacterCatalog())
+	{
+		return;
+	}
+	if (!AvailableCharacters.Contains(SelectedCharacter))
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s': selected asset '%s' no longer belongs to AvailableCharacters."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *GetPathNameSafe(SelectedCharacter));
+		return;
+	}
+	AVampsMatchPlayerController* LocalController =
+	    Cast<AVampsMatchPlayerController>(GetWorld()->GetFirstPlayerController());
 	if (!IsValid(LocalController))
 	{
 		UE_LOG(LogVampsCombat,
@@ -294,23 +483,31 @@ void AVampsMatchGameMode::StartLocalRound()
 		RoundPhase = EVampsMatchPhase::Unavailable;
 		return;
 	}
-	PendingDeaths.Reset();
+	TArray<TObjectPtr<UVampsCombatSettings>> RemainingCharacters = AvailableCharacters;
+	RemainingCharacters.Remove(SelectedCharacter);
+	TArray<TObjectPtr<UVampsCombatSettings>> RoundCharacters = {SelectedCharacter};
+	while (RoundCharacters.Num() < 4)
+	{
+		const int32 ChoiceIndex = FMath::RandHelper(RemainingCharacters.Num());
+		RoundCharacters.Add(RemainingCharacters[ChoiceIndex]);
+		RemainingCharacters.RemoveAtSwap(ChoiceIndex);
+	}
+	if (!CreateParticipants(RoundCharacters, LocalController))
+	{
+		return;
+	}
 	TeamScores.Init(0, 2);
 	WinningTeamIndex = INDEX_NONE;
-	RoundPhase = EVampsMatchPhase::Preparing;
-	PhaseEndsAt = GetWorld()->GetTimeSeconds() + PreparationDuration;
 	for (int32 ParticipantIndex = 0; ParticipantIndex < Participants.Num(); ++ParticipantIndex)
 	{
-		FVampsMatchParticipant& Participant = Participants[ParticipantIndex];
-		Participant.Kills = 0;
-		Participant.Deaths = 0;
-		Participant.KillStreak = 0;
 		if (!RestoreParticipant(ParticipantIndex, false))
 		{
-			RoundPhase = EVampsMatchPhase::Unavailable;
+			ClearParticipants();
 			return;
 		}
 	}
+	RoundPhase = EVampsMatchPhase::Preparing;
+	PhaseEndsAt = GetWorld()->GetTimeSeconds() + PreparationDuration;
 	LocalController->bShowMouseCursor = false;
 	LocalController->bEnableClickEvents = false;
 	LocalController->SetInputMode(FInputModeGameOnly());

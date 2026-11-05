@@ -44,6 +44,9 @@ class VAMPS_API UVampsCombatSettings : public UDataAsset
 
 public:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character")
+	FText CharacterName;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<UBlendSpace> LocomotionBlendSpace;
 

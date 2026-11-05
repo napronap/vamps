@@ -1,5 +1,7 @@
 # 055 — Selector local de Executioner y START
 
+Selección vigente: [064 — Catálogo de DAs y reparto sin repetidos](../064-selector-desde-data-assets/reporte.md), con [guía del editor](../064-selector-desde-data-assets/editor.md). Sustituye la elección fija de Executioner y los cuatro participantes iguales.
+
 La presentación del selector pasa a [058 — Widgets UMG](../058-ui-widgets/reporte.md), manteniendo las acciones y el flujo aprobados aquí.
 
 ## Resultado

@@ -21,6 +21,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+Combos según el montage: [065 — Cualquier cantidad de secciones desde una](reports/065-combos-sin-limite-fijo/reporte.md), con [configuración y comprobaciones](reports/065-combos-sin-limite-fijo/editor.md). Se retira el máximo de tres y la comparación fija del knockback del tercer golpe; el final y las ventanas se validan usando N secciones. Compilado por MCP con los cuatro DAs preservados; configuración de secciones/notifies y observación de N>3 y una sección quedan al usuario.
+
+Selector desde datos: [064 — Nombres, catálogo y reparto sin repetidos](reports/064-selector-desde-data-assets/reporte.md), con [configuración y comprobaciones](reports/064-selector-desde-data-assets/editor.md). El HUD genera opciones desde los cuatro DAs del GameMode; el jugador usa el elegido y los bots reciben otros tres distintos. El ajuste de muerte permite compartir montage normal y bloqueado, compiló por MCP y conservó los valores actuales de los cuatro DAs. El usuario avanzó los recursos; queda comprobar START y ambas muertes.
+
 Locomoción configurable: [063 — BlendSpace por DA y ABP compartido](reports/063-locomocion-configurable/reporte.md), con [asignaciones y comprobación visual](reports/063-locomocion-configurable/editor.md). `ABP_VampsCharacter` usa `LocomotionBlendSpace` del DA; Executioner conserva `BS_Executioner` y los otros tres campos quedan vacíos. Código y Blueprints compilados por MCP; arranque verificado y locomoción visual pendiente del usuario.
 
 Data Assets por personaje: [062 — Executioner, Dual Swords, Sword and Shield y Lancer](reports/062-data-assets-personajes/reporte.md), con [configuración y comprobación de GameModes](reports/062-data-assets-personajes/editor.md). El DA original se llama ahora `DA_ExecutionerCombatSettings`; los tres nuevos tienen parámetros iniciales y tres steps, con armas/montages pendientes. Los modos actuales conservan Executioner y se verificó el arranque de observación y 2v2 por MCP.
