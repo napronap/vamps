@@ -39,6 +39,7 @@ public:
 	void QueueCombatDash(AVampsCharacter* Fighter);
 	void QueueCombatContinuation(AVampsCharacter* Fighter);
 	void QueueCombatRecoveryEnd(AVampsCharacter* Fighter);
+	bool HasQueuedCombatRecoveryEnd(AVampsCharacter& Fighter) const;
 	void DiscardContactsFor(AVampsCharacter* Fighter);
 
 protected:

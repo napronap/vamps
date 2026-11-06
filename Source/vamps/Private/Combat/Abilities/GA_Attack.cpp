@@ -45,9 +45,10 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 	{
 		return TEXT("AttackMontage requires positive, constant playback speed.");
 	}
-	if (!Montage->bEnableAutoBlendOut)
+	if (Montage->bEnableAutoBlendOut)
 	{
-		return TEXT("AttackMontage requires automatic blend-out to finish.");
+		return FString::Printf(TEXT("Montage '%s': disable Enable Auto Blend Out; AN_EndRecovery closes the attack."),
+		                       *Montage->GetPathName());
 	}
 	if (Settings->ComboSteps.Num() < AttackSectionCount)
 	{
@@ -170,25 +171,21 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 		{
 			return SectionContext + TEXT(": missing ANS_ComboWindow before the final attack section.");
 		}
-		const float BlendOutLead =
-		    Montage->BlendOutTriggerTime >= 0.f ? Montage->BlendOutTriggerTime : Montage->BlendOut.GetBlendTime();
-		const float BlendOutStart = SectionEnd - BlendOutLead * Montage->RateScale;
 		if (ComboNotify)
 		{
 			const float ComboStart = ComboNotify->GetTriggerTime();
 			const float ComboEnd = ComboNotify->GetEndTriggerTime();
-			if (!(ComboStart > ContactStart && ComboEnd > ContactEnd && ComboEnd > ComboStart &&
-			      ComboEnd < BlendOutStart))
+			if (!(ComboStart > ContactStart && ComboEnd > ContactEnd && ComboEnd > ComboStart && ComboEnd < SectionEnd))
 			{
 				return FString::Printf(
 				    TEXT("%s: ANS_ComboWindow [%.6f, %.6f] must start after trace start %.6f, end after trace end "
-				         "%.6f and its own start, and end before blend-out %.6f."),
+				         "%.6f and its own start, and end before the section ends at %.6f."),
 				    *SectionContext,
 				    ComboStart,
 				    ComboEnd,
 				    ContactStart,
 				    ContactEnd,
-				    BlendOutStart);
+				    SectionEnd);
 			}
 		}
 		if (!RecoveryNotify)
@@ -198,14 +195,14 @@ static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 		}
 		const float RecoveryEnd = RecoveryNotify->GetTriggerTime();
 		const float RecoveryStart = ComboNotify ? ComboNotify->GetEndTriggerTime() : ContactEnd;
-		if (!(RecoveryEnd > RecoveryStart && RecoveryEnd < BlendOutStart))
+		if (!(RecoveryEnd > RecoveryStart && RecoveryEnd < SectionEnd))
 		{
 			return FString::Printf(TEXT("%s: AN_EndRecovery at %.6f must follow contacts and combo window end %.6f, "
-			                            "and precede blend-out %.6f."),
+			                            "and precede the section end %.6f."),
 			                       *SectionContext,
 			                       RecoveryEnd,
 			                       RecoveryStart,
-			                       BlendOutStart);
+			                       SectionEnd);
 		}
 	}
 	return {};

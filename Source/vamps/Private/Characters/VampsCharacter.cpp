@@ -157,6 +157,17 @@ void AVampsCharacter::Tick(float DeltaSeconds)
 			return;
 		}
 	}
+	if (CombatState.MontageInstanceID != INDEX_NONE)
+	{
+		UAnimInstance* Animation = GetMesh()->GetAnimInstance();
+		const FAnimMontageInstance* Playback =
+		    Animation ? Animation->GetMontageInstanceForID(CombatState.MontageInstanceID) : nullptr;
+		if ((!Playback || (Playback->IsActive() && !Playback->IsPlaying())) &&
+		    !GetWorld()->GetSubsystem<UVampsCombatResolver>()->HasQueuedCombatRecoveryEnd(*this))
+		{
+			AbilitySystem->CancelAbilityHandle(AttackHandle);
+		}
+	}
 	const double Now = GetWorld()->GetTimeSeconds();
 	if (CombatState.Reaction != EVampsCombatReaction::None && Now >= CombatState.ReactionEndsAt)
 	{

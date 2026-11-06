@@ -148,6 +148,12 @@ void UVampsCombatResolver::QueueCombatRecoveryEnd(AVampsCharacter* Fighter)
 	PendingRecoveryEnds.Add(Fighter, Fighter->CombatState.ActionNumber);
 }
 
+bool UVampsCombatResolver::HasQueuedCombatRecoveryEnd(AVampsCharacter& Fighter) const
+{
+	const int32* QueuedActionNumber = PendingRecoveryEnds.Find(&Fighter);
+	return QueuedActionNumber && *QueuedActionNumber == Fighter.CombatState.ActionNumber;
+}
+
 void UVampsCombatResolver::DiscardContactsFor(AVampsCharacter* Fighter)
 {
 	PendingDashes.RemoveAll(

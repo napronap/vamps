@@ -1,5 +1,7 @@
 # 065 — Combos sin límite fijo de secciones
 
+La configuración del fundido continúa en [066 — Cierre por End Recovery](../066-fundido-por-end-recovery/reporte.md).
+
 ## Resultado
 
 `UGA_Attack` acepta un montage con cualquier cantidad de secciones mayor o igual a una. El número de golpes proviene de `AttackMontage.GetNumSections()` y la última sección se identifica por ese total; desaparece el máximo fijo de tres.

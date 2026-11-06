@@ -1,5 +1,7 @@
 # AN_EndRecovery — operaciones del editor
 
+La configuración vigente del fundido y los límites de los notifies están en la [guía de 066](../066-fundido-por-end-recovery/editor.md).
+
 **Ruta actual del DA:** `/Game/Vamps/Data/DA_ExecutionerCombatSettings`, renombrado y verificado en [062](../062-data-assets-personajes/reporte.md). Las capturas de esta guía conservan el nombre anterior; el montage a editar sigue siendo `AM_Executioner_Combo`.
 
 **Queda para el usuario:** agregar un notify `End Recovery` en cada una de las tres secciones de `AM_Executioner_Combo`, guardar y comprobar el combate. La compilación completa y reapertura ya las realizó el usuario; Codex verificó el nuevo arranque y dejó PIE detenido. Hasta configurar los tres, la validación rechaza iniciar ataques e indica la sección que requiere el notify. MCP no dispone de edición de esos eventos; se deja ese paso manual conforme a `AGENTS.md`.

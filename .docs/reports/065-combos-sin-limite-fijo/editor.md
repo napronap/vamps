@@ -1,5 +1,7 @@
 # Combos sin límite fijo — operaciones del editor
 
+La configuración vigente del fundido y los límites de los notifies están en la [guía de 066](../066-fundido-por-end-recovery/editor.md).
+
 **Queda para el usuario:** contar las secciones del montage que quiera usar, configurar una entrada de `ComboSteps` por golpe y sus notifies, y comprobar cadenas de más de tres golpes y de una sección. El cambio compiló por MCP y las 30 propiedades de cada DA se conservaron. No se conoce por MCP el número actual de secciones ni sus tiempos; no se han cambiado assets para inventar esa configuración.
 
 ## 1. Preservar la configuración actual

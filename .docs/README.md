@@ -21,6 +21,8 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+Fundido de ataque: [066 — Cierre por End Recovery sin fundido automático](reports/066-fundido-por-end-recovery/reporte.md), con [configuración y comprobación en Unreal](reports/066-fundido-por-end-recovery/editor.md). El marcador inicia NA y el fundido cuando termina la cadena. El fin de cada sección pasa a ser el límite para ubicar sus notifies.
+
 Combos según el montage: [065 — Cualquier cantidad de secciones desde una](reports/065-combos-sin-limite-fijo/reporte.md), con [configuración y comprobaciones](reports/065-combos-sin-limite-fijo/editor.md). Se retira el máximo de tres y la comparación fija del knockback del tercer golpe; el final y las ventanas se validan usando N secciones. Compilado por MCP con los cuatro DAs preservados; configuración de secciones/notifies y observación de N>3 y una sección quedan al usuario.
 
 Selector desde datos: [064 — Nombres, catálogo y reparto sin repetidos](reports/064-selector-desde-data-assets/reporte.md), con [configuración y comprobaciones](reports/064-selector-desde-data-assets/editor.md). El HUD genera opciones desde los cuatro DAs del GameMode; el jugador usa el elegido y los bots reciben otros tres distintos. El ajuste de muerte permite compartir montage normal y bloqueado, compiló por MCP y conservó los valores actuales de los cuatro DAs. El usuario avanzó los recursos; queda comprobar START y ambas muertes.
