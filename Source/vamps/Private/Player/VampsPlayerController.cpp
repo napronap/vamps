@@ -6,6 +6,7 @@
 #include "EnhancedPlayerInput.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
+#include "Engine/World.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "Combat/VampsCombatLog.h"
@@ -122,7 +123,10 @@ void AVampsPlayerController::SetupInputComponent()
 	Input->BindAction(MobilityAction, ETriggerEvent::Completed, this, &AVampsPlayerController::MobilityReleased);
 	Input->BindAction(MobilityAction, ETriggerEvent::Canceled, this, &AVampsPlayerController::MobilityReleased);
 #if !UE_BUILD_SHIPPING
-	Input->BindDebugKey(FInputChord(EKeys::F9), IE_Pressed, this, &AVampsPlayerController::ToggleCombatHUD, false);
+	if (GetWorld()->WorldType == EWorldType::PIE)
+	{
+		Input->BindDebugKey(FInputChord(EKeys::F9), IE_Pressed, this, &AVampsPlayerController::ToggleCombatHUD, false);
+	}
 #endif
 }
 

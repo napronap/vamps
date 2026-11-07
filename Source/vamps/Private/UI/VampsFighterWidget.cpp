@@ -158,26 +158,25 @@ void UVampsFighterWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	{
 		Status = State.bIsDashing ? TEXT("DASH") : TEXT("SPRINT");
 	}
-	else if (State.Phase == EVampsActionPhase::Preparation || State.Phase == EVampsActionPhase::Contacts)
-	{
-		Status = FString::Printf(TEXT("ATTACK %d"), State.ComboStep);
-	}
-	else if (State.Phase == EVampsActionPhase::Recovery)
-	{
-		Status = TEXT("RECOVERY");
-	}
-	if (State.bIsAlive && (State.Phase == EVampsActionPhase::NARecovery || State.NARecoveryEndsAt > Now))
-	{
-		Status += FString::Printf(TEXT("%sNA %.1fs"),
-		                          Status.IsEmpty() ? TEXT("") : TEXT(" | "),
-		                          FMath::Max(0.0, State.NARecoveryEndsAt - Now));
-	}
-	StatusText->SetText(FText::FromString(Status.IsEmpty() ? TEXT("READY") : Status));
+	StatusText->SetText(FText::FromString(Status));
 	StatusText->SetColorAndOpacity(State.bIsAlive ? FLinearColor::White : FLinearColor::Red);
 	const FLinearColor GuardColor =
 	    State.Reaction == EVampsCombatReaction::Stun ? FLinearColor::Red : FLinearColor(0.3f, 0.6f, 1.f);
 	GuardBar->SetFillColorAndOpacity(GuardColor);
 	DebugGuardBar->SetFillColorAndOpacity(GuardColor);
+	if (bDebugView)
+	{
+		RefreshDebugDetails();
+	}
+}
+
+void UVampsFighterWidget::RefreshDebugDetails()
+{
+	const AVampsCharacter* Fighter = ObservedFighter.Get();
+	const FVampsCombatState& State = Fighter->CombatState;
+	const UVampsCombatMovementComponent* Movement =
+	    Cast<UVampsCombatMovementComponent>(Fighter->GetCharacterMovement());
+	const double Now = GetWorld()->GetTimeSeconds();
 	FString Contact;
 	if (State.LastIncomingContact != EVampsContactResult::None)
 	{
@@ -192,19 +191,6 @@ void UVampsFighterWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	}
 	ContactText->SetText(FText::FromString(Contact));
 	ContactText->SetColorAndOpacity(State.bLastIncomingCritical ? FLinearColor::Yellow : FLinearColor::White);
-	if (bDebugView)
-	{
-		RefreshDebugDetails();
-	}
-}
-
-void UVampsFighterWidget::RefreshDebugDetails()
-{
-	const AVampsCharacter* Fighter = ObservedFighter.Get();
-	const FVampsCombatState& State = Fighter->CombatState;
-	const UVampsCombatMovementComponent* Movement =
-	    Cast<UVampsCombatMovementComponent>(Fighter->GetCharacterMovement());
-	const double Now = GetWorld()->GetTimeSeconds();
 	DebugDetails->SetText(FText::FromString(FString::Printf(
 	    TEXT("ACTION %d: %s\nSTART: %s | HIT: %s | GUARD: %s\nREQUEST #%d: %s\nOUT: %s | FRAME: %llu\nIN: %s | FRAME: "
 	         "%llu\n")
@@ -235,10 +221,8 @@ void UVampsFighterWidget::RefreshDebugDetails()
 	    Fighter->Attributes->GetGuardLoad(),
 	    Fighter->Attributes->GetMaxGuardLoad())));
 	DebugContact->SetText(
-	    FText::FromString(FString::Printf(TEXT("DAMAGE: %.1f | CRITICAL: %s\nDEFENSE: %s #%d\nMOBILITY ENERGY: %.0f / "
+	    FText::FromString(FString::Printf(TEXT("DEFENSE: %s #%d\nMOBILITY ENERGY: %.0f / "
 	                                           "%.0f | SPRINT: %s\nDASH: %s | ACTIVE: %s | PENDING: %s"),
-	                                      State.LastDamageReceived,
-	                                      State.bLastIncomingCritical ? TEXT("YES") : TEXT("NO"),
 	                                      *GetNameSafe(State.DefendedAttacker.Get()),
 	                                      State.DefendedActionNumber,
 	                                      Fighter->Attributes->GetMobilityEnergy(),
@@ -247,5 +231,4 @@ void UVampsFighterWidget::RefreshDebugDetails()
 	                                      State.bCanDash ? TEXT("READY") : TEXT("NO"),
 	                                      State.bIsDashing ? TEXT("YES") : TEXT("NO"),
 	                                      State.bDashRequested ? TEXT("YES") : TEXT("NO"))));
-	DebugContact->SetColorAndOpacity(State.bLastIncomingCritical ? FLinearColor::Yellow : FLinearColor::White);
 }

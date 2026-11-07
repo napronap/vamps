@@ -1,5 +1,7 @@
 # 058 — Migración de la UI a UMG
 
+La presentación vigente de los carteles y el acceso a F9 se detallan en [068 — Carteles del HUD y depuración en PIE](../068-carteles-hud/reporte.md).
+
 El selector continúa en [064 — Opciones desde Data Assets](../064-selector-desde-data-assets/reporte.md), con [guía del editor](../064-selector-desde-data-assets/editor.md). Reemplaza el botón fijo por una lista de opciones reutilizables; conserva las vistas de combate, debug y resultado.
 
 Ampliación posterior: [059 — Flecha de lock-on y barra de NA sobre personajes](../059-indicadores-personaje/reporte.md). Conserva la UI de esta iteración y agrega un Widget Component por personaje.

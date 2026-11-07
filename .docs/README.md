@@ -21,6 +21,8 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+[068 — Carteles del HUD y depuración en PIE](reports/068-carteles-hud/reporte.md) · [Guía del editor](reports/068-carteles-hud/editor.md).
+
 Muerte y cámara: [067 — Presentación de muerte, vista fija y colisión](reports/067-muerte-camara-y-danio/reporte.md), con [respaldo de daño y verificación en Unreal](reports/067-muerte-camara-y-danio/editor.md).
 
 Fundido de ataque: [066 — Cierre por End Recovery sin fundido automático](reports/066-fundido-por-end-recovery/reporte.md), con [configuración y comprobación en Unreal](reports/066-fundido-por-end-recovery/editor.md). El marcador inicia NA y el fundido cuando termina la cadena. El fin de cada sección pasa a ser el límite para ubicar sus notifies.

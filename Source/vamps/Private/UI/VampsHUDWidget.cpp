@@ -8,6 +8,7 @@
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/VampsCombatLog.h"
 #include "Combat/Data/VampsCombatSettings.h"
+#include "Components/Border.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
@@ -37,6 +38,17 @@ namespace
 void UVampsHUDWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
+	if (!Cast<UBorder>(NoticeText->GetParent()) || !Cast<UBorder>(TeamText->GetParent()) ||
+	    !Cast<UBorder>(RespawnText->GetParent()))
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s' requires Border parents for NoticeText, TeamText and RespawnText."),
+		       __FUNCTION__,
+		       *GetPathName());
+		SetVisibility(ESlateVisibility::Collapsed);
+		return;
+	}
 	MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
 	StartButton->OnClicked.AddDynamic(this, &UVampsHUDWidget::StartRound);
 	RestartButton->OnClicked.AddDynamic(this, &UVampsHUDWidget::ReturnToSelection);
@@ -96,6 +108,10 @@ void UVampsHUDWidget::ReturnToSelection()
 void UVampsHUDWidget::ToggleCombatDebug()
 {
 #if !UE_BUILD_SHIPPING
+	if (GetWorld()->WorldType != EWorldType::PIE)
+	{
+		return;
+	}
 	bShowCombatDebug = !bShowCombatDebug;
 	UE_LOG(LogVampsCombat,
 	       Display,
@@ -125,14 +141,15 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	OpponentsSlot->SetSize(FVector2D(DebugWidth, DebugOpponents->GetChildrenCount() * 445.f));
 	const bool bSelecting = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Selecting;
 	const bool bUnavailable = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Unavailable;
+	const bool bPreparing = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Preparing;
 	ShowWidget(SelectionView, bSelecting);
 	ShowWidget(CombatView, !bSelecting && !bUnavailable && !bShowCombatDebug);
 	ShowWidget(DebugView, !bSelecting && !bUnavailable && bShowCombatDebug);
 	ShowWidget(MatchView, MatchMode.IsValid() && !bSelecting && !bUnavailable);
 	ShowWidget(ResultView, MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Finished);
-	ShowWidget(NoticeText, bUnavailable);
+	ShowWidget(NoticeText->GetParent(), bPreparing || bUnavailable);
 #if !UE_BUILD_SHIPPING
-	ShowWidget(DebugHint, !bSelecting && !bUnavailable);
+	ShowWidget(DebugHint, GetWorld()->WorldType == EWorldType::PIE && !bSelecting && !bUnavailable);
 	DebugHint->SetText(FText::FromString(bShowCombatDebug ? TEXT("F9 COMBAT HUD") : TEXT("F9 DEBUG HUD")));
 #else
 	ShowWidget(DebugHint, false);
@@ -152,7 +169,6 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 	if (bUnavailable)
 	{
-		Cast<UCanvasPanelSlot>(NoticeText->Slot)->SetPosition(FVector2D(-200.f, 0.f));
 		NoticeText->SetText(FText::FromString(TEXT("MATCH UNAVAILABLE - See LogVampsCombat")));
 		NoticeText->SetColorAndOpacity(FLinearColor::Red);
 		return;
@@ -293,8 +309,6 @@ void UVampsHUDWidget::RefreshMatch()
 	                                                     Seconds % 60,
 	                                                     MatchMode->TeamScores[1],
 	                                                     MatchMode->ScoreTarget)));
-	ShowWidget(NoticeText, MatchMode->RoundPhase == EVampsMatchPhase::Preparing);
-	Cast<UCanvasPanelSlot>(NoticeText->Slot)->SetPosition(FVector2D(-100.f, 0.f));
 	NoticeText->SetColorAndOpacity(FLinearColor::Yellow);
 	NoticeText->SetText(FText::FromString(FString::Printf(TEXT("MATCH STARTS IN %d"), Seconds)));
 	TeamText->SetText(FText::GetEmpty());
@@ -318,6 +332,8 @@ void UVampsHUDWidget::RefreshMatch()
 			    FText::FromString(FString::Printf(TEXT("SPAWN PROTECTION %.1fs"), Participant.ProtectionEndsAt - Now)));
 		}
 	}
+	ShowWidget(TeamText->GetParent(), !TeamText->GetText().IsEmpty());
+	ShowWidget(RespawnText->GetParent(), !RespawnText->GetText().IsEmpty());
 	if (MatchMode->RoundPhase == EVampsMatchPhase::Finished)
 	{
 		RefreshResults();
