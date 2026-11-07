@@ -75,6 +75,9 @@ public:
 	TObjectPtr<UAnimMontage> GuardDeathMontage;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage", meta = (ClampMin = "0"))
+	float AttackDamage = 12.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage", meta = (ClampMin = "0"))
 	float CriticalDamage = 24.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage", meta = (ClampMin = "0", ClampMax = "100"))

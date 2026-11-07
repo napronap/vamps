@@ -104,7 +104,7 @@ public:
 	bool AreEnemies(const AVampsCharacter* FirstFighter, const AVampsCharacter* SecondFighter) const;
 	bool IsSpawnProtected(const AVampsCharacter* Fighter) const;
 	void EndSpawnProtection(AVampsCharacter* Fighter);
-	void RegisterCombatDeath(AVampsCharacter* Victim, AVampsCharacter* Attacker, bool bBlockedDeath);
+	void RegisterCombatDeath(AVampsCharacter* Victim, AVampsCharacter* Attacker);
 	void CompleteCombatFrame();
 	void OpenCharacterSelection();
 	void SelectCharacter(UVampsCombatSettings* CharacterSettings);
@@ -120,7 +120,6 @@ private:
 		int32 VictimIndex;
 		int32 AttackerIndex;
 		int32 Reward;
-		bool bBlocked;
 	};
 
 	TArray<FPendingMatchDeath> PendingDeaths;

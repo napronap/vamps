@@ -165,6 +165,19 @@ void AVampsPlayerCameraManager::EndPlay(const EEndPlayReason::Type Reason)
 	Super::EndPlay(Reason);
 }
 
+void AVampsPlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime)
+{
+	const AVampsCharacter* PreviouslyViewedFighter = ObservedFighter.Get();
+	if (bHasCameraState && PreviouslyViewedFighter && !PreviouslyViewedFighter->CombatState.bIsAlive &&
+	    ObservedGeneration == PreviouslyViewedFighter->CombatGeneration && PCOwner &&
+	    PCOwner->IsLocalPlayerController() && PCOwner->GetPawn() == PreviouslyViewedFighter &&
+	    OutVT.Target == PreviouslyViewedFighter)
+	{
+		return;
+	}
+	Super::UpdateViewTarget(OutVT, DeltaTime);
+}
+
 void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, float DeltaTime)
 {
 	AVampsCharacter* ViewingFighter = PCOwner ? Cast<AVampsCharacter>(PCOwner->GetPawn()) : nullptr;
@@ -331,9 +344,9 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 	bHasCameraState = true;
 	FVector PublishedEye = EyePosition;
 	FCollisionQueryParams CollisionParams(SCENE_QUERY_STAT(VampsCameraCollision), false, ViewingFighter);
-	if (LockedFighter)
+	for (const TWeakObjectPtr<AVampsCharacter>& Candidate : ViewingFighter->LockOn->GetCandidates())
 	{
-		CollisionParams.AddIgnoredActor(LockedFighter);
+		CollisionParams.AddIgnoredActor(Candidate.Get());
 	}
 	FHitResult CameraHit;
 	if (GetWorld()->SweepSingleByChannel(CameraHit,

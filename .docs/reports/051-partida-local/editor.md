@@ -1,5 +1,7 @@
 # Editor — Partida local 2v2
 
+El flujo vigente de muerte y cámara durante el respawn está en la [guía de 067](../067-muerte-camara-y-danio/editor.md).
+
 El mapa está configurado y guardado. El usuario confirmó el funcionamiento el 2026-10-27 y cerró las comprobaciones manuales en [053](../053-cierre-local-y-documentacion/reporte.md). No queda configuración ni observación obligatoria para cerrar 6.1. Esta guía conserva las operaciones de implementación y sus pasos reproducibles.
 
 ## 1. MCP y compilación

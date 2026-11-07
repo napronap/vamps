@@ -522,7 +522,7 @@ void AVampsCharacter::StopMatchCombat()
 	SetCombatPhase(EVampsActionPhase::Idle);
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
-	GetMesh()->bPauseAnims = true;
+	GetMesh()->bPauseAnims = CombatState.bIsAlive;
 }
 
 void AVampsCharacter::PresentCombatDeath(bool bBlockedDeath)
@@ -1193,9 +1193,10 @@ bool AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact)
 	Attacker->AbilitySystem->ApplyGameplayEffectSpecToTarget(*DamageSpec.Data, AbilitySystem);
 	if (!CombatState.bIsAlive)
 	{
+		PresentCombatDeath(Contact.bBlocked);
 		if (AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode()))
 		{
-			MatchMode->RegisterCombatDeath(this, Attacker, Contact.bBlocked);
+			MatchMode->RegisterCombatDeath(this, Attacker);
 		}
 	}
 	UE_LOG(LogVampsCombat,

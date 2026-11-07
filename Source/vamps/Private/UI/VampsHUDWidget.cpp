@@ -32,7 +32,7 @@ namespace
 		return Deaths > 0 ? FString::Printf(TEXT("%.2f"), double(Kills) / Deaths)
 		                  : FString(Kills > 0 ? TEXT("INF") : TEXT("0.00"));
 	}
-}
+} // namespace
 
 void UVampsHUDWidget::NativeOnInitialized()
 {
@@ -309,8 +309,8 @@ void UVampsHUDWidget::RefreshMatch()
 		TeamText->SetText(FText::FromString(Participant.TeamIndex == 0 ? TEXT("TEAM A") : TEXT("TEAM B")));
 		if (Participant.RespawnAt > Now)
 		{
-			RespawnText->SetText(FText::FromString(FString::Printf(TEXT("RESPAWN IN %d - WASD / mouse: free camera"),
-			                                                       FMath::CeilToInt(Participant.RespawnAt - Now))));
+			RespawnText->SetText(FText::FromString(
+			    FString::Printf(TEXT("RESPAWN IN %d"), FMath::CeilToInt(Participant.RespawnAt - Now))));
 		}
 		else if (Participant.ProtectionEndsAt > Now)
 		{

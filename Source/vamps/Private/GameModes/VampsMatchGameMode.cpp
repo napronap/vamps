@@ -269,10 +269,6 @@ void AVampsMatchGameMode::ClearParticipants()
 		if (IsValid(Fighter))
 		{
 			AController* ParticipantController = Fighter->GetController();
-			if (AVampsMatchPlayerController* MatchController = Cast<AVampsMatchPlayerController>(ParticipantController))
-			{
-				MatchController->FinishRespawnCamera();
-			}
 			if (ParticipantController)
 			{
 				ParticipantController->UnPossess();
@@ -330,7 +326,7 @@ void AVampsMatchGameMode::EndSpawnProtection(AVampsCharacter* Fighter)
 	}
 }
 
-void AVampsMatchGameMode::RegisterCombatDeath(AVampsCharacter* Victim, AVampsCharacter* Attacker, bool bBlockedDeath)
+void AVampsMatchGameMode::RegisterCombatDeath(AVampsCharacter* Victim, AVampsCharacter* Attacker)
 {
 	const int32 VictimIndex = FindParticipantIndex(Victim);
 	const int32 AttackerIndex = FindParticipantIndex(Attacker);
@@ -346,10 +342,8 @@ void AVampsMatchGameMode::RegisterCombatDeath(AVampsCharacter* Victim, AVampsCha
 		       *GetPathNameSafe(Attacker));
 		return;
 	}
-	PendingDeaths.Add({VictimIndex,
-	                   AttackerIndex,
-	                   BaseKillScore + StreakScoreBonus * Participants[VictimIndex].KillStreak,
-	                   bBlockedDeath});
+	PendingDeaths.Add(
+	    {VictimIndex, AttackerIndex, BaseKillScore + StreakScoreBonus * Participants[VictimIndex].KillStreak});
 }
 
 bool AVampsMatchGameMode::RestoreParticipant(int32 ParticipantIndex, bool bRespawn)
@@ -388,7 +382,6 @@ bool AVampsMatchGameMode::RestoreParticipant(int32 ParticipantIndex, bool bRespa
 	Participant.ProtectionEndsAt = bRespawn ? GetWorld()->GetTimeSeconds() + SpawnProtectionDuration : 0;
 	if (AVampsMatchPlayerController* MatchController = Cast<AVampsMatchPlayerController>(Fighter->GetController()))
 	{
-		MatchController->FinishRespawnCamera();
 		MatchController->SetControlRotation(SpawnPoint->GetActorRotation());
 	}
 	return true;
@@ -419,11 +412,6 @@ void AVampsMatchGameMode::OpenCharacterSelection()
 		Participant.RespawnAt = 0;
 		Participant.ProtectionEndsAt = 0;
 		Participant.Fighter->StopMatchCombat();
-		if (AVampsMatchPlayerController* MatchController =
-		        Cast<AVampsMatchPlayerController>(Participant.Fighter->GetController()))
-		{
-			MatchController->FinishRespawnCamera();
-		}
 	}
 	if (!EnableMatchMenuInput())
 	{
@@ -541,12 +529,6 @@ void AVampsMatchGameMode::CompleteCombatFrame()
 		Victim.KillStreak = 0;
 		Victim.RespawnAt = Now + RespawnDelay;
 		Victim.ProtectionEndsAt = 0;
-		Victim.Fighter->PresentCombatDeath(PendingDeath.bBlocked);
-		if (AVampsMatchPlayerController* MatchController =
-		        Cast<AVampsMatchPlayerController>(Victim.Fighter->GetController()))
-		{
-			MatchController->BeginRespawnCamera();
-		}
 		UE_LOG(LogVampsCombat,
 		       Display,
 		       TEXT("%s: participant %d eliminated by %d; reward=%d, score A/B=%d/%d."),

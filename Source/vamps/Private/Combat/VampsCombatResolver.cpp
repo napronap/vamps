@@ -68,7 +68,7 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker, AVampsC
 	const FVampsCombatStepSettings& StepSettings = AttackSettings->ComboSteps[Attacker->CombatState.ComboStep - 1];
 	if (!DefenseSettings || !AttackSettings->HasValidReactionSettings() ||
 	    !DefenseSettings->HasValidReactionSettings() || !Recipient->Attributes ||
-	    !FMath::IsFinite(Attacker->AttackDamage) || Attacker->AttackDamage < 0.f ||
+	    !FMath::IsFinite(AttackSettings->AttackDamage) || AttackSettings->AttackDamage < 0.f ||
 	    !FMath::IsFinite(StepSettings.ContactReactionDuration) || StepSettings.ContactReactionDuration <= 0.f)
 	{
 		UE_LOG(LogVampsCombat,
@@ -79,7 +79,7 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker, AVampsC
 		       __FUNCTION__,
 		       *Attacker->GetPathName(),
 		       *GetPathNameSafe(AttackSettings),
-		       Attacker->AttackDamage,
+		       AttackSettings->AttackDamage,
 		       StepSettings.ContactReactionDuration,
 		       *Recipient->GetPathName(),
 		       *GetPathNameSafe(DefenseSettings));
@@ -95,7 +95,7 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker, AVampsC
 	Contact.bCritical =
 	    AttackSettings->CriticalChancePercent >= 100.f ||
 	    (AttackSettings->CriticalChancePercent > 0.f && FMath::FRand() * 100.f < AttackSettings->CriticalChancePercent);
-	Contact.ContactDamage = Contact.bCritical ? AttackSettings->CriticalDamage : Attacker->AttackDamage;
+	Contact.ContactDamage = Contact.bCritical ? AttackSettings->CriticalDamage : AttackSettings->AttackDamage;
 	Contact.BlockReduction = DefenseSettings->BlockDamageReduction;
 	Contact.GuardLoad = AttackSettings->GuardLoadPerHit;
 	Contact.AttackOrigin = Attacker->GetActorLocation();

@@ -21,6 +21,8 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+Muerte y cámara: [067 — Presentación de muerte, vista fija y colisión](reports/067-muerte-camara-y-danio/reporte.md), con [respaldo de daño y verificación en Unreal](reports/067-muerte-camara-y-danio/editor.md).
+
 Fundido de ataque: [066 — Cierre por End Recovery sin fundido automático](reports/066-fundido-por-end-recovery/reporte.md), con [configuración y comprobación en Unreal](reports/066-fundido-por-end-recovery/editor.md). El marcador inicia NA y el fundido cuando termina la cadena. El fin de cada sección pasa a ser el límite para ubicar sus notifies.
 
 Combos según el montage: [065 — Cualquier cantidad de secciones desde una](reports/065-combos-sin-limite-fijo/reporte.md), con [configuración y comprobaciones](reports/065-combos-sin-limite-fijo/editor.md). Se retira el máximo de tres y la comparación fija del knockback del tercer golpe; el final y las ventanas se validan usando N secciones. Compilado por MCP con los cuatro DAs preservados; configuración de secciones/notifies y observación de N>3 y una sección quedan al usuario.

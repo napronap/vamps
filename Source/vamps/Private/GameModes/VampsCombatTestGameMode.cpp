@@ -4,6 +4,7 @@
 #include "Characters/VampsCharacter_Player.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
 #include "Combat/VampsCombatLog.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Player/VampsCombatTestPlayerController.h"
@@ -114,11 +115,17 @@ void AVampsCombatTestGameMode::ResetCombat()
 	}
 	for (AVampsCharacter* Fighter : {PlayerCharacter, Opponent.Get()})
 	{
+		const bool bWasDead = !Fighter->CombatState.bIsAlive;
 		Fighter->ResetCombatState();
 		Fighter->AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetHealthAttribute(),
 		                                                Fighter->Attributes->GetMaxHealth());
 		Fighter->SetActorTransform(
 		    Fighter == PlayerCharacter ? PlayerSpawn : OpponentSpawn, false, nullptr, ETeleportType::TeleportPhysics);
+		if (bWasDead)
+		{
+			Fighter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			Fighter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		}
 		Fighter->ConsumeMovementInputVector();
 		Fighter->GetCharacterMovement()->StopMovementImmediately();
 	}

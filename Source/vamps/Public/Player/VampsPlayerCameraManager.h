@@ -20,6 +20,7 @@ public:
 
 protected:
 
+	virtual void UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime) override;
 	virtual void UpdateViewTargetInternal(FTViewTarget& OutVT, float DeltaTime) override;
 
 private:
