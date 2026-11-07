@@ -2,6 +2,7 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
+#include "Combat/Data/VampsCombatSettings.h"
 #include "Combat/VampsCombatMovementComponent.h"
 #include "Combat/VampsCombatLog.h"
 #include "Components/ProgressBar.h"
@@ -38,7 +39,6 @@ void UVampsFighterWidget::ObserveFighter(AVampsCharacter* NewFighter,
 	CombatView->SetVisibility(bDebug ? ESlateVisibility::Collapsed : ESlateVisibility::SelfHitTestInvisible);
 	DebugView->SetVisibility(bDebug ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
 	SelectionMark->SetVisibility(bSelected ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
-	PanelTitle->SetText(FText::FromString(PanelLabel));
 	if (NewFighter && ObservedFighter.Get() == NewFighter)
 	{
 		return;
@@ -125,12 +125,52 @@ void UVampsFighterWidget::RefreshMeters()
 	}
 	SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 	UpdateMeter(HealthBar, HealthText, TEXT("HP"), Values->GetHealth(), Values->GetMaxHealth());
-	UpdateMeter(GuardBar, GuardText, TEXT("GUARD"), Values->GetGuardLoad(), Values->GetMaxGuardLoad());
+	RefreshGuardMeter(*Fighter, true);
 	UpdateMeter(EnergyBar, EnergyText, TEXT("ENERGY"), Values->GetMobilityEnergy(), Values->GetMaxMobilityEnergy());
 	DebugHealthBar->SetPercent(HealthBar->GetPercent());
-	DebugGuardBar->SetPercent(GuardBar->GetPercent());
 	DebugTitle->SetText(FText::FromString(
 	    FString::Printf(TEXT("%s   %.0f / %.0f"), *FighterLabel, Values->GetHealth(), Values->GetMaxHealth())));
+}
+
+void UVampsFighterWidget::RefreshGuardMeter(const AVampsCharacter& Fighter, bool bAttributesChanged)
+{
+	const FVampsCombatState& State = Fighter.CombatState;
+	const bool bStunned = State.bIsAlive && State.Reaction == EVampsCombatReaction::Stun;
+	if (!bStunned && !bShowingStun && !bAttributesChanged)
+	{
+		return;
+	}
+	if (bStunned)
+	{
+		const UVampsCombatSettings* Settings = Fighter.CombatSettings;
+		if (!Settings || !FMath::IsFinite(Settings->StunDuration) || Settings->StunDuration <= 0.f)
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s' requires a finite, positive StunDuration in '%s'."),
+			       __FUNCTION__,
+			       *Fighter.GetPathName(),
+			       *GetPathNameSafe(Settings));
+			SetVisibility(ESlateVisibility::Collapsed);
+			return;
+		}
+		if (!bShowingStun)
+		{
+			GuardText->SetText(FText::FromString(TEXT("GUARD")));
+		}
+		const double RemainingStun = State.ReactionEndsAt - GetWorld()->GetTimeSeconds();
+		GuardBar->SetPercent(FMath::Clamp(float(RemainingStun / Settings->StunDuration), 0.f, 1.f));
+	}
+	else
+	{
+		const UVampsAttributeSet* Values = Fighter.Attributes;
+		UpdateMeter(GuardBar, GuardText, TEXT("GUARD"), Values->GetGuardLoad(), Values->GetMaxGuardLoad());
+	}
+	const FLinearColor GuardColor = bStunned ? FLinearColor::Red : FLinearColor(0.3f, 0.6f, 1.f);
+	GuardBar->SetFillColorAndOpacity(GuardColor);
+	DebugGuardBar->SetPercent(GuardBar->GetPercent());
+	DebugGuardBar->SetFillColorAndOpacity(GuardColor);
+	bShowingStun = bStunned;
 }
 
 void UVampsFighterWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -141,29 +181,7 @@ void UVampsFighterWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	{
 		return;
 	}
-	const FVampsCombatState& State = Fighter->CombatState;
-	const double Now = GetWorld()->GetTimeSeconds();
-	FString Status;
-	if (!State.bIsAlive)
-	{
-		Status = TEXT("DOWN");
-	}
-	else if (State.Reaction != EVampsCombatReaction::None)
-	{
-		Status = FString::Printf(TEXT("%s %.1fs"),
-		                         *StaticEnum<EVampsCombatReaction>()->GetNameStringByValue(int64(State.Reaction)),
-		                         FMath::Max(0.0, State.ReactionEndsAt - Now));
-	}
-	else if (State.bIsDashing || State.bIsSprinting)
-	{
-		Status = State.bIsDashing ? TEXT("DASH") : TEXT("SPRINT");
-	}
-	StatusText->SetText(FText::FromString(Status));
-	StatusText->SetColorAndOpacity(State.bIsAlive ? FLinearColor::White : FLinearColor::Red);
-	const FLinearColor GuardColor =
-	    State.Reaction == EVampsCombatReaction::Stun ? FLinearColor::Red : FLinearColor(0.3f, 0.6f, 1.f);
-	GuardBar->SetFillColorAndOpacity(GuardColor);
-	DebugGuardBar->SetFillColorAndOpacity(GuardColor);
+	RefreshGuardMeter(*Fighter, false);
 	if (bDebugView)
 	{
 		RefreshDebugDetails();

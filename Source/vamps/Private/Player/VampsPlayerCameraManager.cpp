@@ -2,8 +2,8 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/VampsCombatLog.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
-#include "Engine/OverlapResult.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "HAL/IConsoleManager.h"
@@ -366,63 +366,65 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 	OutVT.POV.bConstrainAspectRatio = false;
 	OutVT.POV.FOV = FMath::RadiansToDegrees(
 	    2.f * FMath::Atan(FMath::Tan(FMath::DegreesToRadians(VerticalFov * 0.5f)) * OutVT.POV.AspectRatio));
-	UpdateOccluders(PublishedEye, PlayerAnchor, LockedFighter ? &TargetAnchor : nullptr, DeltaTime);
+	UpdateOccluders(PublishedEye, *ViewingFighter, LockedFighter, DeltaTime);
 }
 
 void AVampsPlayerCameraManager::UpdateOccluders(const FVector& PublishedEye,
-                                                const FVector& PlayerAnchor,
-                                                const FVector* TargetAnchor,
+                                                const AVampsCharacter& ViewingFighter,
+                                                const AVampsCharacter* LockedFighter,
                                                 float DeltaTime)
 {
-	FBox ViewBounds(EForceInit::ForceInit);
-	ViewBounds += PublishedEye;
-	ViewBounds += PlayerAnchor;
-	if (TargetAnchor)
+	const FCollisionObjectQueryParams ObjectParams(FCollisionObjectQueryParams::AllObjects);
+	FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(VampsCameraFade), false, &ViewingFighter);
+	QueryParams.bFindInitialOverlaps = true;
+	if (LockedFighter)
 	{
-		ViewBounds += *TargetAnchor;
+		QueryParams.AddIgnoredActor(LockedFighter);
 	}
-	TArray<FOverlapResult> ViewOverlaps;
-	FCollisionObjectQueryParams ObjectParams(FCollisionObjectQueryParams::AllObjects);
-	FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(VampsCameraFade), false, ObservedFighter.Get());
-	GetWorld()->OverlapMultiByObjectType(ViewOverlaps,
-	                                     ViewBounds.GetCenter(),
-	                                     FQuat::Identity,
-	                                     ObjectParams,
-	                                     FCollisionShape::MakeBox(ViewBounds.GetExtent() + FVector(12.f)),
-	                                     QueryParams);
+	TArray<FHitResult> ViewHits;
 	TSet<TWeakObjectPtr<UPrimitiveComponent>> CurrentOccluders;
-	for (const FOverlapResult& ViewOverlap : ViewOverlaps)
+	for (const AVampsCharacter* Subject : {&ViewingFighter, LockedFighter})
 	{
-		UPrimitiveComponent* Occluder = ViewOverlap.GetComponent();
-		if (!Occluder || !Occluder->ComponentHasTag(OccluderTag))
+		if (!Subject)
 		{
 			continue;
 		}
-		FHitResult OcclusionHit;
-		if (!Occluder->LineTraceComponent(OcclusionHit, PublishedEye, PlayerAnchor, QueryParams) &&
-		    (!TargetAnchor || !Occluder->LineTraceComponent(OcclusionHit, PublishedEye, *TargetAnchor, QueryParams)))
+		const UCapsuleComponent* SubjectCapsule = Subject->GetCapsuleComponent();
+		ViewHits.Reset();
+		GetWorld()->SweepMultiByObjectType(ViewHits,
+		                                   PublishedEye,
+		                                   SubjectCapsule->GetComponentLocation(),
+		                                   FQuat::Identity,
+		                                   ObjectParams,
+		                                   SubjectCapsule->GetCollisionShape(-8.f),
+		                                   QueryParams);
+		for (const FHitResult& ViewHit : ViewHits)
 		{
-			continue;
-		}
-		if (Occluder->GetCollisionResponseToChannel(ECC_Camera) != ECR_Ignore ||
-		    Occluder->GetCustomPrimitiveDataIndexForScalarParameter(OccluderTag) != 0)
-		{
-			UE_LOG(LogVampsCombat,
-			       Error,
-			       TEXT("%hs: '%s': prepared occluder must ignore Camera and expose material scalar VampsCameraFade at "
-			            "custom primitive data index 0."),
-			       __FUNCTION__,
-			       *Occluder->GetPathName());
-			continue;
-		}
-		CurrentOccluders.Add(Occluder);
-		if (!FadedComponents.Contains(Occluder))
-		{
-			const TArray<float>& OriginalData = Occluder->GetCustomPrimitiveData().Data;
-			FadedComponents.Add(Occluder, OriginalData.IsValidIndex(0) ? OriginalData[0] : 0.f);
+			UPrimitiveComponent* Occluder = ViewHit.GetComponent();
+			if (!Occluder || !Occluder->ComponentHasTag(OccluderTag) || CurrentOccluders.Contains(Occluder))
+			{
+				continue;
+			}
+			if (Occluder->GetCollisionResponseToChannel(ECC_Camera) != ECR_Ignore ||
+			    Occluder->GetCustomPrimitiveDataIndexForScalarParameter(OccluderTag) != 0)
+			{
+				UE_LOG(
+				    LogVampsCombat,
+				    Error,
+				    TEXT("%hs: '%s': prepared occluder must ignore Camera and expose material scalar VampsCameraFade "
+				         "at custom primitive data index 0."),
+				    __FUNCTION__,
+				    *Occluder->GetPathName());
+				continue;
+			}
+			CurrentOccluders.Add(Occluder);
+			if (!FadedComponents.Contains(Occluder))
+			{
+				const TArray<float>& OriginalData = Occluder->GetCustomPrimitiveData().Data;
+				FadedComponents.Add(Occluder, OriginalData.IsValidIndex(0) ? OriginalData[0] : 0.f);
+			}
 		}
 	}
-	const float OccluderBlendAlpha = 1.f - FMath::Exp(-10.f * DeltaTime);
 	for (auto FadeIterator = FadedComponents.CreateIterator(); FadeIterator; ++FadeIterator)
 	{
 		UPrimitiveComponent* Occluder = FadeIterator.Key().Get();
@@ -431,13 +433,23 @@ void AVampsPlayerCameraManager::UpdateOccluders(const FVector& PublishedEye,
 			FadeIterator.RemoveCurrent();
 			continue;
 		}
-		const float FadeTarget = CurrentOccluders.Contains(Occluder) ? 1.f : FadeIterator.Value();
+		const bool bOccluded = CurrentOccluders.Contains(Occluder);
+		const float FadeTarget = bOccluded ? 1.f : FadeIterator.Value();
+		const float OccluderBlendAlpha = 1.f - FMath::Exp(-(bOccluded ? 25.f : 10.f) * DeltaTime);
 		const TArray<float>& CurrentData = Occluder->GetCustomPrimitiveData().Data;
 		const float CurrentFade = CurrentData.IsValidIndex(0) ? CurrentData[0] : 0.f;
 		const float NextFade = FMath::Lerp(CurrentFade, FadeTarget, OccluderBlendAlpha);
 		const bool bFadeComplete = FMath::IsNearlyEqual(NextFade, FadeTarget, 0.001f);
 		Occluder->SetCustomPrimitiveDataFloat(0, bFadeComplete ? FadeTarget : NextFade);
-		if (bFadeComplete && !CurrentOccluders.Contains(Occluder))
+		if (bFadeComplete && CurrentFade != FadeTarget)
+		{
+			UE_LOG(LogVampsCombat,
+			       VeryVerbose,
+			       TEXT("Camera fade reached %.2f for '%s'."),
+			       FadeTarget,
+			       *Occluder->GetPathName());
+		}
+		if (bFadeComplete && !bOccluded)
 		{
 			FadeIterator.RemoveCurrent();
 		}

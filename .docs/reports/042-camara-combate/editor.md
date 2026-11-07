@@ -19,6 +19,8 @@ No hay parámetros editables por personaje. Para preparar otro mesh, todos sus s
 
 ## 2. Obstáculos del mapa
 
+Para `L_LocalMatch`, la [arena de 069](../069-arena-local-match/editor.md) usa el mismo contrato de cámara en sus paredes de perímetro.
+
 **Hecho — Codex por MCP.** SceneTools.add_to_scene_from_asset y ObjectTools configuraron y guardaron en `/Game/Vamps/Maps/L_CharacterBasic` tres cubos, escala (0,3;3;2,5):
 
 | Label | Ubicación | Configuración |

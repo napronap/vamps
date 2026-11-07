@@ -54,7 +54,7 @@ private:
 
 	void ResetCameraState();
 	void UpdateOccluders(const FVector& PublishedEye,
-	                     const FVector& PlayerAnchor,
-	                     const FVector* TargetAnchor,
+	                     const AVampsCharacter& ViewingFighter,
+	                     const AVampsCharacter* LockedFighter,
 	                     float DeltaTime);
 };

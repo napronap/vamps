@@ -1,5 +1,7 @@
 # 068 — Carteles del HUD y depuración en PIE
 
+El panel de combate actual y el aviso de aturdimiento se detallan en [070 — Barra de guardia y aviso de STUN](../070-stun-hud/reporte.md).
+
 - `UVampsHUDWidget` controla el texto y la visibilidad de los carteles de inicio, reaparición y equipo. `/Game/Vamps/UI/WBP_VampsHUD` envuelve los tres textos existentes en Borders con el mismo fondo oscuro semitransparente del marcador y tamaño ajustado al contenido. Los dos avisos quedan centrados y la etiqueta conserva su anclaje inferior izquierdo. El fondo de equipo cubre `TEAM A` y `TEAM B`.
 - `UVampsFighterWidget` reserva el último contacto y las fases de ataque y recuperación para depuración. Los paneles normales conservan las barras, las reacciones, la movilidad y el indicador `DOWN`. En `/Game/Vamps/UI/WBP_VampsFighter`, `ContactText` pasa de `CombatView` a `DebugView`, y `StatusText` parte vacío.
 - `AVampsPlayerController` registra F9 únicamente en mundos `EWorldType::PIE`. `UVampsHUDWidget` aplica la misma restricción a la activación y al aviso de pantalla. `/Game/Vamps/UI/BP_VampsHUD` instancia `WBP_VampsHUD`, que usa `WBP_VampsFighter` para los paneles del jugador y de los rivales.

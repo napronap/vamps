@@ -21,6 +21,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+[070 — Barra de guardia y aviso de STUN](reports/070-stun-hud/reporte.md) · [Guía del editor](reports/070-stun-hud/editor.md).
+
+[069 — Arena de la partida local](reports/069-arena-local-match/reporte.md) · [Guía del editor](reports/069-arena-local-match/editor.md).
+
 [068 — Carteles del HUD y depuración en PIE](reports/068-carteles-hud/reporte.md) · [Guía del editor](reports/068-carteles-hud/editor.md).
 
 Muerte y cámara: [067 — Presentación de muerte, vista fija y colisión](reports/067-muerte-camara-y-danio/reporte.md), con [respaldo de daño y verificación en Unreal](reports/067-muerte-camara-y-danio/editor.md).

@@ -142,12 +142,21 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	const bool bSelecting = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Selecting;
 	const bool bUnavailable = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Unavailable;
 	const bool bPreparing = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Preparing;
+	const AVampsCharacter* Viewer = Cast<AVampsCharacter>(GetOwningPlayerPawn());
+	const bool bShowStun = (!MatchMode.IsValid() || MatchMode->RoundPhase == EVampsMatchPhase::Active) && Viewer &&
+	                       Viewer->CombatState.bIsAlive && Viewer->CombatState.Reaction == EVampsCombatReaction::Stun &&
+	                       Viewer->CombatState.ReactionEndsAt > GetWorld()->GetTimeSeconds();
 	ShowWidget(SelectionView, bSelecting);
 	ShowWidget(CombatView, !bSelecting && !bUnavailable && !bShowCombatDebug);
 	ShowWidget(DebugView, !bSelecting && !bUnavailable && bShowCombatDebug);
 	ShowWidget(MatchView, MatchMode.IsValid() && !bSelecting && !bUnavailable);
 	ShowWidget(ResultView, MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Finished);
-	ShowWidget(NoticeText->GetParent(), bPreparing || bUnavailable);
+	ShowWidget(NoticeText->GetParent(), bPreparing || bUnavailable || bShowStun);
+	if (bShowStun)
+	{
+		NoticeText->SetText(FText::FromString(TEXT("STUN")));
+		NoticeText->SetColorAndOpacity(FLinearColor(1.f, 0.28f, 0.24f));
+	}
 #if !UE_BUILD_SHIPPING
 	ShowWidget(DebugHint, GetWorld()->WorldType == EWorldType::PIE && !bSelecting && !bUnavailable);
 	DebugHint->SetText(FText::FromString(bShowCombatDebug ? TEXT("F9 COMBAT HUD") : TEXT("F9 DEBUG HUD")));
@@ -309,8 +318,11 @@ void UVampsHUDWidget::RefreshMatch()
 	                                                     Seconds % 60,
 	                                                     MatchMode->TeamScores[1],
 	                                                     MatchMode->ScoreTarget)));
-	NoticeText->SetColorAndOpacity(FLinearColor::Yellow);
-	NoticeText->SetText(FText::FromString(FString::Printf(TEXT("MATCH STARTS IN %d"), Seconds)));
+	if (MatchMode->RoundPhase == EVampsMatchPhase::Preparing)
+	{
+		NoticeText->SetColorAndOpacity(FLinearColor::Yellow);
+		NoticeText->SetText(FText::FromString(FString::Printf(TEXT("MATCH STARTS IN %d"), Seconds)));
+	}
 	TeamText->SetText(FText::GetEmpty());
 	RespawnText->SetText(FText::GetEmpty());
 	ProtectionText->SetText(FText::GetEmpty());

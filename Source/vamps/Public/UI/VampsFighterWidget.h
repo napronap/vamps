@@ -33,8 +33,6 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UWidget> DebugView;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> PanelTitle;
-	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> HealthText;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> GuardText;
@@ -46,8 +44,6 @@ private:
 	TObjectPtr<UProgressBar> GuardBar;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> EnergyBar;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> StatusText;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> ContactText;
 	UPROPERTY(meta = (BindWidget))
@@ -67,10 +63,12 @@ private:
 	TWeakObjectPtr<UAbilitySystemComponent> ObservedAbilitySystem;
 	FString FighterLabel;
 	bool bDebugView = false;
+	bool bShowingStun = false;
 	TArray<FDelegateHandle> AttributeHandles;
 
 	void ReleaseAttributes();
 	void RefreshMeters();
+	void RefreshGuardMeter(const AVampsCharacter& Fighter, bool bAttributesChanged);
 	void HandleAttributeChanged(const FOnAttributeChangeData& AttributeChange);
 	void RefreshDebugDetails();
 };

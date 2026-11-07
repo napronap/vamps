@@ -30,7 +30,9 @@ void UVampsCharacterIndicatorWidget::NativeTick(const FGeometry& MyGeometry, flo
 	    bShowIndicators && Fighter != Viewer && Viewer->LockOn && Viewer->LockOn->GetCurrentTarget() == Fighter;
 	LockOnMarker->SetVisibility(bSelected ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
 	const double Now = GetWorld()->GetTimeSeconds();
-	const bool bShowNA = bShowIndicators && Fighter == Viewer && Fighter->CombatState.NARecoveryEndsAt > Now;
+	const bool bShowNA =
+	    bShowIndicators && Fighter == Viewer && Fighter->CombatState.NARecoveryEndsAt > Now &&
+	    (Fighter->CombatState.Reaction != EVampsCombatReaction::Stun || Fighter->CombatState.ReactionEndsAt <= Now);
 	NAView->SetVisibility(bShowNA ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
 	if (!bShowNA)
 	{
