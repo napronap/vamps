@@ -24,17 +24,20 @@ void UANS_AttackTrace::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& Pay
 
 void UANS_AttackTrace::SetTracing(FBranchingPointNotifyPayload& Payload, bool bEnabled)
 {
-	AVampsCharacter* Fighter =
-	    Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
-	if (!Fighter)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: notify '%s' cannot update attack traces; mesh '%s' requires a VampsCharacter owner."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(Payload.SkelMeshComponent));
-		return;
+	if (AVampsCharacter* Fighter = Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner())) {
+		Fighter->SetCombatContacts(Payload, bEnabled);
 	}
-	Fighter->SetCombatContacts(Payload, bEnabled);
+	
+	// AVampsCharacter* Fighter =
+	//     Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
+	// if (!Fighter)
+	// {
+	// 	UE_LOG(LogVampsCombat,
+	// 	       Error,
+	// 	       TEXT("%hs: notify '%s' cannot update attack traces; mesh '%s' requires a VampsCharacter owner."),
+	// 	       __FUNCTION__,
+	// 	       *GetPathName(),
+	// 	       *GetPathNameSafe(Payload.SkelMeshComponent));
+	// 	return;
+	// }
 }

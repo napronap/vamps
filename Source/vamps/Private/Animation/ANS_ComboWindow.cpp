@@ -14,34 +14,39 @@ UANS_ComboWindow::UANS_ComboWindow()
 
 void UANS_ComboWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayload& Payload)
 {
-	AVampsCharacter* Fighter =
-	    Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
-	if (!Fighter)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: notify '%s' cannot open combo window; mesh '%s' requires a VampsCharacter owner."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(Payload.SkelMeshComponent));
-		return;
+	if (AVampsCharacter* Fighter = Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner())) {
+		Fighter->SetCombatComboWindow(Payload, true);
 	}
-	Fighter->SetCombatComboWindow(Payload, true);
+	// AVampsCharacter* Fighter =
+	//     Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
+	// if (!Fighter)
+	// {
+	// 	UE_LOG(LogVampsCombat,
+	// 	       Error,
+	// 	       TEXT("%hs: notify '%s' cannot open combo window; mesh '%s' requires a VampsCharacter owner."),
+	// 	       __FUNCTION__,
+	// 	       *GetPathName(),
+	// 	       *GetPathNameSafe(Payload.SkelMeshComponent));
+	// 	return;
+	// }
 }
 
 void UANS_ComboWindow::BranchingPointNotifyEnd(FBranchingPointNotifyPayload& Payload)
 {
-	AVampsCharacter* Fighter =
-	    Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
-	if (!Fighter)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: notify '%s' cannot close combo window; mesh '%s' requires a VampsCharacter owner."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(Payload.SkelMeshComponent));
-		return;
+	if (AVampsCharacter* Fighter = Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner())) {
+		Fighter->SetCombatComboWindow(Payload, false);
 	}
-	Fighter->SetCombatComboWindow(Payload, false);
+	
+	// AVampsCharacter* Fighter =
+	//     Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
+	// if (!Fighter)
+	// {
+	// 	UE_LOG(LogVampsCombat,
+	// 	       Error,
+	// 	       TEXT("%hs: notify '%s' cannot close combo window; mesh '%s' requires a VampsCharacter owner."),
+	// 	       __FUNCTION__,
+	// 	       *GetPathName(),
+	// 	       *GetPathNameSafe(Payload.SkelMeshComponent));
+	// 	return;
+	// }
 }
