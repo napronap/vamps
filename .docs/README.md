@@ -21,6 +21,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+[072 — Revisión de código](reports/072-revision-codigo/reporte.md) · [Guía del editor](reports/072-revision-codigo/editor.md).
+
+[071 — Simplificación del combate y la presentación](reports/071-simplificacion-combate/reporte.md) · [Guía del editor](reports/071-simplificacion-combate/editor.md).
+
 [070 — Barra de guardia y aviso de STUN](reports/070-stun-hud/reporte.md) · [Guía del editor](reports/070-stun-hud/editor.md).
 
 [069 — Arena de la partida local](reports/069-arena-local-match/reporte.md) · [Guía del editor](reports/069-arena-local-match/editor.md).

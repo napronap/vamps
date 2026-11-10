@@ -23,11 +23,6 @@ namespace
 	float PositionRadius = 180.f;
 	float AngularSpeed = 6.f;
 	float TransitionDuration = 0.3f;
-	constexpr float UnlockedLookAheadTime = 0.5f;
-	constexpr float UnlockedAngularSpeed = 1.5f;
-	constexpr float UnlockedHeadingResponse = 0.4f;
-	constexpr float UnlockedHeadingTurnRate = 60.f;
-	const FName OccluderTag(TEXT("VampsCameraFade"));
 
 #if !UE_BUILD_SHIPPING
 	FAutoConsoleVariableRef FollowDistanceSetting(TEXT("vamps.Camera.FollowDistance"),
@@ -83,40 +78,67 @@ namespace
 	                                          TEXT("Framing and target transition duration in seconds."),
 	                                          ECVF_Cheat);
 #endif
+} // namespace
 
-	FVector SpatialFollow(const FVector& PreviousPosition, const FVector& DesiredPosition, float DeltaTime)
+FVector AVampsPlayerCameraManager::SpatialFollow(const FVector& PreviousPosition,
+                                                 const FVector& DesiredPosition,
+                                                 float DeltaTime)
+{
+	if (PositionRadius == 0.f)
 	{
-		if (PositionRadius == 0.f)
-		{
-			return DesiredPosition;
-		}
-		const float ReferenceAlpha = FMath::Square(FMath::Min(
-		    float(FVector::Distance(PreviousPosition, DesiredPosition)) / FMath::Max(PositionRadius, 0.1f), 1.f));
-		const float TimeAlpha = 1.f - FMath::Pow(1.f - ReferenceAlpha, DeltaTime * 60.f);
-		return FMath::Lerp(PreviousPosition, DesiredPosition, TimeAlpha);
+		return DesiredPosition;
+	}
+	const float ReferenceAlpha = FMath::Square(FMath::Min(
+	    float(FVector::Distance(PreviousPosition, DesiredPosition)) / FMath::Max(PositionRadius, 0.1f), 1.f));
+	const float TimeAlpha = 1.f - FMath::Pow(1.f - ReferenceAlpha, DeltaTime * 60.f);
+	return FMath::Lerp(PreviousPosition, DesiredPosition, TimeAlpha);
+}
+
+void AVampsPlayerCameraManager::InitializeFor(APlayerController* OwningController)
+{
+	Super::InitializeFor(OwningController);
+	OwningController->OnPossessedPawnChanged.AddUniqueDynamic(this,
+	                                                          &AVampsPlayerCameraManager::HandleObservedPawnChanged);
+	HandleObservedPawnChanged(nullptr, OwningController->GetPawn());
+}
+
+void AVampsPlayerCameraManager::HandleObservedPawnChanged(APawn*, APawn* NewPawn)
+{
+	if (AVampsCharacter* PreviousFighter = ObservedFighter.Get())
+	{
+		PreviousFighter->OnCombatFramingRequested.RemoveAll(this);
+	}
+	ResetCameraState();
+	AVampsCharacter* ViewingFighter = Cast<AVampsCharacter>(NewPawn);
+	ObservedFighter = ViewingFighter;
+	if (ViewingFighter)
+	{
+		ObservedGeneration = ViewingFighter->CombatGeneration;
+		ViewingFighter->OnCombatFramingRequested.AddUObject(this,
+		                                                    &AVampsPlayerCameraManager::HandleCombatFramingRequested);
 	}
 }
 
-void AVampsPlayerCameraManager::BeginCombatFraming(AVampsCharacter* ChainSource)
+void AVampsPlayerCameraManager::HandleCombatFramingRequested(AVampsCharacter* ChainSource)
 {
-	AVampsCharacter* ViewingFighter = PCOwner ? Cast<AVampsCharacter>(PCOwner->GetPawn()) : nullptr;
-	if (!PCOwner || !PCOwner->IsLocalPlayerController() || !ViewingFighter || !IsValid(ChainSource) ||
-	    ChainSource->GetWorld() != GetWorld())
+	if (!PCOwner || !PCOwner->IsLocalPlayerController())
+	{
+		return;
+	}
+	if (!IsValid(ChainSource) || ChainSource->GetWorld() != GetWorld())
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: '%s': framing requires a local VampsCharacter and a valid chain source in this world; "
-		            "source='%s'."),
+		       TEXT("%hs: '%s': framing requires a valid chain source in this world; source='%s'."),
 		       __FUNCTION__,
 		       *GetPathName(),
 		       *GetPathNameSafe(ChainSource));
 		return;
 	}
-	if (ObservedFighter != ViewingFighter || ObservedGeneration != ViewingFighter->CombatGeneration)
+	if (ObservedGeneration != ObservedFighter->CombatGeneration)
 	{
 		ResetCameraState();
-		ObservedFighter = ViewingFighter;
-		ObservedGeneration = ViewingFighter->CombatGeneration;
+		ObservedGeneration = ObservedFighter->CombatGeneration;
 	}
 	FramingSource = ChainSource;
 	FramingGeneration = ChainSource->CombatGeneration;
@@ -152,7 +174,6 @@ void AVampsPlayerCameraManager::ResetCameraState()
 		}
 	}
 	FadedComponents.Reset();
-	ObservedFighter.Reset();
 	ObservedTarget.Reset();
 	FramingSource.Reset();
 	bHasCameraState = false;
@@ -161,7 +182,11 @@ void AVampsPlayerCameraManager::ResetCameraState()
 
 void AVampsPlayerCameraManager::EndPlay(const EEndPlayReason::Type Reason)
 {
-	ResetCameraState();
+	if (PCOwner)
+	{
+		PCOwner->OnPossessedPawnChanged.RemoveDynamic(this, &AVampsPlayerCameraManager::HandleObservedPawnChanged);
+	}
+	HandleObservedPawnChanged(nullptr, nullptr);
 	Super::EndPlay(Reason);
 }
 
@@ -180,7 +205,12 @@ void AVampsPlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float Delt
 
 void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, float DeltaTime)
 {
-	AVampsCharacter* ViewingFighter = PCOwner ? Cast<AVampsCharacter>(PCOwner->GetPawn()) : nullptr;
+	constexpr float UnlockedLookAheadTime = 0.5f;
+	constexpr float UnlockedAngularSpeed = 1.5f;
+	constexpr float UnlockedHeadingResponse = 0.4f;
+	constexpr float UnlockedHeadingTurnRate = 60.f;
+
+	AVampsCharacter* ViewingFighter = ObservedFighter.Get();
 	if (!PCOwner || !PCOwner->IsLocalPlayerController() || !ViewingFighter || OutVT.Target != ViewingFighter)
 	{
 		ResetCameraState();
@@ -225,10 +255,9 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 		       *ViewingFighter->GetPathName());
 		return;
 	}
-	if (ObservedFighter != ViewingFighter || ObservedGeneration != ViewingFighter->CombatGeneration)
+	if (ObservedGeneration != ViewingFighter->CombatGeneration)
 	{
 		ResetCameraState();
-		ObservedFighter = ViewingFighter;
 		ObservedGeneration = ViewingFighter->CombatGeneration;
 	}
 	if (!ViewingFighter->CombatState.bIsAlive)
@@ -374,6 +403,7 @@ void AVampsPlayerCameraManager::UpdateOccluders(const FVector& PublishedEye,
                                                 const AVampsCharacter* LockedFighter,
                                                 float DeltaTime)
 {
+	static const FName OccluderTag(TEXT("VampsCameraFade"));
 	const FCollisionObjectQueryParams ObjectParams(FCollisionObjectQueryParams::AllObjects);
 	FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(VampsCameraFade), false, &ViewingFighter);
 	QueryParams.bFindInitialOverlaps = true;

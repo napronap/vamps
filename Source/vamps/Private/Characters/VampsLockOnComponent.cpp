@@ -36,7 +36,7 @@ void UVampsLockOnComponent::EndPlay(const EEndPlayReason::Type Reason)
 {
 	GetWorld()->RemoveOnActorSpawnedHandler(ActorSpawnedHandle);
 	Candidates.Reset();
-	CurrentTarget.Reset();
+	SetCurrentTarget(nullptr);
 	Super::EndPlay(Reason);
 }
 
@@ -78,11 +78,11 @@ void UVampsLockOnComponent::CycleTarget()
 		AVampsCharacter* Candidate = Candidates[(CurrentIndex + Offset) % Candidates.Num()].Get();
 		if (IsEligible(Candidate))
 		{
-			CurrentTarget = Candidate;
+			SetCurrentTarget(Candidate);
 			return;
 		}
 	}
-	CurrentTarget.Reset();
+	SetCurrentTarget(nullptr);
 }
 
 void UVampsLockOnComponent::SelectTarget(AVampsCharacter* NewTarget)
@@ -90,7 +90,17 @@ void UVampsLockOnComponent::SelectTarget(AVampsCharacter* NewTarget)
 	if (IsEligible(NewTarget))
 	{
 		Candidates.AddUnique(NewTarget);
-		CurrentTarget = NewTarget;
+		SetCurrentTarget(NewTarget);
+	}
+}
+
+void UVampsLockOnComponent::SetCurrentTarget(AVampsCharacter* NewTarget)
+{
+	const TWeakObjectPtr<AVampsCharacter> NextTarget(NewTarget);
+	if (!CurrentTarget.HasSameIndexAndSerialNumber(NextTarget))
+	{
+		CurrentTarget = NextTarget;
+		OnTargetChanged.Broadcast(NewTarget);
 	}
 }
 

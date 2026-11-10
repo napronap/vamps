@@ -393,8 +393,8 @@ void AVampsMatchGameMode::OpenCharacterSelection()
 	{
 		return;
 	}
-	RoundPhase = EVampsMatchPhase::Selecting;
 	PhaseEndsAt = 0;
+	SetRoundPhase(EVampsMatchPhase::Selecting);
 	PendingDeaths.Reset();
 	for (FVampsMatchParticipant& Participant : Participants)
 	{
@@ -406,7 +406,7 @@ void AVampsMatchGameMode::OpenCharacterSelection()
 			       __FUNCTION__,
 			       *GetPathName(),
 			       *GetPathNameSafe(Participant.Fighter));
-			RoundPhase = EVampsMatchPhase::Unavailable;
+			SetRoundPhase(EVampsMatchPhase::Unavailable);
 			return;
 		}
 		Participant.RespawnAt = 0;
@@ -436,7 +436,11 @@ void AVampsMatchGameMode::SelectCharacter(UVampsCombatSettings* CharacterSetting
 		       *GetPathNameSafe(CharacterSettings));
 		return;
 	}
-	SelectedCharacter = CharacterSettings;
+	if (SelectedCharacter != CharacterSettings)
+	{
+		SelectedCharacter = CharacterSettings;
+		OnSelectedCharacterChanged.Broadcast(CharacterSettings);
+	}
 }
 
 void AVampsMatchGameMode::StartLocalRound()
@@ -468,7 +472,7 @@ void AVampsMatchGameMode::StartLocalRound()
 		       TEXT("%hs: '%s': cannot start the local round without a valid player controller."),
 		       __FUNCTION__,
 		       *GetPathName());
-		RoundPhase = EVampsMatchPhase::Unavailable;
+		SetRoundPhase(EVampsMatchPhase::Unavailable);
 		return;
 	}
 	TArray<TObjectPtr<UVampsCombatSettings>> RemainingCharacters = AvailableCharacters;
@@ -494,8 +498,8 @@ void AVampsMatchGameMode::StartLocalRound()
 			return;
 		}
 	}
-	RoundPhase = EVampsMatchPhase::Preparing;
 	PhaseEndsAt = GetWorld()->GetTimeSeconds() + PreparationDuration;
+	SetRoundPhase(EVampsMatchPhase::Preparing);
 	LocalController->bShowMouseCursor = false;
 	LocalController->bEnableClickEvents = false;
 	LocalController->SetInputMode(FInputModeGameOnly());
@@ -507,8 +511,8 @@ void AVampsMatchGameMode::CompleteCombatFrame()
 	const double Now = GetWorld()->GetTimeSeconds();
 	if (RoundPhase == EVampsMatchPhase::Preparing && Now >= PhaseEndsAt)
 	{
-		RoundPhase = EVampsMatchPhase::Active;
 		PhaseEndsAt = Now + RoundDuration;
+		SetRoundPhase(EVampsMatchPhase::Active);
 		UE_LOG(LogVampsCombat, Display, TEXT("%s: local round started."), *GetPathName());
 	}
 	if (RoundPhase != EVampsMatchPhase::Active)
@@ -550,7 +554,7 @@ void AVampsMatchGameMode::CompleteCombatFrame()
 		if (Participants[ParticipantIndex].RespawnAt > 0 && Now >= Participants[ParticipantIndex].RespawnAt &&
 		    !RestoreParticipant(ParticipantIndex, true))
 		{
-			RoundPhase = EVampsMatchPhase::Unavailable;
+			SetRoundPhase(EVampsMatchPhase::Unavailable);
 			return;
 		}
 	}
@@ -588,8 +592,8 @@ void AVampsMatchGameMode::FinishLocalRound(bool bTimeExpired)
 			WinningTeamIndex = RatioA > RatioB ? 0 : 1;
 		}
 	}
-	RoundPhase = EVampsMatchPhase::Finished;
 	PhaseEndsAt = GetWorld()->GetTimeSeconds();
+	SetRoundPhase(EVampsMatchPhase::Finished);
 	for (FVampsMatchParticipant& Participant : Participants)
 	{
 		Participant.RespawnAt = 0;
@@ -609,6 +613,15 @@ void AVampsMatchGameMode::FinishLocalRound(bool bTimeExpired)
 	       TeamScores[1]);
 }
 
+void AVampsMatchGameMode::SetRoundPhase(EVampsMatchPhase NewPhase)
+{
+	if (RoundPhase != NewPhase)
+	{
+		RoundPhase = NewPhase;
+		OnRoundPhaseChanged.Broadcast();
+	}
+}
+
 bool AVampsMatchGameMode::EnableMatchMenuInput()
 {
 	APlayerController* LocalController = GetWorld()->GetFirstPlayerController();
@@ -619,7 +632,7 @@ bool AVampsMatchGameMode::EnableMatchMenuInput()
 		       TEXT("%hs: '%s': match menu requires a valid local player controller."),
 		       __FUNCTION__,
 		       *GetPathName());
-		RoundPhase = EVampsMatchPhase::Unavailable;
+		SetRoundPhase(EVampsMatchPhase::Unavailable);
 		return false;
 	}
 	LocalController->bShowMouseCursor = true;

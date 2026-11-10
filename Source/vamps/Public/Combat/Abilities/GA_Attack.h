@@ -3,6 +3,8 @@
 #include "Abilities/GameplayAbility.h"
 #include "GA_Attack.generated.h"
 
+class AVampsCharacter;
+
 UCLASS()
 class VAMPS_API UGA_Attack : public UGameplayAbility
 {
@@ -23,6 +25,8 @@ public:
 	                        bool bWasCancelled) override;
 
 private:
+
+	static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter);
 
 	UFUNCTION()
 	void FinishAttack();

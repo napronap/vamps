@@ -1,5 +1,7 @@
 # 070 — Barra de guardia y aviso de STUN
 
+La iteración continúa en [071 — Simplificación del combate y la presentación](../071-simplificacion-combate/reporte.md).
+
 - `UVampsFighterWidget` muestra HP, GUARD y ENERGY en el panel normal. Durante un stun, el relleno rojo de GUARD representa `(ReactionEndsAt − tiempo actual) / StunDuration`, limitado al rango de 0 a 1. En ese intervalo la etiqueta dice `GUARD`. Al terminar, el panel recupera el color azul y vuelve a mostrar la carga real. El cambio se aplica tanto al jugador como al objetivo observado. El panel de depuración conserva sus diagnósticos.
 - `UVampsHUDWidget` muestra `STUN` para el personaje local vivo mientras dura el aturdimiento durante la pelea. Usa `NoticeText` y `NoticeBackground` de `/Game/Vamps/UI/WBP_VampsHUD`, anclados en `(0.5, 0.5)` con alineación central y desplazamiento cero. El aviso comparte el fondo oscuro del countdown y queda fijo al centro de la pantalla durante el encuadre de combate.
 - `UVampsCharacterIndicatorWidget` omite la barra de NA durante el aturdimiento. Si aún queda tiempo de NA al salir del stun, se vuelve a mostrar su barra. Se retiró el cartel anterior del indicador proyectado sobre el personaje.

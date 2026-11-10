@@ -233,6 +233,6 @@ void AVampsWeapon::SweepWeaponSegment(const FVector& SweepStart,
 			continue;
 		}
 		HitActors.Add(Target);
-		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContact(Fighter, Target);
+		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContact(*Fighter, *Target);
 	}
 }

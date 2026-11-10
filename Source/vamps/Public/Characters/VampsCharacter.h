@@ -2,6 +2,7 @@
 
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "Delegates/Delegate.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "Combat/VampsCombatState.h"
 #include "TimerManager.h"
@@ -23,6 +24,8 @@ class VAMPS_API AVampsCharacter : public ACharacter, public IAbilitySystemInterf
 	GENERATED_BODY()
 
 public:
+
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCombatFramingRequested, AVampsCharacter*);
 
 	AVampsCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	virtual void BeginPlay() override;
@@ -54,40 +57,40 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "1"))
 	float StartingMaxHealth = 100.f;
 
-	bool CanEngageEnemy(const AVampsCharacter* OtherFighter) const;
-	bool CanHitCombatTarget(const AVampsCharacter* OtherFighter) const;
-	void StopMatchCombat();
-
-	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void RequestCombatAction();
-
-	void SetMobilityInput(bool bHasInput);
-	void SetMobilityHeld(bool bHeld, const FVector& DashDirection = FVector::ZeroVector);
-	void ResolveCombatDash();
-
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	FVampsCombatState CombatState;
 
+	// A reset invalidates contacts captured for this fighter before the reset.
 	uint32 CombatGeneration = 0;
+
+	// The source is this fighter on attack start and the attacker on a confirmed block.
+	FOnCombatFramingRequested OnCombatFramingRequested;
+
+	bool CanEngageEnemy(const AVampsCharacter* OtherFighter) const;
+	bool CanHitCombatTarget(const AVampsCharacter* OtherFighter) const;
+	void StopMatchCombat();
+	void ResetCombatState();
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	void RequestCombatAction();
+	bool CanRequestCombatContinuation() const;
+
+	void SetMobilityInput(bool bHasInput);
+	void SetMobilityHeld(bool bHeld, const FVector& DashDirection = FVector::ZeroVector);
 
 	bool BeginCombatAction(int32 PlaybackInstanceID);
 	void FinishCombatAction();
+
+	// Montage callbacks are scoped to the current playback instance and combo section.
 	void EndCombatRecovery(const FBranchingPointNotifyPayload& Payload);
-	void ResolveCombatRecoveryEnd(int32 RecoveryActionNumber);
 	void SetCombatContacts(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
 	void ResetCombatWeaponHits(const FBranchingPointNotifyPayload& Payload, const TArray<int32>& WeaponIndices);
 	void SetCombatComboWindow(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
-	void ResolveCombatContinuation();
-	bool MatchesDefendedContact(const FVampsPendingContact& Contact) const;
-	void RememberDefendedContact(const FVampsPendingContact& Contact);
-	void RegisterCombatContact(bool bBlocked);
-	bool ReceiveCombatHit(const FVampsPendingContact& Contact);
-	void ApplyCombatReaction(const FVampsPendingContact& Contact);
-	void ResetCombatState();
 
 private:
 
 	friend class UGA_Dash;
+	friend class UVampsCombatResolver;
 
 	FGameplayAbilitySpecHandle AttackHandle;
 	FGameplayAbilitySpecHandle DashHandle;
@@ -98,22 +101,33 @@ private:
 	bool bHasMobilityInput = false;
 	bool bMobilityHeld = false;
 	double MobilityRecoveryStartsAt = 0;
-	int32 DashRequestActionNumber = INDEX_NONE;
 	FVector RequestedDashDirection = FVector::ZeroVector;
 
+	void ResolveCombatDash();
 	void UpdateMobilityEnergy(float DeltaSeconds);
 	void ClearMobilityIntent();
 
 	bool InitializeCombatWeapons();
 	void DestroyCombatWeapons();
+	void SetCombatWeaponTracing(bool bEnabled);
+
 	bool BeginCombatStep();
 	bool IsCurrentCombatNotify(const FBranchingPointNotifyPayload& Payload) const;
-	void FinishNARecovery();
+	void ResolveCombatContinuation();
+	void ResolveCombatRecoveryEnd(int32 RecoveryActionNumber);
 	void BeginNARecovery();
+	void FinishNARecovery();
 	void CancelCombatOffense();
-	void FinishCombatReaction();
-	void ArmDefenseRequest();
 	void SetCombatPhase(EVampsActionPhase NewPhase);
+	void RefreshCombatPermissions();
+
+	void ArmDefenseRequest();
+	bool MatchesDefendedContact(const FVampsPendingContact& Contact) const;
+	void RememberDefendedContact(const FVampsPendingContact& Contact);
+	void RegisterCombatContact(bool bBlocked);
+	bool ReceiveCombatHit(const FVampsPendingContact& Contact);
+	void ApplyCombatReaction(const FVampsPendingContact& Contact);
+	void FinishCombatReaction();
 	void HandleCombatHealthChanged(const FOnAttributeChangeData& AttributeChange);
 	void PresentCombatDeath(bool bBlockedDeath);
 };

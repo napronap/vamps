@@ -1,6 +1,5 @@
 #include "Animation/AN_ResetWeaponHits.h"
 #include "Characters/VampsCharacter.h"
-#include "Combat/VampsCombatLog.h"
 #include "Components/SkeletalMeshComponent.h"
 
 UAN_ResetWeaponHits::UAN_ResetWeaponHits()
@@ -13,20 +12,9 @@ UAN_ResetWeaponHits::UAN_ResetWeaponHits()
 
 void UAN_ResetWeaponHits::BranchingPointNotify(FBranchingPointNotifyPayload& Payload)
 {
-	if (AVampsCharacter* Fighter = Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner())) {
+	if (AVampsCharacter* Fighter =
+	        Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr)
+	{
 		Fighter->ResetCombatWeaponHits(Payload, WeaponIndices);
 	}
-	
-	// AVampsCharacter* Fighter =
-	//     Payload.SkelMeshComponent ? Cast<AVampsCharacter>(Payload.SkelMeshComponent->GetOwner()) : nullptr;
-	// if (!Fighter)
-	// {
-	// 	UE_LOG(LogVampsCombat,
-	// 	       Error,
-	// 	       TEXT("%hs: notify '%s' cannot reset weapon hits; mesh '%s' requires a VampsCharacter owner."),
-	// 	       __FUNCTION__,
-	// 	       *GetPathName(),
-	// 	       *GetPathNameSafe(Payload.SkelMeshComponent));
-	// 	return;
-	// }
 }

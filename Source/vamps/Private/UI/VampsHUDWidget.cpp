@@ -21,19 +21,16 @@
 #include "GameModes/VampsCombatTestGameMode.h"
 #include "GameModes/VampsMatchGameMode.h"
 
-namespace
+void UVampsHUDWidget::ShowWidget(UWidget* Widget, bool bShow)
 {
-	void ShowWidget(UWidget* Widget, bool bShow)
-	{
-		Widget->SetVisibility(bShow ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
-	}
+	Widget->SetVisibility(bShow ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
+}
 
-	FString FormatRatio(int32 Kills, int32 Deaths)
-	{
-		return Deaths > 0 ? FString::Printf(TEXT("%.2f"), double(Kills) / Deaths)
-		                  : FString(Kills > 0 ? TEXT("INF") : TEXT("0.00"));
-	}
-} // namespace
+FString UVampsHUDWidget::FormatRatio(int32 Kills, int32 Deaths)
+{
+	return Deaths > 0 ? FString::Printf(TEXT("%.2f"), double(Kills) / Deaths)
+	                  : FString(Kills > 0 ? TEXT("INF") : TEXT("0.00"));
+}
 
 void UVampsHUDWidget::NativeOnInitialized()
 {
@@ -87,6 +84,117 @@ void UVampsHUDWidget::NativeOnInitialized()
 			CharacterOptions->AddChildToVerticalBox(CharacterOption)->SetPadding(FMargin(0.f, 0.f, 0.f, 8.f));
 		}
 	}
+	bHUDInitialized = true;
+}
+
+void UVampsHUDWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+	if (!bHUDInitialized)
+	{
+		return;
+	}
+	if (AVampsMatchGameMode* LocalMatch = MatchMode.Get())
+	{
+		LocalMatch->OnRoundPhaseChanged.AddUObject(this, &UVampsHUDWidget::RefreshMatchViews);
+		LocalMatch->OnSelectedCharacterChanged.AddUObject(this, &UVampsHUDWidget::RefreshCharacterSelection);
+		RefreshCharacterSelection(LocalMatch->SelectedCharacter);
+	}
+	GetOwningPlayer()->OnPossessedPawnChanged.AddUniqueDynamic(this, &UVampsHUDWidget::HandleObservedPawnChanged);
+	HandleObservedPawnChanged(nullptr, GetOwningPlayerPawn());
+}
+
+void UVampsHUDWidget::NativeDestruct()
+{
+	if (UVampsLockOnComponent* LockOn = ObservedLockOn.Get())
+	{
+		LockOn->OnTargetChanged.RemoveAll(this);
+	}
+	ObservedLockOn.Reset();
+	if (APlayerController* HUDController = GetOwningPlayer())
+	{
+		HUDController->OnPossessedPawnChanged.RemoveDynamic(this, &UVampsHUDWidget::HandleObservedPawnChanged);
+	}
+	if (AVampsMatchGameMode* LocalMatch = MatchMode.Get())
+	{
+		LocalMatch->OnRoundPhaseChanged.RemoveAll(this);
+		LocalMatch->OnSelectedCharacterChanged.RemoveAll(this);
+	}
+	Super::NativeDestruct();
+}
+
+void UVampsHUDWidget::HandleObservedPawnChanged(APawn*, APawn* NewPawn)
+{
+	if (UVampsLockOnComponent* PreviousLockOn = ObservedLockOn.Get())
+	{
+		PreviousLockOn->OnTargetChanged.RemoveAll(this);
+	}
+	AVampsCharacter* Viewer = Cast<AVampsCharacter>(NewPawn);
+	UVampsLockOnComponent* LockOn = Viewer ? Viewer->LockOn.Get() : nullptr;
+	ObservedLockOn = LockOn;
+	if (LockOn)
+	{
+		LockOn->OnTargetChanged.AddUObject(this, &UVampsHUDWidget::RefreshTargetPanel);
+	}
+	else if (NewPawn)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s' requires a VampsCharacter with LockOn; pawn='%s'."),
+		       __FUNCTION__,
+		       *GetPathName(),
+		       *NewPawn->GetPathName());
+	}
+	PlayerPanel->ObserveFighter(LockOn ? Viewer : nullptr, TEXT("PLAYER"));
+	DebugPlayerPanel->ObserveFighter(LockOn ? Viewer : nullptr, TEXT("PLAYER"), true);
+	RefreshTargetPanel(LockOn ? LockOn->GetCurrentTarget() : nullptr);
+	RefreshMatchViews();
+}
+
+void UVampsHUDWidget::RefreshTargetPanel(AVampsCharacter* TargetFighter)
+{
+	TargetPanel->ObserveFighter(TargetFighter, TEXT("TARGET"));
+	ShowWidget(NoTargetText, !TargetFighter);
+}
+
+void UVampsHUDWidget::RefreshCharacterSelection(UVampsCombatSettings* CharacterSettings)
+{
+	StartButton->SetIsEnabled(CharacterSettings != nullptr);
+	StartButton->SetBackgroundColor(CharacterSettings ? FLinearColor(0.15f, 0.35f, 0.45f)
+	                                                  : FLinearColor(0.08f, 0.08f, 0.1f));
+	for (int32 CharacterIndex = 0; CharacterIndex < CharacterOptions->GetChildrenCount(); ++CharacterIndex)
+	{
+		Cast<UVampsCharacterOptionWidget>(CharacterOptions->GetChildAt(CharacterIndex))
+		    ->RefreshSelection(CharacterSettings);
+	}
+}
+
+void UVampsHUDWidget::RefreshMatchViews()
+{
+	const bool bSelecting = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Selecting;
+	const bool bUnavailable = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Unavailable;
+	const bool bFinished = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Finished;
+	const bool bShowFighters = ObservedLockOn.IsValid() && !bSelecting && !bUnavailable;
+	ShowWidget(SelectionView, bSelecting);
+	ShowWidget(CombatView, bShowFighters && !bShowCombatDebug);
+	ShowWidget(DebugView, bShowFighters && bShowCombatDebug);
+	ShowWidget(MatchView, MatchMode.IsValid() && !bSelecting && !bUnavailable);
+	ShowWidget(ResultView, bFinished);
+#if !UE_BUILD_SHIPPING
+	ShowWidget(DebugHint, GetWorld()->WorldType == EWorldType::PIE && !bSelecting && !bUnavailable);
+	DebugHint->SetText(FText::FromString(bShowCombatDebug ? TEXT("F9 COMBAT HUD") : TEXT("F9 DEBUG HUD")));
+#else
+	ShowWidget(DebugHint, false);
+#endif
+	if (bUnavailable)
+	{
+		NoticeText->SetText(FText::FromString(TEXT("MATCH UNAVAILABLE - See LogVampsCombat")));
+		NoticeText->SetColorAndOpacity(FLinearColor::Red);
+	}
+	if (bFinished)
+	{
+		RefreshResults();
+	}
 }
 
 void UVampsHUDWidget::StartRound()
@@ -108,11 +216,12 @@ void UVampsHUDWidget::ReturnToSelection()
 void UVampsHUDWidget::ToggleCombatDebug()
 {
 #if !UE_BUILD_SHIPPING
-	if (GetWorld()->WorldType != EWorldType::PIE)
+	if (!bHUDInitialized || GetWorld()->WorldType != EWorldType::PIE)
 	{
 		return;
 	}
 	bShowCombatDebug = !bShowCombatDebug;
+	RefreshMatchViews();
 	UE_LOG(LogVampsCombat,
 	       Display,
 	       TEXT("%s: %s HUD (F9)."),
@@ -125,7 +234,7 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 	const FVector2D ViewSize = MyGeometry.GetLocalSize();
-	if (ViewSize.X <= 0.f || ViewSize.Y <= 0.f)
+	if (!bHUDInitialized || ViewSize.X <= 0.f || ViewSize.Y <= 0.f)
 	{
 		return;
 	}
@@ -146,40 +255,14 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	const bool bShowStun = (!MatchMode.IsValid() || MatchMode->RoundPhase == EVampsMatchPhase::Active) && Viewer &&
 	                       Viewer->CombatState.bIsAlive && Viewer->CombatState.Reaction == EVampsCombatReaction::Stun &&
 	                       Viewer->CombatState.ReactionEndsAt > GetWorld()->GetTimeSeconds();
-	ShowWidget(SelectionView, bSelecting);
-	ShowWidget(CombatView, !bSelecting && !bUnavailable && !bShowCombatDebug);
-	ShowWidget(DebugView, !bSelecting && !bUnavailable && bShowCombatDebug);
-	ShowWidget(MatchView, MatchMode.IsValid() && !bSelecting && !bUnavailable);
-	ShowWidget(ResultView, MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Finished);
 	ShowWidget(NoticeText->GetParent(), bPreparing || bUnavailable || bShowStun);
 	if (bShowStun)
 	{
 		NoticeText->SetText(FText::FromString(TEXT("STUN")));
 		NoticeText->SetColorAndOpacity(FLinearColor(1.f, 0.28f, 0.24f));
 	}
-#if !UE_BUILD_SHIPPING
-	ShowWidget(DebugHint, GetWorld()->WorldType == EWorldType::PIE && !bSelecting && !bUnavailable);
-	DebugHint->SetText(FText::FromString(bShowCombatDebug ? TEXT("F9 COMBAT HUD") : TEXT("F9 DEBUG HUD")));
-#else
-	ShowWidget(DebugHint, false);
-#endif
-	if (bSelecting)
+	if (bSelecting || bUnavailable)
 	{
-		const bool bCharacterSelected = MatchMode->SelectedCharacter != nullptr;
-		StartButton->SetIsEnabled(bCharacterSelected);
-		StartButton->SetBackgroundColor(bCharacterSelected ? FLinearColor(0.15f, 0.35f, 0.45f)
-		                                                   : FLinearColor(0.08f, 0.08f, 0.1f));
-		for (int32 CharacterIndex = 0; CharacterIndex < CharacterOptions->GetChildrenCount(); ++CharacterIndex)
-		{
-			Cast<UVampsCharacterOptionWidget>(CharacterOptions->GetChildAt(CharacterIndex))
-			    ->RefreshSelection(MatchMode->SelectedCharacter);
-		}
-		return;
-	}
-	if (bUnavailable)
-	{
-		NoticeText->SetText(FText::FromString(TEXT("MATCH UNAVAILABLE - See LogVampsCombat")));
-		NoticeText->SetColorAndOpacity(FLinearColor::Red);
 		return;
 	}
 	RefreshFighters(ViewSize.Y / ViewScale);
@@ -192,27 +275,16 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 void UVampsHUDWidget::RefreshFighters(float LayoutHeight)
 {
 	AVampsCharacter* Viewer = Cast<AVampsCharacter>(GetOwningPlayerPawn());
-	if (!Viewer || !Viewer->LockOn)
+	UVampsLockOnComponent* LockOn = ObservedLockOn.Get();
+	if (!Viewer || !LockOn)
 	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s' requires a VampsCharacter with LockOn; pawn='%s'."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetNameSafe(GetOwningPlayerPawn()));
-		ShowWidget(CombatView, false);
-		ShowWidget(DebugView, false);
 		return;
 	}
-	AVampsCharacter* SelectedFighter = Viewer->LockOn->GetCurrentTarget();
-	PlayerPanel->ObserveFighter(Viewer, TEXT("PLAYER"));
-	TargetPanel->ObserveFighter(SelectedFighter, TEXT("TARGET"));
-	ShowWidget(NoTargetText, !SelectedFighter);
+	AVampsCharacter* SelectedFighter = LockOn->GetCurrentTarget();
 	if (bShowCombatDebug)
 	{
-		DebugPlayerPanel->ObserveFighter(Viewer, TEXT("PLAYER"), true);
 		int32 PanelIndex = 0;
-		for (const TWeakObjectPtr<AVampsCharacter>& Candidate : Viewer->LockOn->GetCandidates())
+		for (const TWeakObjectPtr<AVampsCharacter>& Candidate : LockOn->GetCandidates())
 		{
 			AVampsCharacter* Fighter = Candidate.Get();
 			if (!Fighter)
@@ -253,7 +325,7 @@ void UVampsHUDWidget::RefreshFighters(float LayoutHeight)
 		return;
 	}
 	TArray<AVampsCharacter*> Enemies;
-	for (const TWeakObjectPtr<AVampsCharacter>& Candidate : Viewer->LockOn->GetCandidates())
+	for (const TWeakObjectPtr<AVampsCharacter>& Candidate : LockOn->GetCandidates())
 	{
 		if (Viewer->CanEngageEnemy(Candidate.Get()))
 		{
@@ -346,10 +418,6 @@ void UVampsHUDWidget::RefreshMatch()
 	}
 	ShowWidget(TeamText->GetParent(), !TeamText->GetText().IsEmpty());
 	ShowWidget(RespawnText->GetParent(), !RespawnText->GetText().IsEmpty());
-	if (MatchMode->RoundPhase == EVampsMatchPhase::Finished)
-	{
-		RefreshResults();
-	}
 }
 
 void UVampsHUDWidget::RefreshResults()

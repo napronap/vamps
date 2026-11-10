@@ -5,7 +5,9 @@
 #include "VampsCombatResolver.generated.h"
 
 class AVampsCharacter;
+class AVampsWeapon;
 
+// Captures the action and the values needed to resolve a weapon contact after all actors have ticked.
 struct FVampsPendingContact
 {
 	TWeakObjectPtr<AVampsCharacter> Attacker;
@@ -35,25 +37,28 @@ public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 
-	void QueueCombatContact(AVampsCharacter* Attacker, AVampsCharacter* Recipient);
-	void QueueCombatDash(AVampsCharacter* Fighter);
-	void QueueCombatContinuation(AVampsCharacter* Fighter);
-	void QueueCombatRecoveryEnd(AVampsCharacter* Fighter);
-	bool HasQueuedCombatRecoveryEnd(AVampsCharacter& Fighter) const;
-	void DiscardContactsFor(AVampsCharacter* Fighter);
-
 protected:
 
 	virtual bool DoesSupportWorldType(const EWorldType::Type WorldType) const override;
 
 private:
 
-	TArray<TWeakObjectPtr<AVampsCharacter>> PendingDashes;
+	friend class AVampsCharacter;
+	friend class AVampsWeapon;
+
+	void QueueCombatContact(AVampsCharacter& Attacker, AVampsCharacter& Recipient);
+	void QueueCombatDash(AVampsCharacter& Fighter);
+	void QueueCombatContinuation(AVampsCharacter& Fighter);
+	void QueueCombatRecoveryEnd(AVampsCharacter& Fighter);
+	bool HasQueuedCombatRecoveryEnd(AVampsCharacter& Fighter) const;
+	void DiscardPendingCombatFor(AVampsCharacter& Fighter);
+
+	void ResolveCombatFrame(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds);
+	void ResolvePendingContacts();
 
 	TArray<FVampsPendingContact> PendingContacts;
 	TArray<TWeakObjectPtr<AVampsCharacter>> PendingContinuations;
 	TMap<TWeakObjectPtr<AVampsCharacter>, int32> PendingRecoveryEnds;
+	TArray<TWeakObjectPtr<AVampsCharacter>> PendingDashes;
 	FDelegateHandle PostActorTickHandle;
-
-	void ResolveCombatContacts(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds);
 };

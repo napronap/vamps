@@ -36,12 +36,6 @@ void UGA_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
-	Fighter->SetCombatPhase(Fighter->CombatState.Phase);
-	if (!Fighter->CombatState.bCanDash)
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-		return;
-	}
 	const bool bBackwardDash = Fighter->RequestedDashDirection.IsNearlyZero();
 	UAnimMontage* DashMontage = bBackwardDash ? Fighter->CombatSettings->BackwardDashMontage.Get()
 	                                          : Fighter->CombatSettings->ForwardDashMontage.Get();
@@ -118,7 +112,7 @@ void UGA_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	                                                    Fighter->CombatSettings->DashEnergyCost);
 	Fighter->MobilityRecoveryStartsAt =
 	    Fighter->GetWorld()->GetTimeSeconds() + Fighter->CombatSettings->MobilityRecoveryDelay;
-	Fighter->SetCombatPhase(Fighter->CombatState.Phase);
+	Fighter->RefreshCombatPermissions();
 }
 
 void UGA_Dash::FinishDash()
@@ -142,7 +136,7 @@ void UGA_Dash::EndAbility(const FGameplayAbilitySpecHandle Handle,
 			Fighter->CombatState.bIsDashing = false;
 			Fighter->GetCharacterMovement()->StopMovementImmediately();
 		}
-		Fighter->SetCombatPhase(Fighter->CombatState.Phase);
+		Fighter->RefreshCombatPermissions();
 	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

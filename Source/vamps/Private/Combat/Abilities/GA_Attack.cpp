@@ -12,11 +12,18 @@
 #include "Combat/VampsCombatLog.h"
 #include "Combat/VampsWeapon.h"
 
-static FString ValidateAttackConfiguration(const AVampsCharacter& Fighter)
+FString UGA_Attack::ValidateAttackConfiguration(const AVampsCharacter& Fighter)
 {
 	const UVampsCombatSettings* Settings = Fighter.CombatSettings;
-	if (!Settings || !Settings->HasValidReactionSettings() || !FMath::IsFinite(Settings->NARecoveryDuration) ||
-	    !(Settings->NARecoveryDuration > 0.f))
+	if (!Settings)
+	{
+		return TEXT("Attack requires CombatSettings.");
+	}
+	if (!FMath::IsFinite(Settings->AttackDamage) || Settings->AttackDamage < 0.f)
+	{
+		return FString::Printf(TEXT("AttackDamage must be finite and nonnegative; got %f."), Settings->AttackDamage);
+	}
+	if (!FMath::IsFinite(Settings->NARecoveryDuration) || Settings->NARecoveryDuration <= 0.f)
 	{
 		return TEXT("CombatSettings must define a positive NA recovery duration.");
 	}

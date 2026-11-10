@@ -5,6 +5,8 @@
 
 class AVampsCharacter;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FVampsTargetChanged, AVampsCharacter*);
+
 UCLASS()
 class VAMPS_API UVampsLockOnComponent : public UActorComponent
 {
@@ -18,6 +20,7 @@ public:
 	const TArray<TWeakObjectPtr<AVampsCharacter>>& GetCandidates() const;
 	void CycleTarget();
 	void SelectTarget(AVampsCharacter* NewTarget);
+	FVampsTargetChanged OnTargetChanged;
 
 #if !UE_BUILD_SHIPPING
 	void ToggleDebugLockOn();
@@ -44,5 +47,6 @@ private:
 #endif
 
 	void RegisterCandidate(AActor* SpawnedActor);
+	void SetCurrentTarget(AVampsCharacter* NewTarget);
 	bool IsEligible(const AVampsCharacter* Candidate) const;
 };

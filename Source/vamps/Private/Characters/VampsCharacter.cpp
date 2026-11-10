@@ -19,34 +19,8 @@
 #include "Components/WidgetComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/PlayerController.h"
-#include "Player/VampsPlayerCameraManager.h"
 #include "GameModes/VampsMatchGameMode.h"
 #include "UI/VampsCharacterIndicatorWidget.h"
-
-namespace
-{
-	void RequestCombatFraming(AVampsCharacter* ViewingFighter, AVampsCharacter* ChainSource)
-	{
-		APlayerController* LocalController = Cast<APlayerController>(ViewingFighter->GetController());
-		if (!LocalController || !LocalController->IsLocalPlayerController())
-		{
-			return;
-		}
-		AVampsPlayerCameraManager* CombatCamera = Cast<AVampsPlayerCameraManager>(LocalController->PlayerCameraManager);
-		if (!CombatCamera)
-		{
-			UE_LOG(LogVampsCombat,
-			       Error,
-			       TEXT("%hs: '%s': combat framing requires VampsPlayerCameraManager; got '%s'."),
-			       __FUNCTION__,
-			       *ViewingFighter->GetPathName(),
-			       *GetPathNameSafe(LocalController->PlayerCameraManager));
-			return;
-		}
-		CombatCamera->BeginCombatFraming(ChainSource);
-	}
-} // namespace
 
 AVampsCharacter::AVampsCharacter(const FObjectInitializer& ObjectInitializer)
     : Super(ObjectInitializer.SetDefaultSubobjectClass<UVampsCombatMovementComponent>(
@@ -153,7 +127,7 @@ void AVampsCharacter::Tick(float DeltaSeconds)
 	{
 		if (!MatchMode->AllowsCombat(this))
 		{
-			SetCombatPhase(CombatState.Phase);
+			RefreshCombatPermissions();
 			return;
 		}
 	}
@@ -190,7 +164,7 @@ void AVampsCharacter::Tick(float DeltaSeconds)
 		    UVampsAttributeSet::GetGuardLoadAttribute(),
 		    FMath::Max(0.f, Attributes->GetGuardLoad() - CombatSettings->GuardRecoveryPerSecond * RecoverySeconds));
 	}
-	SetCombatPhase(CombatState.Phase);
+	RefreshCombatPermissions();
 	UpdateMobilityEnergy(DeltaSeconds);
 }
 
@@ -204,7 +178,6 @@ void AVampsCharacter::ClearMobilityIntent()
 	bMobilityHeld = false;
 	CombatState.bIsSprinting = false;
 	CombatState.bDashRequested = false;
-	DashRequestActionNumber = INDEX_NONE;
 	RequestedDashDirection = FVector::ZeroVector;
 	AbilitySystem->CancelAbilityHandle(DashHandle);
 }
@@ -221,7 +194,7 @@ void AVampsCharacter::SetMobilityHeld(bool bHeld, const FVector& DashDirection)
 		CombatState.bIsSprinting = false;
 		return;
 	}
-	SetCombatPhase(CombatState.Phase);
+	RefreshCombatPermissions();
 	if (!CombatState.bCanDash)
 	{
 		return;
@@ -239,8 +212,7 @@ void AVampsCharacter::SetMobilityHeld(bool bHeld, const FVector& DashDirection)
 	RequestedDashDirection = DashDirection.GetSafeNormal2D();
 	bMobilityHeld = true;
 	CombatState.bDashRequested = true;
-	DashRequestActionNumber = CombatState.ActionNumber;
-	GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatDash(this);
+	GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatDash(*this);
 }
 
 void AVampsCharacter::ResolveCombatDash()
@@ -250,9 +222,8 @@ void AVampsCharacter::ResolveCombatDash()
 		return;
 	}
 	CombatState.bDashRequested = false;
-	SetCombatPhase(CombatState.Phase);
-	if (!CombatState.bCanDash || DashRequestActionNumber != CombatState.ActionNumber ||
-	    !AbilitySystem->TryActivateAbility(DashHandle) || !CombatState.bIsDashing)
+	RefreshCombatPermissions();
+	if (!CombatState.bCanDash || !AbilitySystem->TryActivateAbility(DashHandle) || !CombatState.bIsDashing)
 	{
 		bMobilityHeld = false;
 	}
@@ -435,7 +406,7 @@ void AVampsCharacter::RequestCombatAction()
 		return;
 	}
 
-	SetCombatPhase(CombatState.Phase);
+	RefreshCombatPermissions();
 	++CombatState.RequestCount;
 	CombatState.LastRequest = EVampsCombatRequest::Rejected;
 	if (!AttackHandle.IsValid())
@@ -466,26 +437,20 @@ void AVampsCharacter::RequestCombatAction()
 	if (CombatState.Phase != EVampsActionPhase::Recovery)
 	{
 		ArmDefenseRequest();
+		RefreshCombatPermissions();
 		CombatState.LastRequest = EVampsCombatRequest::DefenseRearmed;
 	}
-	if (CombatState.bComboWindowOpen && !CombatState.bOffenseRestricted)
+	if (CanRequestCombatContinuation())
 	{
-		if (!CombatSettings || !CombatSettings->AttackMontage)
-		{
-			UE_LOG(LogVampsCombat,
-			       Error,
-			       TEXT("%hs: %s: cannot request a combo continuation without CombatSettings and AttackMontage."),
-			       __FUNCTION__,
-			       *GetPathName());
-			return;
-		}
-		if (CombatState.ComboStep >= CombatSettings->AttackMontage->GetNumSections())
-		{
-			return;
-		}
 		CombatState.bContinuationRequested = true;
 		CombatState.LastRequest = EVampsCombatRequest::ContinuationRequested;
 	}
+}
+
+bool AVampsCharacter::CanRequestCombatContinuation() const
+{
+	return CombatState.bCanRequestCombat && CombatState.bComboWindowOpen && !CombatState.bOffenseRestricted &&
+	       CombatState.ComboStep < CombatSettings->AttackMontage->GetNumSections();
 }
 
 bool AVampsCharacter::CanEngageEnemy(const AVampsCharacter* OtherFighter) const
@@ -577,7 +542,7 @@ bool AVampsCharacter::BeginCombatAction(int32 PlaybackInstanceID)
 		CombatState.ComboStep = 0;
 		return false;
 	}
-	RequestCombatFraming(this, this);
+	OnCombatFramingRequested.Broadcast(this);
 	return true;
 }
 
@@ -700,8 +665,9 @@ void AVampsCharacter::EndCombatRecovery(const FBranchingPointNotifyPayload& Payl
 		       *GetPathName());
 		return;
 	}
+	// Hold the montage here until the resolver decides whether the combo continues.
 	Animation->Montage_Pause(CombatSettings->AttackMontage);
-	GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatRecoveryEnd(this);
+	GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatRecoveryEnd(*this);
 }
 
 void AVampsCharacter::ResolveCombatRecoveryEnd(int32 RecoveryActionNumber)
@@ -717,25 +683,6 @@ void AVampsCharacter::ResolveCombatRecoveryEnd(int32 RecoveryActionNumber)
 
 void AVampsCharacter::BeginNARecovery()
 {
-	if (!CombatState.bIsAlive)
-	{
-		SetCombatPhase(EVampsActionPhase::Idle);
-		return;
-	}
-	if (!CombatSettings || !FMath::IsFinite(CombatSettings->NARecoveryDuration) ||
-	    CombatSettings->NARecoveryDuration <= 0.f)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: CombatSettings '%s' must define a finite, positive NARecoveryDuration. Combat remains "
-		            "unavailable until reset."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(CombatSettings));
-		CombatState.NARecoveryEndsAt = 0;
-		SetCombatPhase(EVampsActionPhase::NARecovery);
-		return;
-	}
 	CombatState.NARecoveryEndsAt = GetWorld()->GetTimeSeconds() + CombatSettings->NARecoveryDuration;
 	SetCombatPhase(EVampsActionPhase::NARecovery);
 	GetWorldTimerManager().SetTimer(
@@ -758,7 +705,7 @@ bool AVampsCharacter::IsCurrentCombatNotify(const FBranchingPointNotifyPayload& 
 		return false;
 	}
 	return Payload.SkelMeshComponent == GetMesh() && Payload.SequenceAsset == CombatSettings->AttackMontage &&
-	       Payload.MontageInstanceID == CombatState.MontageInstanceID && Payload.NotifyEvent &&
+	       Payload.MontageInstanceID == CombatState.MontageInstanceID &&
 	       CombatSettings->AttackMontage->GetSectionIndexFromPosition(Payload.NotifyEvent->GetTriggerTime()) ==
 	           CombatState.ComboStep - 1;
 }
@@ -853,10 +800,10 @@ void AVampsCharacter::SetCombatComboWindow(const FBranchingPointNotifyPayload& P
 		return;
 	}
 	CombatState.bComboWindowOpen = bEnabled;
-	SetCombatPhase(CombatState.Phase);
+	RefreshCombatPermissions();
 	if (!bEnabled && CombatState.bContinuationRequested)
 	{
-		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContinuation(this);
+		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContinuation(*this);
 	}
 }
 
@@ -922,7 +869,6 @@ void AVampsCharacter::ArmDefenseRequest()
 {
 	CombatState.bDefenseRequestArmed = true;
 	CombatState.DefenseRequestEndsAt = GetWorld()->GetTimeSeconds() + CombatSettings->DefenseRequestDuration;
-	SetCombatPhase(CombatState.Phase);
 }
 
 bool AVampsCharacter::MatchesDefendedContact(const FVampsPendingContact& Contact) const
@@ -939,7 +885,7 @@ void AVampsCharacter::RememberDefendedContact(const FVampsPendingContact& Contac
 	CombatState.DefendedActionNumber = Contact.ActionNumber;
 	DefendedGeneration = Contact.AttackerGeneration;
 	LockOn->SelectTarget(Contact.Attacker.Get());
-	RequestCombatFraming(this, Contact.Attacker.Get());
+	OnCombatFramingRequested.Broadcast(Contact.Attacker.Get());
 }
 
 void AVampsCharacter::CancelCombatOffense()
@@ -977,7 +923,7 @@ void AVampsCharacter::FinishCombatReaction()
 	CombatState.ReactionSource.Reset();
 	CombatState.DefendedAttacker.Reset();
 	CombatState.DefendedActionNumber = INDEX_NONE;
-	SetCombatPhase(CombatState.Phase);
+	RefreshCombatPermissions();
 }
 
 void AVampsCharacter::FinishNARecovery()
@@ -1016,7 +962,7 @@ void AVampsCharacter::ResetCombatState()
 	ReactionPlaybackInstanceID = INDEX_NONE;
 	GuardRecoveryStartsAt = 0;
 	AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetGuardLoadAttribute(), 0.f);
-	GetWorld()->GetSubsystem<UVampsCombatResolver>()->DiscardContactsFor(this);
+	GetWorld()->GetSubsystem<UVampsCombatResolver>()->DiscardPendingCombatFor(*this);
 	for (AVampsWeapon* EquippedWeapon : Weapons)
 	{
 		if (IsValid(EquippedWeapon))
@@ -1045,45 +991,50 @@ void AVampsCharacter::ResetCombatState()
 
 void AVampsCharacter::SetCombatPhase(EVampsActionPhase NewPhase)
 {
-	const bool bWasDamageEnabled = CombatState.bCanDealDamage;
 	CombatState.Phase = NewPhase;
+	RefreshCombatPermissions();
+}
+
+void AVampsCharacter::RefreshCombatPermissions()
+{
+	const EVampsActionPhase Phase = CombatState.Phase;
+	const bool bWasDamageEnabled = CombatState.bCanDealDamage;
 	CombatState.bIsAlive = Attributes->GetHealth() > 0.f;
 	const AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
 	const bool bMatchAllowsCombat = !MatchMode || MatchMode->AllowsCombat(this);
-	CombatState.bIsRecovering = NewPhase == EVampsActionPhase::Recovery || NewPhase == EVampsActionPhase::NARecovery;
+	const bool bInRecovery = Phase == EVampsActionPhase::Recovery;
+	const bool bInNA = Phase == EVampsActionPhase::NARecovery;
+	CombatState.bIsRecovering = bInRecovery || bInNA;
 	const bool bInReaction = CombatState.Reaction != EVampsCombatReaction::None;
-	const bool bDefenseAllowed = CombatState.bIsAlive && bMatchAllowsCombat && AttackHandle.IsValid() &&
-	                             NewPhase != EVampsActionPhase::NARecovery &&
-	                             CombatState.Reaction != EVampsCombatReaction::Stun &&
-	                             (NewPhase != EVampsActionPhase::Recovery || bInReaction);
+	const bool bCombatAllowed = CombatState.bIsAlive && bMatchAllowsCombat;
+	const bool bCanRespond =
+	    bCombatAllowed && AttackHandle.IsValid() && !bInNA && CombatState.Reaction != EVampsCombatReaction::Stun;
 	CombatState.bOffenseRestricted = bInReaction;
-	CombatState.bCanMove = CombatState.bIsAlive && bMatchAllowsCombat && !bInReaction &&
-	                       (NewPhase == EVampsActionPhase::Idle || NewPhase == EVampsActionPhase::NARecovery);
-	const UVampsCombatMovementComponent* Mobility = Cast<UVampsCombatMovementComponent>(GetCharacterMovement());
-	CombatState.bCanDash = CombatState.bCanMove && DashHandle.IsValid() && CombatSettings &&
-	                       Attributes->GetMobilityEnergy() >= CombatSettings->DashEnergyCost && Mobility &&
+	CombatState.bCanMove = bCombatAllowed && !bInReaction && (Phase == EVampsActionPhase::Idle || bInNA);
+	CombatState.bCanDash = CombatState.bCanMove && DashHandle.IsValid() &&
+	                       Attributes->GetMobilityEnergy() >= CombatSettings->DashEnergyCost &&
 	                       !CombatState.bIsDashing && GetCharacterMovement()->IsMovingOnGround();
-	CombatState.bCanRequestCombat =
-	    CombatState.bIsAlive && bMatchAllowsCombat && AttackHandle.IsValid() &&
-	    NewPhase != EVampsActionPhase::NARecovery && CombatState.Reaction != EVampsCombatReaction::Stun &&
-	    (NewPhase != EVampsActionPhase::Recovery || CombatState.bComboWindowOpen || bInReaction);
-	CombatState.bCanStartAction = CombatState.bCanRequestCombat && NewPhase == EVampsActionPhase::Idle && !bInReaction;
-	CombatState.bCanDealDamage =
-	    CombatState.bIsAlive && bMatchAllowsCombat && NewPhase == EVampsActionPhase::Contacts && !bInReaction;
+	CombatState.bCanRequestCombat = bCanRespond && (!bInRecovery || CombatState.bComboWindowOpen || bInReaction);
+	CombatState.bCanStartAction = CombatState.bCanRequestCombat && Phase == EVampsActionPhase::Idle && !bInReaction;
+	CombatState.bCanDealDamage = bCombatAllowed && Phase == EVampsActionPhase::Contacts && !bInReaction;
 	CombatState.bCanDefend =
-	    bDefenseAllowed &&
+	    bCanRespond && (!bInRecovery || bInReaction) &&
 	    ((CombatState.bDefenseRequestArmed && GetWorld()->GetTimeSeconds() < CombatState.DefenseRequestEndsAt) ||
 	     (CombatState.Reaction == EVampsCombatReaction::Guard && CombatState.DefendedAttacker.IsValid()));
 
-	if (bWasDamageEnabled == CombatState.bCanDealDamage)
+	if (bWasDamageEnabled != CombatState.bCanDealDamage)
 	{
-		return;
+		SetCombatWeaponTracing(CombatState.bCanDealDamage);
 	}
+}
+
+void AVampsCharacter::SetCombatWeaponTracing(bool bEnabled)
+{
 	for (AVampsWeapon* EquippedWeapon : Weapons)
 	{
 		if (!IsValid(EquippedWeapon))
 		{
-			if (CombatState.bCanDealDamage)
+			if (bEnabled)
 			{
 				UE_LOG(LogVampsCombat,
 				       Error,
@@ -1096,7 +1047,7 @@ void AVampsCharacter::SetCombatPhase(EVampsActionPhase NewPhase)
 			}
 			continue;
 		}
-		if (!EquippedWeapon->SetTracingEnabled(CombatState.bCanDealDamage))
+		if (!EquippedWeapon->SetTracingEnabled(bEnabled))
 		{
 			UE_LOG(LogVampsCombat,
 			       Error,
@@ -1113,7 +1064,7 @@ void AVampsCharacter::SetCombatPhase(EVampsActionPhase NewPhase)
 
 void AVampsCharacter::HandleCombatHealthChanged(const FOnAttributeChangeData&)
 {
-	SetCombatPhase(CombatState.Phase);
+	RefreshCombatPermissions();
 	if (!CombatState.bIsAlive)
 	{
 		ClearMobilityIntent();
@@ -1124,7 +1075,7 @@ void AVampsCharacter::HandleCombatHealthChanged(const FOnAttributeChangeData&)
 		CombatState.ReactionEndsAt = 0;
 		CombatState.DefendedAttacker.Reset();
 		CombatState.bDefenseRequestArmed = false;
-		GetWorld()->GetSubsystem<UVampsCombatResolver>()->DiscardContactsFor(this);
+		GetWorld()->GetSubsystem<UVampsCombatResolver>()->DiscardPendingCombatFor(*this);
 		UVampsCombatMovementComponent* CombatMovement = Cast<UVampsCombatMovementComponent>(GetCharacterMovement());
 		if (!CombatMovement)
 		{
@@ -1148,16 +1099,8 @@ bool AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact)
 	{
 		return false;
 	}
-	if (!IsValid(Attacker) || Attacker == this || Attacker->CombatGeneration != Contact.AttackerGeneration ||
-	    !FMath::IsFinite(Contact.ContactDamage) || Contact.ContactDamage < 0.f)
+	if (!IsValid(Attacker) || Attacker->CombatGeneration != Contact.AttackerGeneration)
 	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s': rejected captured contact from '%s', damage=%f."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(Attacker),
-		       Contact.ContactDamage);
 		return false;
 	}
 	const float DamageAmount =
@@ -1248,7 +1191,7 @@ void AVampsCharacter::ApplyCombatReaction(const FVampsPendingContact& Contact)
 		CombatState.DefendedActionNumber = INDEX_NONE;
 		CombatState.bDefenseRequestArmed = false;
 	}
-	SetCombatPhase(CombatState.Phase);
+	RefreshCombatPermissions();
 	UAnimMontage* ReactionMontage =
 	    CombatState.Reaction == EVampsCombatReaction::Guard
 	        ? CombatSettings->GuardReactionMontage.Get()

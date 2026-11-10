@@ -11,7 +11,7 @@ void UVampsCombatResolver::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 	PostActorTickHandle =
-	    FWorldDelegates::OnWorldPostActorTick.AddUObject(this, &UVampsCombatResolver::ResolveCombatContacts);
+	    FWorldDelegates::OnWorldPostActorTick.AddUObject(this, &UVampsCombatResolver::ResolveCombatFrame);
 }
 
 void UVampsCombatResolver::Deinitialize()
@@ -29,68 +29,52 @@ bool UVampsCombatResolver::DoesSupportWorldType(const EWorldType::Type WorldType
 	return WorldType == EWorldType::Game || WorldType == EWorldType::PIE;
 }
 
-void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker, AVampsCharacter* Recipient)
+void UVampsCombatResolver::QueueCombatContact(AVampsCharacter& Attacker, AVampsCharacter& Recipient)
 {
-	if (!IsValid(Attacker) || !IsValid(Recipient) || Attacker == Recipient || !Attacker->HasAuthority() ||
-	    !Recipient->HasAuthority() || Attacker->GetWorld() != GetWorld() || Recipient->GetWorld() != GetWorld())
+	if (!Attacker.HasAuthority() || !Recipient.HasAuthority() || Attacker.GetWorld() != GetWorld() ||
+	    Recipient.GetWorld() != GetWorld())
+	{
+		UE_LOG(
+		    LogVampsCombat,
+		    Error,
+		    TEXT(
+		        "%hs: contact rejected: attacker='%s', recipient='%s'. Expected authoritative fighters in world '%s'."),
+		    __FUNCTION__,
+		    *Attacker.GetPathName(),
+		    *Recipient.GetPathName(),
+		    *GetPathNameSafe(GetWorld()));
+		return;
+	}
+	const UVampsCombatSettings* AttackSettings = Attacker.CombatSettings;
+	const int32 StepIndex = Attacker.CombatState.ComboStep - 1;
+	if (!AttackSettings || !AttackSettings->ComboSteps.IsValidIndex(StepIndex))
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: contact rejected: attacker='%s', recipient='%s'. Expected distinct valid authoritative "
-		            "fighters in resolver world '%s'."),
+		       TEXT("%hs: contact rejected: attacker='%s' has no settings for combo step %d in '%s'."),
 		       __FUNCTION__,
-		       *GetPathNameSafe(Attacker),
-		       *GetPathNameSafe(Recipient),
-		       *GetPathNameSafe(GetWorld()));
+		       *Attacker.GetPathName(),
+		       Attacker.CombatState.ComboStep,
+		       *GetPathNameSafe(AttackSettings));
 		return;
 	}
-	if (!Attacker->CanHitCombatTarget(Recipient))
-	{
-		return;
-	}
-	if (!Attacker->CombatSettings ||
-	    !Attacker->CombatSettings->ComboSteps.IsValidIndex(Attacker->CombatState.ComboStep - 1) || !Recipient->LockOn ||
-	    !Cast<UVampsCombatMovementComponent>(Recipient->GetCharacterMovement()))
+	const UVampsCombatSettings* DefenseSettings = Recipient.CombatSettings;
+	if (!Recipient.AttackHandle.IsValid() || !DefenseSettings || !Recipient.LockOn || !Recipient.Attributes)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: contact rejected: attacker='%s', step=%d, CombatSettings='%s', recipient='%s'. Required step "
-		            "settings, recipient LockOn or combat movement are missing."),
+		       TEXT("%hs: contact rejected: recipient '%s' has incomplete combat initialization with settings '%s'."),
 		       __FUNCTION__,
-		       *Attacker->GetPathName(),
-		       Attacker->CombatState.ComboStep,
-		       *GetPathNameSafe(Attacker->CombatSettings),
-		       *Recipient->GetPathName());
-		return;
-	}
-	const UVampsCombatSettings* AttackSettings = Attacker->CombatSettings;
-	const UVampsCombatSettings* DefenseSettings = Recipient->CombatSettings;
-	const FVampsCombatStepSettings& StepSettings = AttackSettings->ComboSteps[Attacker->CombatState.ComboStep - 1];
-	if (!DefenseSettings || !AttackSettings->HasValidReactionSettings() ||
-	    !DefenseSettings->HasValidReactionSettings() || !Recipient->Attributes ||
-	    !FMath::IsFinite(AttackSettings->AttackDamage) || AttackSettings->AttackDamage < 0.f ||
-	    !FMath::IsFinite(StepSettings.ContactReactionDuration) || StepSettings.ContactReactionDuration <= 0.f)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: contact rejected: attacker='%s', settings='%s', damage=%f, "
-		            "reaction=%f, recipient='%s', settings='%s'. Required finite nonnegative damage and positive "
-		            "reaction duration."),
-		       __FUNCTION__,
-		       *Attacker->GetPathName(),
-		       *GetPathNameSafe(AttackSettings),
-		       AttackSettings->AttackDamage,
-		       StepSettings.ContactReactionDuration,
-		       *Recipient->GetPathName(),
+		       *Recipient.GetPathName(),
 		       *GetPathNameSafe(DefenseSettings));
 		return;
 	}
 	FVampsPendingContact& Contact = PendingContacts.AddDefaulted_GetRef();
-	Contact.Attacker = Attacker;
-	Contact.Recipient = Recipient;
-	Contact.ActionNumber = Attacker->CombatState.ActionNumber;
-	Contact.AttackerGeneration = Attacker->CombatGeneration;
-	Contact.RecipientGeneration = Recipient->CombatGeneration;
+	Contact.Attacker = &Attacker;
+	Contact.Recipient = &Recipient;
+	Contact.ActionNumber = Attacker.CombatState.ActionNumber;
+	Contact.AttackerGeneration = Attacker.CombatGeneration;
+	Contact.RecipientGeneration = Recipient.CombatGeneration;
 	Contact.ContactTime = GetWorld()->GetTimeSeconds();
 	Contact.bCritical =
 	    AttackSettings->CriticalChancePercent >= 100.f ||
@@ -98,54 +82,24 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter* Attacker, AVampsC
 	Contact.ContactDamage = Contact.bCritical ? AttackSettings->CriticalDamage : AttackSettings->AttackDamage;
 	Contact.BlockReduction = DefenseSettings->BlockDamageReduction;
 	Contact.GuardLoad = AttackSettings->GuardLoadPerHit;
-	Contact.AttackOrigin = Attacker->GetActorLocation();
-	Contact.AttackDirection = Attacker->GetActorForwardVector().GetSafeNormal2D();
-	Contact.StepSettings = StepSettings;
+	Contact.AttackOrigin = Attacker.GetActorLocation();
+	Contact.AttackDirection = Attacker.GetActorForwardVector().GetSafeNormal2D();
+	Contact.StepSettings = AttackSettings->ComboSteps[StepIndex];
 }
 
-void UVampsCombatResolver::QueueCombatDash(AVampsCharacter* Fighter)
+void UVampsCombatResolver::QueueCombatDash(AVampsCharacter& Fighter)
 {
-	if (!IsValid(Fighter) || !Fighter->HasAuthority() || Fighter->GetWorld() != GetWorld())
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: dash rejected for '%s'; expected an authoritative fighter in '%s'."),
-		       __FUNCTION__,
-		       *GetPathNameSafe(Fighter),
-		       *GetPathName());
-		return;
-	}
-	PendingDashes.AddUnique(Fighter);
+	PendingDashes.AddUnique(&Fighter);
 }
 
-void UVampsCombatResolver::QueueCombatContinuation(AVampsCharacter* Fighter)
+void UVampsCombatResolver::QueueCombatContinuation(AVampsCharacter& Fighter)
 {
-	if (!IsValid(Fighter) || !Fighter->HasAuthority() || Fighter->GetWorld() != GetWorld())
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: continuation rejected for '%s'; expected a valid authoritative fighter in world '%s'."),
-		       __FUNCTION__,
-		       *GetPathNameSafe(Fighter),
-		       *GetPathNameSafe(GetWorld()));
-		return;
-	}
-	PendingContinuations.AddUnique(Fighter);
+	PendingContinuations.AddUnique(&Fighter);
 }
 
-void UVampsCombatResolver::QueueCombatRecoveryEnd(AVampsCharacter* Fighter)
+void UVampsCombatResolver::QueueCombatRecoveryEnd(AVampsCharacter& Fighter)
 {
-	if (!IsValid(Fighter) || !Fighter->HasAuthority() || Fighter->GetWorld() != GetWorld())
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: recovery end rejected for '%s'; expected a valid authoritative fighter in world '%s'."),
-		       __FUNCTION__,
-		       *GetPathNameSafe(Fighter),
-		       *GetPathNameSafe(GetWorld()));
-		return;
-	}
-	PendingRecoveryEnds.Add(Fighter, Fighter->CombatState.ActionNumber);
+	PendingRecoveryEnds.Add(&Fighter, Fighter.CombatState.ActionNumber);
 }
 
 bool UVampsCombatResolver::HasQueuedCombatRecoveryEnd(AVampsCharacter& Fighter) const
@@ -154,33 +108,23 @@ bool UVampsCombatResolver::HasQueuedCombatRecoveryEnd(AVampsCharacter& Fighter) 
 	return QueuedActionNumber && *QueuedActionNumber == Fighter.CombatState.ActionNumber;
 }
 
-void UVampsCombatResolver::DiscardContactsFor(AVampsCharacter* Fighter)
+void UVampsCombatResolver::DiscardPendingCombatFor(AVampsCharacter& Fighter)
 {
-	PendingDashes.RemoveAll(
-	    [Fighter](const TWeakObjectPtr<AVampsCharacter>& Candidate)
-	    {
-		    return Candidate.Get() == Fighter;
-	    });
+	const TWeakObjectPtr<AVampsCharacter> FighterRef(&Fighter);
 	PendingContacts.RemoveAll(
-	    [Fighter](const FVampsPendingContact& Contact)
+	    [&FighterRef](const FVampsPendingContact& Contact)
 	    {
-		    return Contact.Attacker.Get() == Fighter || Contact.Recipient.Get() == Fighter;
+		    return Contact.Attacker.HasSameIndexAndSerialNumber(FighterRef) ||
+		           Contact.Recipient.HasSameIndexAndSerialNumber(FighterRef);
 	    });
-	PendingContinuations.RemoveAll(
-	    [Fighter](const TWeakObjectPtr<AVampsCharacter>& Candidate)
-	    {
-		    return Candidate.Get() == Fighter;
-	    });
-	PendingRecoveryEnds.Remove(Fighter);
+	PendingContinuations.Remove(FighterRef);
+	PendingRecoveryEnds.Remove(FighterRef);
+	PendingDashes.Remove(FighterRef);
 }
 
-void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds)
+void UVampsCombatResolver::ResolvePendingContacts()
 {
-	if (TickedWorld != GetWorld())
-	{
-		return;
-	}
-
+	// A death callback clears queued work without removing exchanges already captured for this frame.
 	TArray<FVampsPendingContact> Contacts = MoveTemp(PendingContacts);
 	Contacts.RemoveAll(
 	    [](const FVampsPendingContact& Contact)
@@ -218,6 +162,7 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 		                                 : Left.Attacker->GetPathName() < Right.Attacker->GetPathName();
 	    });
 
+	// Classify defense and guard breaks before any contact changes health or reactions.
 	for (int32 GroupStart = 0; GroupStart < Contacts.Num();)
 	{
 		AVampsCharacter* Recipient = Contacts[GroupStart].Recipient.Get();
@@ -313,7 +258,16 @@ void UVampsCombatResolver::ResolveCombatContacts(UWorld* TickedWorld, ELevelTick
 		}
 		GroupStart = GroupEnd;
 	}
+}
 
+void UVampsCombatResolver::ResolveCombatFrame(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds)
+{
+	if (TickedWorld != GetWorld())
+	{
+		return;
+	}
+	// An impact can interrupt a continuation or cancel a dash before it costs energy.
+	ResolvePendingContacts();
 	const TArray<TWeakObjectPtr<AVampsCharacter>> Continuations = MoveTemp(PendingContinuations);
 	for (const TWeakObjectPtr<AVampsCharacter>& Fighter : Continuations)
 	{

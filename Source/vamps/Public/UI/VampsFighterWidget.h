@@ -7,6 +7,7 @@ class AVampsCharacter;
 class UAbilitySystemComponent;
 class UProgressBar;
 class UTextBlock;
+struct FGameplayAttribute;
 struct FOnAttributeChangeData;
 
 UCLASS(Abstract)
@@ -66,6 +67,8 @@ private:
 	bool bShowingStun = false;
 	TArray<FDelegateHandle> AttributeHandles;
 
+	static const TArray<FGameplayAttribute>& MeterAttributes();
+	static void UpdateMeter(UProgressBar* Meter, UTextBlock* Label, const TCHAR* Caption, float Value, float Capacity);
 	void ReleaseAttributes();
 	void RefreshMeters();
 	void RefreshGuardMeter(const AVampsCharacter& Fighter, bool bAttributesChanged);

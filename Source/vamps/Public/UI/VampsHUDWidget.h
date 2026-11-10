@@ -3,6 +3,8 @@
 #include "Blueprint/UserWidget.h"
 #include "VampsHUDWidget.generated.h"
 
+class APawn;
+class AVampsCharacter;
 class AVampsMatchGameMode;
 class UButton;
 class UCanvasPanel;
@@ -10,8 +12,10 @@ class UScaleBox;
 class UTextBlock;
 class UVerticalBox;
 class UVampsCharacterOptionWidget;
+class UVampsCombatSettings;
 class UVampsEnemyWidget;
 class UVampsFighterWidget;
+class UVampsLockOnComponent;
 
 UCLASS(Abstract)
 class VAMPS_API UVampsHUDWidget : public UUserWidget
@@ -25,6 +29,8 @@ public:
 protected:
 
 	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 private:
@@ -91,12 +97,21 @@ private:
 	TObjectPtr<UVerticalBox> DebugOpponents;
 
 	TWeakObjectPtr<AVampsMatchGameMode> MatchMode;
+	TWeakObjectPtr<UVampsLockOnComponent> ObservedLockOn;
+	bool bHUDInitialized = false;
 	bool bShowCombatDebug = false;
 
+	static void ShowWidget(UWidget* Widget, bool bShow);
+	static FString FormatRatio(int32 Kills, int32 Deaths);
+	void RefreshMatchViews();
+	void RefreshCharacterSelection(UVampsCombatSettings* CharacterSettings);
+	void RefreshTargetPanel(AVampsCharacter* TargetFighter);
 	void RefreshMatch();
 	void RefreshFighters(float LayoutHeight);
 	void RefreshResults();
 
+	UFUNCTION()
+	void HandleObservedPawnChanged(APawn* OldPawn, APawn* NewPawn);
 	UFUNCTION()
 	void StartRound();
 	UFUNCTION()

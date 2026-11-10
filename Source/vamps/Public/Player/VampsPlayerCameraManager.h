@@ -3,6 +3,7 @@
 #include "Camera/PlayerCameraManager.h"
 #include "VampsPlayerCameraManager.generated.h"
 
+class APawn;
 class AVampsCharacter;
 class UPrimitiveComponent;
 
@@ -13,7 +14,7 @@ class VAMPS_API AVampsPlayerCameraManager : public APlayerCameraManager
 
 public:
 
-	void BeginCombatFraming(AVampsCharacter* ChainSource);
+	virtual void InitializeFor(APlayerController* OwningController) override;
 	virtual void UpdateCamera(float DeltaTime) override;
 	virtual void ProcessViewRotation(float DeltaTime, FRotator& OutViewRotation, FRotator& OutDeltaRot) override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
@@ -52,6 +53,11 @@ private:
 	float TransitionFov = 38.f;
 	TMap<TWeakObjectPtr<UPrimitiveComponent>, float> FadedComponents;
 
+	static FVector SpatialFollow(const FVector& PreviousPosition, const FVector& DesiredPosition, float DeltaTime);
+
+	UFUNCTION()
+	void HandleObservedPawnChanged(APawn* OldPawn, APawn* NewPawn);
+	void HandleCombatFramingRequested(AVampsCharacter* ChainSource);
 	void ResetCameraState();
 	void UpdateOccluders(const FVector& PublishedEye,
 	                     const AVampsCharacter& ViewingFighter,

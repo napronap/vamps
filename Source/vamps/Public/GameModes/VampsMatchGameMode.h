@@ -18,6 +18,9 @@ enum class EVampsMatchPhase : uint8
 	Finished
 };
 
+DECLARE_MULTICAST_DELEGATE(FVampsRoundPhaseChanged);
+DECLARE_MULTICAST_DELEGATE_OneParam(FVampsSelectedCharacterChanged, UVampsCombatSettings*);
+
 USTRUCT(BlueprintType)
 struct VAMPS_API FVampsMatchParticipant
 {
@@ -100,6 +103,9 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Transient, Category = "Match")
 	TObjectPtr<UVampsCombatSettings> SelectedCharacter;
 
+	FVampsRoundPhaseChanged OnRoundPhaseChanged;
+	FVampsSelectedCharacterChanged OnSelectedCharacterChanged;
+
 	bool AllowsCombat(const AVampsCharacter* Fighter) const;
 	bool AreEnemies(const AVampsCharacter* FirstFighter, const AVampsCharacter* SecondFighter) const;
 	bool IsSpawnProtected(const AVampsCharacter* Fighter) const;
@@ -131,5 +137,6 @@ private:
 	void ClearParticipants();
 	bool RestoreParticipant(int32 ParticipantIndex, bool bRespawn);
 	void FinishLocalRound(bool bTimeExpired);
+	void SetRoundPhase(EVampsMatchPhase NewPhase);
 	bool EnableMatchMenuInput();
 };

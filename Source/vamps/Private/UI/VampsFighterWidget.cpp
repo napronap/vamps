@@ -9,23 +9,22 @@
 #include "Components/TextBlock.h"
 #include "Engine/World.h"
 
-namespace
+const TArray<FGameplayAttribute>& UVampsFighterWidget::MeterAttributes()
 {
-	TArray<FGameplayAttribute> MeterAttributes()
-	{
-		return {UVampsAttributeSet::GetHealthAttribute(),
-		        UVampsAttributeSet::GetMaxHealthAttribute(),
-		        UVampsAttributeSet::GetGuardLoadAttribute(),
-		        UVampsAttributeSet::GetMaxGuardLoadAttribute(),
-		        UVampsAttributeSet::GetMobilityEnergyAttribute(),
-		        UVampsAttributeSet::GetMaxMobilityEnergyAttribute()};
-	}
+	static const TArray<FGameplayAttribute> Attributes = {UVampsAttributeSet::GetHealthAttribute(),
+	                                                      UVampsAttributeSet::GetMaxHealthAttribute(),
+	                                                      UVampsAttributeSet::GetGuardLoadAttribute(),
+	                                                      UVampsAttributeSet::GetMaxGuardLoadAttribute(),
+	                                                      UVampsAttributeSet::GetMobilityEnergyAttribute(),
+	                                                      UVampsAttributeSet::GetMaxMobilityEnergyAttribute()};
+	return Attributes;
+}
 
-	void UpdateMeter(UProgressBar* Meter, UTextBlock* Label, const TCHAR* Caption, float Value, float Capacity)
-	{
-		Meter->SetPercent(FMath::Clamp(Value / Capacity, 0.f, 1.f));
-		Label->SetText(FText::FromString(FString::Printf(TEXT("%s %.0f / %.0f"), Caption, Value, Capacity)));
-	}
+void UVampsFighterWidget::UpdateMeter(
+    UProgressBar* Meter, UTextBlock* Label, const TCHAR* Caption, float Value, float Capacity)
+{
+	Meter->SetPercent(FMath::Clamp(Value / Capacity, 0.f, 1.f));
+	Label->SetText(FText::FromString(FString::Printf(TEXT("%s %.0f / %.0f"), Caption, Value, Capacity)));
 }
 
 void UVampsFighterWidget::ObserveFighter(AVampsCharacter* NewFighter,
@@ -76,7 +75,7 @@ void UVampsFighterWidget::ReleaseAttributes()
 {
 	if (UAbilitySystemComponent* PreviousAbilitySystem = ObservedAbilitySystem.Get())
 	{
-		const TArray<FGameplayAttribute> MeterProperties = MeterAttributes();
+		const TArray<FGameplayAttribute>& MeterProperties = MeterAttributes();
 		for (int32 AttributeIndex = 0; AttributeIndex < AttributeHandles.Num(); ++AttributeIndex)
 		{
 			PreviousAbilitySystem->GetGameplayAttributeValueChangeDelegate(MeterProperties[AttributeIndex])
