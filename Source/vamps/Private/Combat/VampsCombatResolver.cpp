@@ -75,7 +75,6 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter& Attacker, AVampsC
 	Contact.ActionNumber = Attacker.CombatState.ActionNumber;
 	Contact.AttackerGeneration = Attacker.CombatGeneration;
 	Contact.RecipientGeneration = Recipient.CombatGeneration;
-	Contact.ContactTime = GetWorld()->GetTimeSeconds();
 	Contact.bCritical =
 	    AttackSettings->CriticalChancePercent >= 100.f ||
 	    (AttackSettings->CriticalChancePercent > 0.f && FMath::FRand() * 100.f < AttackSettings->CriticalChancePercent);
@@ -100,12 +99,6 @@ void UVampsCombatResolver::QueueCombatContinuation(AVampsCharacter& Fighter)
 void UVampsCombatResolver::QueueCombatRecoveryEnd(AVampsCharacter& Fighter)
 {
 	PendingRecoveryEnds.Add(&Fighter, Fighter.CombatState.ActionNumber);
-}
-
-bool UVampsCombatResolver::HasQueuedCombatRecoveryEnd(AVampsCharacter& Fighter) const
-{
-	const int32* QueuedActionNumber = PendingRecoveryEnds.Find(&Fighter);
-	return QueuedActionNumber && *QueuedActionNumber == Fighter.CombatState.ActionNumber;
 }
 
 void UVampsCombatResolver::DiscardPendingCombatFor(AVampsCharacter& Fighter)
@@ -172,8 +165,7 @@ void UVampsCombatResolver::ResolvePendingContacts()
 			++GroupEnd;
 		}
 		FVampsPendingContact* RequestedDefense = nullptr;
-		if (Recipient->CombatState.bCanDefend && Recipient->CombatState.bDefenseRequestArmed &&
-		    GetWorld()->GetTimeSeconds() < Recipient->CombatState.DefenseRequestEndsAt)
+		if (Recipient->CombatState.bCanDefend && Recipient->CombatState.bDefenseRequestArmed)
 		{
 			for (int32 ContactIndex = GroupStart; ContactIndex < GroupEnd; ++ContactIndex)
 			{
@@ -224,37 +216,31 @@ void UVampsCombatResolver::ResolvePendingContacts()
 		while (GroupEnd < Contacts.Num() && Contacts[GroupEnd].Recipient.Get() == Recipient)
 		{
 			const FVampsPendingContact& Contact = Contacts[GroupEnd++];
-			if (Recipient->ReceiveCombatHit(Contact))
+			AVampsCharacter* Attacker = Contact.Attacker.Get();
+			if (!Recipient || !Recipient->CombatState.bIsAlive ||
+			    Recipient->CombatGeneration != Contact.RecipientGeneration || !Attacker ||
+			    Attacker->CombatGeneration != Contact.AttackerGeneration ||
+			    !Recipient->ReceiveCombatHit(Contact, *Attacker))
 			{
-				const int32 Severity = Contact.bGuardBreak ? 2 : (Contact.bBlocked ? 0 : 1);
-				const int32 PreviousSeverity =
-				    ReactionContact ? (ReactionContact->bGuardBreak ? 2 : (ReactionContact->bBlocked ? 0 : 1)) : -1;
-				if (Severity > PreviousSeverity)
-				{
-					ReactionContact = &Contact;
-				}
+				continue;
+			}
+			const int32 Severity = Contact.bGuardBreak ? 2 : (Contact.bBlocked ? 0 : 1);
+			const int32 PreviousSeverity =
+			    ReactionContact ? (ReactionContact->bGuardBreak ? 2 : (ReactionContact->bBlocked ? 0 : 1)) : -1;
+			if (Severity > PreviousSeverity)
+			{
+				ReactionContact = &Contact;
 			}
 		}
-		if (ReactionContact && Recipient->CombatState.bIsAlive)
+		if (ReactionContact && ReactionContact->Recipient.IsValid() && Recipient->CombatState.bIsAlive &&
+		    Recipient->CombatGeneration == ReactionContact->RecipientGeneration)
 		{
 			Recipient->ApplyCombatReaction(*ReactionContact);
-			UVampsCombatMovementComponent* CombatMovement =
-			    Cast<UVampsCombatMovementComponent>(Recipient->GetCharacterMovement());
-			if (CombatMovement)
-			{
-				CombatMovement->ReceiveCombatDisplacement(ReactionContact->AttackOrigin,
-				                                          ReactionContact->AttackDirection,
-				                                          ReactionContact->StepSettings,
-				                                          ReactionContact->bBlocked);
-			}
-			else
-			{
-				UE_LOG(LogVampsCombat,
-				       Error,
-				       TEXT("%hs: '%s': cannot apply reaction displacement without VampsCombatMovementComponent."),
-				       __FUNCTION__,
-				       *Recipient->GetPathName());
-			}
+			auto* CombatMovement = static_cast<UVampsCombatMovementComponent*>(Recipient->GetCharacterMovement());
+			CombatMovement->ReceiveCombatDisplacement(ReactionContact->AttackOrigin,
+			                                          ReactionContact->AttackDirection,
+			                                          ReactionContact->StepSettings,
+			                                          ReactionContact->bBlocked);
 		}
 		GroupStart = GroupEnd;
 	}
@@ -287,7 +273,7 @@ void UVampsCombatResolver::ResolveCombatFrame(UWorld* TickedWorld, ELevelTick Ti
 	const TArray<TWeakObjectPtr<AVampsCharacter>> Dashes = MoveTemp(PendingDashes);
 	for (const TWeakObjectPtr<AVampsCharacter>& Fighter : Dashes)
 	{
-		if (Fighter.IsValid() && !Fighter->IsActorBeingDestroyed())
+		if (Fighter.IsValid() && !Fighter->IsActorBeingDestroyed() && Fighter->CombatState.bDashRequested)
 		{
 			Fighter->ResolveCombatDash();
 		}

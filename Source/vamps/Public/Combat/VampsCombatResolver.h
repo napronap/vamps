@@ -15,7 +15,6 @@ struct FVampsPendingContact
 	int32 ActionNumber = 0;
 	uint32 AttackerGeneration = 0;
 	uint32 RecipientGeneration = 0;
-	double ContactTime = 0;
 	float ContactDamage = 0.f;
 	float BlockReduction = 0.f;
 	float GuardLoad = 0.f;
@@ -50,7 +49,6 @@ private:
 	void QueueCombatDash(AVampsCharacter& Fighter);
 	void QueueCombatContinuation(AVampsCharacter& Fighter);
 	void QueueCombatRecoveryEnd(AVampsCharacter& Fighter);
-	bool HasQueuedCombatRecoveryEnd(AVampsCharacter& Fighter) const;
 	void DiscardPendingCombatFor(AVampsCharacter& Fighter);
 
 	void ResolveCombatFrame(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds);

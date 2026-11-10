@@ -253,8 +253,7 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	const bool bPreparing = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Preparing;
 	const AVampsCharacter* Viewer = Cast<AVampsCharacter>(GetOwningPlayerPawn());
 	const bool bShowStun = (!MatchMode.IsValid() || MatchMode->RoundPhase == EVampsMatchPhase::Active) && Viewer &&
-	                       Viewer->CombatState.bIsAlive && Viewer->CombatState.Reaction == EVampsCombatReaction::Stun &&
-	                       Viewer->CombatState.ReactionEndsAt > GetWorld()->GetTimeSeconds();
+	                       Viewer->CombatState.bIsAlive && Viewer->CombatState.Reaction == EVampsCombatReaction::Stun;
 	ShowWidget(NoticeText->GetParent(), bPreparing || bUnavailable || bShowStun);
 	if (bShowStun)
 	{

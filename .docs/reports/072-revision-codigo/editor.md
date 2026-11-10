@@ -1,7 +1,10 @@
 # Editor — Revisión de código
 
-**Pendiente — usuario.** Abrir Unreal con PIE detenido para habilitar la compilación por MCP. El editor estaba cerrado durante esta revisión. Los Blueprints conservan su configuración.
+**Pendiente — usuario.** Con Unreal cerrado, compilar `vampsEditor` en `Win64 Development` desde el IDE y abrir Unreal de nuevo. La retirada de propiedades reflejadas de `VampsAnimInstance` y `FVampsCombatState` requiere comprobar las clases en un arranque limpio.
 
-1. **Pendiente — Codex por MCP.** Con el editor conectado, compilar mediante `LiveCodingToolset.LiveCodingToolset.CompileLiveCoding` y confirmar el resultado.
+1. **Pendiente — Codex por MCP.** Con el editor conectado y PIE detenido, compilar `/Game/Vamps/Animations/ABP_VampsCharacter` y `/Game/Vamps/Animations/Executioner/ABP_Executioner` mediante `BlueprintTools.compile_blueprint`. Confirmar que el graph del AnimBP compartido conserva `LocomotionBlendSpace` y `Speed`.
 2. **Pendiente — usuario.** Abrir `/Game/Vamps/Maps/L_CharacterBasic` y arrancar PIE. Pulsar **F6** para recorrer `Passive`, `Attack`, `Guard`, `Sidestep` y `Mixed`. Comprobar que el rival conserva el foco sobre el jugador, se acerca en `Attack` y encadena después de conectar. Confirmar que `Mixed` alterna comportamientos y que **R** reinicia el duelo.
 3. **Pendiente — usuario.** Abrir `/Game/Vamps/Maps/L_LocalMatch`, arrancar una ronda y observar que los bots adquieren un enemigo al entrar en combate. Cuando un objetivo muere, el bot debe cambiar a otro elegible o esperar. Finalizar la ronda y volver a selección para comprobar que se retiran los bots anteriores.
+4. **Pendiente — usuario.** En cualquiera de los dos mapas, comprobar que un ataque aislado entra en NA al cerrar Recovery y que un combo encadenado continúa con el siguiente golpe. Los marcadores existentes se conservan en los montages.
+5. **Pendiente — usuario.** En `L_LocalMatch`, elegir un perfil y comprobar que su locomoción pasa de idle a caminar y correr con el Blend Space de su Data Asset. Comprobar que los montages de ataque y reacción siguen reproduciéndose.
+6. **Pendiente — usuario.** En la partida local, comprobar que después del respawn se puede caminar y atacar. Observar la barra de stun, el indicador de NA y las dos variantes de muerte. Verificar que el dash válido consume energía y que un impacto del mismo frame lo cancela antes de que la consuma. En **F9**, comprobar el resultado de los últimos contactos y los tiempos restantes de reacción y NA.

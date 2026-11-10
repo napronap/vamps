@@ -15,33 +15,9 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "Animation")
+	UPROPERTY(BlueprintReadOnly, Transient)
 	TObjectPtr<UBlendSpace> LocomotionBlendSpace;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
+	UPROPERTY(BlueprintReadOnly)
 	float Speed = 0;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	float Direction = 0;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	bool bInAir = false;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	bool bIsGuarding = false;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	bool bIsHitReacting = false;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	bool bIsStunned = false;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	float CombatReactionRemaining = 0.f;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	bool bIsDashing = false;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Animation")
-	bool bIsSprinting = false;
 };

@@ -33,7 +33,10 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override
+	{
+		return AbilitySystem.Get();
+	}
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.f, bool bForce = false) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
@@ -60,28 +63,42 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	FVampsCombatState CombatState;
 
-	// A reset invalidates contacts captured for this fighter before the reset.
+	// TODO: maybe try to come up with a better way to do this to stop using magic numbers
+	// CombatGeneration tracks the "version" of the current attack so that the combat resolver knows what to do when it requests any action
+	// it goes up any time the state is reset (ResetCombatState) or teardown so contacts, defense and camera can discard stale combat state
+	// (i.e number is different from the previous requested action)
 	uint32 CombatGeneration = 0;
 
-	// The source is this fighter on attack start and the attacker on a confirmed block.
+	// broadcasted on attack start and from an incoming attacker on a confirmed block
 	FOnCombatFramingRequested OnCombatFramingRequested;
 
+	// lockon, AI and HUD can track an enemy even while spawn protection prevents hits
 	bool CanEngageEnemy(const AVampsCharacter* OtherFighter) const;
 	bool CanHitCombatTarget(const AVampsCharacter* OtherFighter) const;
+
+	// the match mode stops the round. Both game modes and the AI can reset a fighter for reuse
 	void StopMatchCombat();
 	void ResetCombatState();
 
+	// player input and AI request an attack, defense or combo continuation here
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestCombatAction();
 	bool CanRequestCombatContinuation() const;
 
+	// player input supplies movement intent and the shared dash/sprint button state
 	void SetMobilityInput(bool bHasInput);
 	void SetMobilityHeld(bool bHeld, const FVector& DashDirection = FVector::ZeroVector);
 
+	// consumed by HUD
+	bool CanStartCombatDash() const;
+	float GetCombatReactionTimeRemaining() const;
+	float GetNARecoveryTimeRemaining() const;
+
+	// consumed by GA_Attack, registers the montage playback and closes the action when the ability ends
 	bool BeginCombatAction(int32 PlaybackInstanceID);
 	void FinishCombatAction();
 
-	// Montage callbacks are scoped to the current playback instance and combo section.
+	// montage callbacks are scoped to the current playback instance and combo section
 	void EndCombatRecovery(const FBranchingPointNotifyPayload& Payload);
 	void SetCombatContacts(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
 	void ResetCombatWeaponHits(const FBranchingPointNotifyPayload& Payload, const TArray<int32>& WeaponIndices);
@@ -95,6 +112,8 @@ private:
 	FGameplayAbilitySpecHandle AttackHandle;
 	FGameplayAbilitySpecHandle DashHandle;
 	FTimerHandle NARecoveryTimer;
+	FTimerHandle CombatReactionTimer;
+	FTimerHandle DefenseRequestTimer;
 	double GuardRecoveryStartsAt = 0;
 	uint32 DefendedGeneration = 0;
 	int32 ReactionPlaybackInstanceID = INDEX_NONE;
@@ -103,6 +122,7 @@ private:
 	double MobilityRecoveryStartsAt = 0;
 	FVector RequestedDashDirection = FVector::ZeroVector;
 
+	// combat resolver consumes dash intent after impacts, which may cancel it before energy is spent
 	void ResolveCombatDash();
 	void UpdateMobilityEnergy(float DeltaSeconds);
 	void ClearMobilityIntent();
@@ -111,23 +131,32 @@ private:
 	void DestroyCombatWeapons();
 	void SetCombatWeaponTracing(bool bEnabled);
 
-	bool BeginCombatStep();
+	void BeginCombatStep();
 	bool IsCurrentCombatNotify(const FBranchingPointNotifyPayload& Payload) const;
+
+	// combat resolver tries a queued combo before ending Recovery for the same action number
 	void ResolveCombatContinuation();
 	void ResolveCombatRecoveryEnd(int32 RecoveryActionNumber);
 	void BeginNARecovery();
 	void FinishNARecovery();
 	void CancelCombatOffense();
 	void SetCombatPhase(EVampsActionPhase NewPhase);
+	bool IsMatchCombatAllowed() const;
 	void RefreshCombatPermissions();
 
+	void ClearCombatTimers();
 	void ArmDefenseRequest();
+	void ClearDefenseRequest();
+	void ExpireDefenseRequest();
 	bool MatchesDefendedContact(const FVampsPendingContact& Contact) const;
 	void RememberDefendedContact(const FVampsPendingContact& Contact);
+
+	// combat resolver passes validated contacts here and selects one reaction per recipient
 	void RegisterCombatContact(bool bBlocked);
-	bool ReceiveCombatHit(const FVampsPendingContact& Contact);
+	bool ReceiveCombatHit(const FVampsPendingContact& Contact, AVampsCharacter& Attacker);
 	void ApplyCombatReaction(const FVampsPendingContact& Contact);
 	void FinishCombatReaction();
+	void StopCombatReactionMontage();
 	void HandleCombatHealthChanged(const FOnAttributeChangeData& AttributeChange);
 	void PresentCombatDeath(bool bBlockedDeath);
 };

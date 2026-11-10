@@ -85,16 +85,10 @@ struct VAMPS_API FVampsCombatState
 	bool bOffenseRestricted = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	double ReactionEndsAt = 0;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	EVampsCombatReaction Reaction = EVampsCombatReaction::None;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bCanMove = true;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mobility")
-	bool bCanDash = true;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mobility")
 	bool bIsDashing = false;
@@ -107,9 +101,6 @@ struct VAMPS_API FVampsCombatState
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bDefenseRequestArmed = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	double DefenseRequestEndsAt = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	TWeakObjectPtr<AVampsCharacter> DefendedAttacker;
@@ -125,9 +116,6 @@ struct VAMPS_API FVampsCombatState
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
 	float LastDamageReceived = 0.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	double NARecoveryEndsAt = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	int32 MontageInstanceID = INDEX_NONE;
@@ -149,10 +137,4 @@ struct VAMPS_API FVampsCombatState
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
 	bool bActionConnected = false;
-
-	UPROPERTY(VisibleAnywhere, Category = "Debug")
-	uint64 LastOutgoingContactFrame = 0;
-
-	UPROPERTY(VisibleAnywhere, Category = "Debug")
-	uint64 LastIncomingContactFrame = 0;
 };

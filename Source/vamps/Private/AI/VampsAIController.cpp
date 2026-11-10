@@ -20,11 +20,7 @@ void AVampsAIController::OnUnPossess()
 {
 	GetWorldTimerManager().ClearTimer(DecisionTimer);
 	MoveDirection = FVector::ZeroVector;
-
-	if (APawn* ControlledPawn = GetPawn())
-	{
-		ControlledPawn->ConsumeMovementInputVector();
-	}
+	GetPawn()->ConsumeMovementInputVector();
 
 	Super::OnUnPossess();
 }

@@ -7,7 +7,6 @@
 #include "Combat/VampsCombatLog.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "Engine/World.h"
 
 const TArray<FGameplayAttribute>& UVampsFighterWidget::MeterAttributes()
 {
@@ -157,8 +156,7 @@ void UVampsFighterWidget::RefreshGuardMeter(const AVampsCharacter& Fighter, bool
 		{
 			GuardText->SetText(FText::FromString(TEXT("GUARD")));
 		}
-		const double RemainingStun = State.ReactionEndsAt - GetWorld()->GetTimeSeconds();
-		GuardBar->SetPercent(FMath::Clamp(float(RemainingStun / Settings->StunDuration), 0.f, 1.f));
+		GuardBar->SetPercent(FMath::Clamp(Fighter.GetCombatReactionTimeRemaining() / Settings->StunDuration, 0.f, 1.f));
 	}
 	else
 	{
@@ -193,7 +191,6 @@ void UVampsFighterWidget::RefreshDebugDetails()
 	const FVampsCombatState& State = Fighter->CombatState;
 	const UVampsCombatMovementComponent* Movement =
 	    Cast<UVampsCombatMovementComponent>(Fighter->GetCharacterMovement());
-	const double Now = GetWorld()->GetTimeSeconds();
 	FString Contact;
 	if (State.LastIncomingContact != EVampsContactResult::None)
 	{
@@ -209,8 +206,7 @@ void UVampsFighterWidget::RefreshDebugDetails()
 	ContactText->SetText(FText::FromString(Contact));
 	ContactText->SetColorAndOpacity(State.bLastIncomingCritical ? FLinearColor::Yellow : FLinearColor::White);
 	DebugDetails->SetText(FText::FromString(FString::Printf(
-	    TEXT("ACTION %d: %s\nSTART: %s | HIT: %s | GUARD: %s\nREQUEST #%d: %s\nOUT: %s | FRAME: %llu\nIN: %s | FRAME: "
-	         "%llu\n")
+	    TEXT("ACTION %d: %s\nSTART: %s | HIT: %s | GUARD: %s\nREQUEST #%d: %s\nOUT: %s | IN: %s\n")
 	        TEXT("LOCK ON: %s\nSTEP %d | WINDOW: %s | CONTACT: %s\nCONTINUATION: %s\nREACTION TIME: %.2f | NA: %.2f\n")
 	            TEXT("MOTION: %s | WALL: %s\nREACTION: %s | MOVE: %s\nGUARD LOAD: %.0f / %.0f"),
 	    State.ActionNumber,
@@ -221,16 +217,14 @@ void UVampsFighterWidget::RefreshDebugDetails()
 	    State.RequestCount,
 	    *StaticEnum<EVampsCombatRequest>()->GetNameStringByValue(int64(State.LastRequest)),
 	    *StaticEnum<EVampsContactResult>()->GetNameStringByValue(int64(State.LastOutgoingContact)),
-	    State.LastOutgoingContactFrame,
 	    *StaticEnum<EVampsContactResult>()->GetNameStringByValue(int64(State.LastIncomingContact)),
-	    State.LastIncomingContactFrame,
 	    *GetNameSafe(Fighter->LockOn->GetCurrentTarget()),
 	    State.ComboStep,
 	    State.bComboWindowOpen ? TEXT("OPEN") : TEXT("CLOSED"),
 	    State.bActionConnected ? TEXT("YES") : TEXT("NO"),
 	    State.bContinuationRequested ? TEXT("PENDING") : TEXT("NONE"),
-	    FMath::Max(0.0, State.ReactionEndsAt - Now),
-	    FMath::Max(0.0, State.NARecoveryEndsAt - Now),
+	    Fighter->GetCombatReactionTimeRemaining(),
+	    Fighter->GetNARecoveryTimeRemaining(),
 	    *StaticEnum<EVampsCombatMotion>()->GetNameStringByValue(int64(Movement->CombatMotion)),
 	    Movement->bCombatMotionBlocked ? TEXT("YES") : TEXT("NO"),
 	    *StaticEnum<EVampsCombatReaction>()->GetNameStringByValue(int64(State.Reaction)),
@@ -245,7 +239,7 @@ void UVampsFighterWidget::RefreshDebugDetails()
 	                                      Fighter->Attributes->GetMobilityEnergy(),
 	                                      Fighter->Attributes->GetMaxMobilityEnergy(),
 	                                      State.bIsSprinting ? TEXT("ON") : TEXT("OFF"),
-	                                      State.bCanDash ? TEXT("READY") : TEXT("NO"),
+	                                      Fighter->CanStartCombatDash() ? TEXT("READY") : TEXT("NO"),
 	                                      State.bIsDashing ? TEXT("YES") : TEXT("NO"),
 	                                      State.bDashRequested ? TEXT("YES") : TEXT("NO"))));
 }

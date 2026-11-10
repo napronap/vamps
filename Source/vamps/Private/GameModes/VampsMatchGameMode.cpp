@@ -293,6 +293,7 @@ int32 AVampsMatchGameMode::FindParticipantIndex(const AVampsCharacter* Fighter) 
 	    });
 }
 
+// CHECK SI ES NECESARIO
 bool AVampsMatchGameMode::AllowsCombat(const AVampsCharacter* Fighter) const
 {
 	const int32 ParticipantIndex = FindParticipantIndex(Fighter);
@@ -366,6 +367,7 @@ bool AVampsMatchGameMode::RestoreParticipant(int32 ParticipantIndex, bool bRespa
 	Fighter->GetMesh()->bPauseAnims = false;
 	FighterAnimation->Montage_Stop(0.f);
 	Fighter->ResetCombatState();
+	Participant.RespawnAt = 0;
 	Fighter->AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetHealthAttribute(),
 	                                                Fighter->Attributes->GetMaxHealth());
 	const AVampsTeamSpawnPoint* SpawnPoint = TeamSpawnPoints[Participant.TeamIndex];
@@ -378,7 +380,6 @@ bool AVampsMatchGameMode::RestoreParticipant(int32 ParticipantIndex, bool bRespa
 	Fighter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	Fighter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	Fighter->ConsumeMovementInputVector();
-	Participant.RespawnAt = 0;
 	Participant.ProtectionEndsAt = bRespawn ? GetWorld()->GetTimeSeconds() + SpawnProtectionDuration : 0;
 	if (AVampsMatchPlayerController* MatchController = Cast<AVampsMatchPlayerController>(Fighter->GetController()))
 	{

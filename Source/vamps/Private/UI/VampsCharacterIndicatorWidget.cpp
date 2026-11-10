@@ -29,10 +29,8 @@ void UVampsCharacterIndicatorWidget::NativeTick(const FGeometry& MyGeometry, flo
 	const bool bSelected =
 	    bShowIndicators && Fighter != Viewer && Viewer->LockOn && Viewer->LockOn->GetCurrentTarget() == Fighter;
 	LockOnMarker->SetVisibility(bSelected ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
-	const double Now = GetWorld()->GetTimeSeconds();
-	const bool bShowNA =
-	    bShowIndicators && Fighter == Viewer && Fighter->CombatState.NARecoveryEndsAt > Now &&
-	    (Fighter->CombatState.Reaction != EVampsCombatReaction::Stun || Fighter->CombatState.ReactionEndsAt <= Now);
+	const float RemainingNA = bShowIndicators && Fighter == Viewer ? Fighter->GetNARecoveryTimeRemaining() : 0.f;
+	const bool bShowNA = RemainingNA > 0.f && Fighter->CombatState.Reaction != EVampsCombatReaction::Stun;
 	NAView->SetVisibility(bShowNA ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
 	if (!bShowNA)
 	{
@@ -51,6 +49,5 @@ void UVampsCharacterIndicatorWidget::NativeTick(const FGeometry& MyGeometry, flo
 		NAView->SetVisibility(ESlateVisibility::Collapsed);
 		return;
 	}
-	NAProgress->SetPercent(
-	    FMath::Clamp(float((Fighter->CombatState.NARecoveryEndsAt - Now) / Settings->NARecoveryDuration), 0.f, 1.f));
+	NAProgress->SetPercent(FMath::Clamp(RemainingNA / Settings->NARecoveryDuration, 0.f, 1.f));
 }

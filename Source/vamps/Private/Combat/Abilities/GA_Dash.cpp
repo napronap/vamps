@@ -112,7 +112,6 @@ void UGA_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	                                                    Fighter->CombatSettings->DashEnergyCost);
 	Fighter->MobilityRecoveryStartsAt =
 	    Fighter->GetWorld()->GetTimeSeconds() + Fighter->CombatSettings->MobilityRecoveryDelay;
-	Fighter->RefreshCombatPermissions();
 }
 
 void UGA_Dash::FinishDash()
@@ -136,7 +135,6 @@ void UGA_Dash::EndAbility(const FGameplayAbilitySpecHandle Handle,
 			Fighter->CombatState.bIsDashing = false;
 			Fighter->GetCharacterMovement()->StopMovementImmediately();
 		}
-		Fighter->RefreshCombatPermissions();
 	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

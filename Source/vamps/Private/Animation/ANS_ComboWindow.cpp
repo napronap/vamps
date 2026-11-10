@@ -6,9 +6,6 @@
 UANS_ComboWindow::UANS_ComboWindow()
 {
 	bIsNativeBranchingPoint = true;
-#if WITH_EDITORONLY_DATA
-	bShouldFireInEditor = false;
-#endif
 }
 
 void UANS_ComboWindow::BranchingPointNotifyBegin(FBranchingPointNotifyPayload& Payload)

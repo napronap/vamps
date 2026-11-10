@@ -6,9 +6,6 @@
 UANS_AttackTrace::UANS_AttackTrace()
 {
 	bIsNativeBranchingPoint = true;
-#if WITH_EDITORONLY_DATA
-	bShouldFireInEditor = false;
-#endif
 }
 
 void UANS_AttackTrace::BranchingPointNotifyBegin(FBranchingPointNotifyPayload& Payload)
