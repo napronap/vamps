@@ -2,63 +2,64 @@
 #include "Characters/VampsCharacter.h"
 #include "Engine/World.h"
 #include "EngineUtils.h"
-#include "Combat/VampsCombatLog.h"
+#include "GameModes/VampsMatchGameMode.h"
 
-UVampsLockOnComponent::UVampsLockOnComponent()
+void UVampsLockOnComponent::InitializeCandidates()
 {
-	PrimaryComponentTick.bCanEverTick = true;
-}
+	AVampsCharacter& OwnerFighter = *static_cast<AVampsCharacter*>(GetOwner());
+	AVampsMatchGameMode* MatchMode = GetWorld()->GetAuthGameMode<AVampsMatchGameMode>();
 
-void UVampsLockOnComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	if (!Cast<AVampsCharacter>(GetOwner()))
+	for (AVampsCharacter* Fighter : TActorRange<AVampsCharacter>(GetWorld()))
 	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: LockOn initialization cancelled; owner '%s' must be a VampsCharacter."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(GetOwner()));
-		SetComponentTickEnabled(false);
-		return;
+		if (Fighter != &OwnerFighter && Fighter->HasActorBegunPlay() &&
+		    (!MatchMode || MatchMode->AreEnemies(&OwnerFighter, Fighter)))
+		{
+			RegisterCandidate(*Fighter);
+			Fighter->LockOn->RegisterCandidate(OwnerFighter);
+			Fighter->LockOn->RefreshTarget();
+		}
 	}
-	ActorSpawnedHandle = GetWorld()->AddOnActorSpawnedHandler(
-	    FOnActorSpawned::FDelegate::CreateUObject(this, &UVampsLockOnComponent::RegisterCandidate));
-	for (TActorIterator<AVampsCharacter> FighterIterator(GetWorld()); FighterIterator; ++FighterIterator)
+
+	if (MatchMode)
 	{
-		RegisterCandidate(*FighterIterator);
+		MatchMode->OnRoundPhaseChanged.AddUObject(this, &UVampsLockOnComponent::RefreshTarget);
 	}
-	CycleTarget();
+
+	RefreshTarget();
 }
 
 void UVampsLockOnComponent::EndPlay(const EEndPlayReason::Type Reason)
 {
-	GetWorld()->RemoveOnActorSpawnedHandler(ActorSpawnedHandle);
+	if (AVampsMatchGameMode* MatchMode = GetWorld()->GetAuthGameMode<AVampsMatchGameMode>())
+	{
+		MatchMode->OnRoundPhaseChanged.RemoveAll(this);
+	}
+	for (const TWeakObjectPtr<AVampsCharacter>& Candidate : Candidates)
+	{
+		if (AVampsCharacter* Fighter = Candidate.Get())
+		{
+			Fighter->OnCombatAliveChanged.RemoveAll(this);
+			Fighter->OnEndPlay.RemoveDynamic(this, &UVampsLockOnComponent::HandleCandidateEndPlay);
+		}
+	}
+
 	Candidates.Reset();
 	SetCurrentTarget(nullptr);
+
 	Super::EndPlay(Reason);
 }
 
-void UVampsLockOnComponent::TickComponent(float DeltaSeconds,
-                                          ELevelTick TickType,
-                                          FActorComponentTickFunction* ThisTickFunction)
+void UVampsLockOnComponent::RefreshTarget()
 {
-	Super::TickComponent(DeltaSeconds, TickType, ThisTickFunction);
 	if (!IsEligible(CurrentTarget.Get()))
 	{
 		CycleTarget();
 	}
-	Candidates.RemoveAll(
-	    [](const TWeakObjectPtr<AVampsCharacter>& Candidate)
-	    {
-		    return !Candidate.IsValid();
-	    });
 }
 
 AVampsCharacter* UVampsLockOnComponent::GetCurrentTarget() const
 {
-	return IsEligible(CurrentTarget.Get()) ? CurrentTarget.Get() : nullptr;
+	return CurrentTarget.Get();
 }
 
 const TArray<TWeakObjectPtr<AVampsCharacter>>& UVampsLockOnComponent::GetCandidates() const
@@ -73,15 +74,18 @@ void UVampsLockOnComponent::CycleTarget()
 	    {
 		    return Candidate.HasSameIndexAndSerialNumber(CurrentTarget);
 	    });
+
 	for (int32 Offset = 1; Offset <= Candidates.Num(); ++Offset)
 	{
 		AVampsCharacter* Candidate = Candidates[(CurrentIndex + Offset) % Candidates.Num()].Get();
+
 		if (IsEligible(Candidate))
 		{
 			SetCurrentTarget(Candidate);
 			return;
 		}
 	}
+
 	SetCurrentTarget(nullptr);
 }
 
@@ -89,7 +93,6 @@ void UVampsLockOnComponent::SelectTarget(AVampsCharacter* NewTarget)
 {
 	if (IsEligible(NewTarget))
 	{
-		Candidates.AddUnique(NewTarget);
 		SetCurrentTarget(NewTarget);
 	}
 }
@@ -97,6 +100,7 @@ void UVampsLockOnComponent::SelectTarget(AVampsCharacter* NewTarget)
 void UVampsLockOnComponent::SetCurrentTarget(AVampsCharacter* NewTarget)
 {
 	const TWeakObjectPtr<AVampsCharacter> NextTarget(NewTarget);
+
 	if (!CurrentTarget.HasSameIndexAndSerialNumber(NextTarget))
 	{
 		CurrentTarget = NextTarget;
@@ -104,47 +108,30 @@ void UVampsLockOnComponent::SetCurrentTarget(AVampsCharacter* NewTarget)
 	}
 }
 
-void UVampsLockOnComponent::RegisterCandidate(AActor* SpawnedActor)
+void UVampsLockOnComponent::RegisterCandidate(AVampsCharacter& Candidate)
 {
-	AVampsCharacter* Candidate = Cast<AVampsCharacter>(SpawnedActor);
-	if (Candidate && Candidate != GetOwner())
+	if (!Candidates.Contains(&Candidate))
 	{
-		Candidates.AddUnique(Candidate);
+		Candidates.Add(&Candidate);
+		Candidate.OnCombatAliveChanged.AddUObject(this, &UVampsLockOnComponent::RefreshTarget);
+		Candidate.OnEndPlay.AddDynamic(this, &UVampsLockOnComponent::HandleCandidateEndPlay);
 	}
 }
 
-#if !UE_BUILD_SHIPPING
-void UVampsLockOnComponent::ToggleDebugLockOn()
+void UVampsLockOnComponent::HandleCandidateEndPlay(AActor* EndingActor, EEndPlayReason::Type)
 {
-	const AVampsCharacter* OwningFighter = Cast<AVampsCharacter>(GetOwner());
-	if (!OwningFighter || !OwningFighter->IsPlayerControlled() || !OwningFighter->IsLocallyControlled())
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s': debug lock-on toggle requires a locally controlled player fighter; owner='%s'."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(GetOwner()));
-		return;
-	}
-	bDebugLockOnDisabled = !bDebugLockOnDisabled;
-	CycleTarget();
-	UE_LOG(LogVampsCombat,
-	       Display,
-	       TEXT("%s: debug player lock-on %s (F7)."),
-	       *GetOwner()->GetPathName(),
-	       bDebugLockOnDisabled ? TEXT("disabled") : TEXT("enabled"));
+	AVampsCharacter& Fighter = *static_cast<AVampsCharacter*>(EndingActor);
+
+	// Keep the old slot until selection advances past it
+	RefreshTarget();
+
+	Candidates.Remove(&Fighter);
+
+	Fighter.OnCombatAliveChanged.RemoveAll(this);
+	Fighter.OnEndPlay.RemoveDynamic(this, &UVampsLockOnComponent::HandleCandidateEndPlay);
 }
-#endif
 
 bool UVampsLockOnComponent::IsEligible(const AVampsCharacter* Candidate) const
 {
-#if !UE_BUILD_SHIPPING
-	if (bDebugLockOnDisabled)
-	{
-		return false;
-	}
-#endif
-	const AVampsCharacter* OwningFighter = Cast<AVampsCharacter>(GetOwner());
-	return OwningFighter && OwningFighter->CanEngageEnemy(Candidate);
+	return static_cast<const AVampsCharacter*>(GetOwner())->CanEngageEnemy(Candidate);
 }

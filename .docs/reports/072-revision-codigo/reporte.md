@@ -3,7 +3,7 @@
 ## Controlador de IA
 
 - `AVampsAIController::OnPossess` usa el `VampsCharacter` válido que le entregan los GameModes y orienta al bot según el foco del controller. Se retira el respaldo de los flags de rotación porque el respawn mantiene la posesión y el cierre de ronda destruye el pawn al desposeerlo. `SetMode` arma el timer de decisión solo con un `AVampsCharacter` poseído. `OnUnPossess` cancela el timer y consume el input antes de que Unreal desvincule el pawn. El reset de combate queda en `AVampsCharacter::UnPossessed`.
-- En partida, el controlador toma el objetivo elegible de `UVampsLockOnComponent`. El componente selecciona otro objetivo en su tick cuando corresponde. En el mapa de prueba, el controlador usa el foco que le asigna `AVampsCombatTestGameMode`. Si falta objetivo o el bot está muerto, el controlador espera. La comprobación de permisos de movimiento y acción queda en el personaje.
+- En partida, el controlador toma el objetivo de `UVampsLockOnComponent`. En el mapa de prueba, usa el foco que le asigna `AVampsCombatTestGameMode`. Si falta objetivo o el bot está muerto, el controlador espera. La comprobación de permisos de movimiento y acción queda en el personaje.
 - `AVampsCharacter::CanRequestCombatContinuation` centraliza el permiso, la ventana y la existencia de un paso siguiente. La IA consulta esa función y conserva sus decisiones propias de esperar un contacto, evitar solicitudes duplicadas, acercarse y espaciar ataques. `UGA_Attack` valida la configuración del montage. Se retiró el `default` del `switch` y el log de configuración de `SetMode`. Se conserva la guarda de tiempos y el reset al cambiar de comportamiento en `Mixed`.
 
 `/Game/Vamps/Blueprints/BP_VampsAIController` conserva su padre nativo y sus defaults. `BP_VampsCombatTestGameMode` selecciona el controller del rival en `L_CharacterBasic`. `AVampsMatchGameMode` instancia el controller nativo para los bots de `L_LocalMatch`. El cambio se limita a C++.
@@ -33,6 +33,14 @@ Los paquetes guardados de `/Game/Vamps/Animations/ABP_VampsCharacter` y `/Game/V
 Los Blueprints de personaje, armas, cámara e indicador conservan sus asignaciones. No se editaron Data Assets ni sus clases. La búsqueda en paquetes guardados no encontró consumidores de los tres plazos retirados ni de `bCanDash`.
 
 Se documentan en el `.cpp` las decisiones de recuperación, movilidad, solicitud de combate y permisos. El resolver descarta un dash invalidado antes de llamar al personaje. El inicio de paso usa las armas validadas por `GA_Attack`. Los notifies conservan autoridad, identidad de reproducción y sección del combo como condiciones de entrada.
+
+## Lock-on
+
+`UVampsLockOnComponent` usa al `AVampsCharacter` que lo crea como subobjeto nativo. Se retiran el diagnóstico de tipo de dueño y el modo de depuración de lock-on. `AVampsCombatTestPlayerController` retira el binding nativo de F7 y su callback. `CycleTarget` recorre candidatos elegibles, `SelectTarget` recibe un objetivo concreto, `RegisterCandidate` registra personajes y `SetCurrentTarget` publica los cambios al HUD. El cambio se limita a C++.
+
+El componente se queda sin tick. Cada luchador llama al método público `InitializeCandidates` después de `Super::BeginPlay()` para registrarse con los demás. `SelectTarget` selecciona al atacante elegible tras un bloqueo confirmado y deja el registro a la inicialización. El header de `RefreshTarget` identifica las llamadas directas, los delegates y quién consume la selección. Si falta un objetivo elegible, busca el siguiente del ciclo o limpia la selección. Conserva al luchador muerto como candidato para el respawn y retira al que sale de juego.
+
+En partida, `InitializeCandidates` registra solo rivales. El GameMode ya asignó los equipos al llegar a `BeginPlay`. `AreEnemies` consulta esa relación y `CanEngageEnemy` exige fase activa para seleccionar. La cámara y el HUD de F9 usan `Participants` en partida para seguir incluyendo aliados. En el mapa de prueba siguen leyendo los candidatos.
 
 ## Verificación
 

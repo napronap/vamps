@@ -306,8 +306,7 @@ bool AVampsMatchGameMode::AreEnemies(const AVampsCharacter* FirstFighter, const 
 {
 	const int32 FirstIndex = FindParticipantIndex(FirstFighter);
 	const int32 SecondIndex = FindParticipantIndex(SecondFighter);
-	return IsValid(FirstFighter) && IsValid(SecondFighter) && RoundPhase == EVampsMatchPhase::Active &&
-	       FirstIndex != INDEX_NONE && SecondIndex != INDEX_NONE &&
+	return IsValid(FirstFighter) && IsValid(SecondFighter) && FirstIndex != INDEX_NONE && SecondIndex != INDEX_NONE &&
 	       Participants[FirstIndex].TeamIndex != Participants[SecondIndex].TeamIndex;
 }
 

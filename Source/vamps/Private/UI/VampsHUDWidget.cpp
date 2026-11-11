@@ -282,11 +282,15 @@ void UVampsHUDWidget::RefreshFighters(float LayoutHeight)
 	AVampsCharacter* SelectedFighter = LockOn->GetCurrentTarget();
 	if (bShowCombatDebug)
 	{
+		const AVampsMatchGameMode* LocalMatch = MatchMode.Get();
+		const TArray<TWeakObjectPtr<AVampsCharacter>>& Candidates = LockOn->GetCandidates();
+		const int32 FighterCount = LocalMatch ? LocalMatch->Participants.Num() : Candidates.Num();
 		int32 PanelIndex = 0;
-		for (const TWeakObjectPtr<AVampsCharacter>& Candidate : LockOn->GetCandidates())
+		for (int32 FighterIndex = 0; FighterIndex < FighterCount; ++FighterIndex)
 		{
-			AVampsCharacter* Fighter = Candidate.Get();
-			if (!Fighter)
+			AVampsCharacter* Fighter =
+			    LocalMatch ? LocalMatch->Participants[FighterIndex].Fighter.Get() : Candidates[FighterIndex].Get();
+			if (!IsValid(Fighter) || Fighter == Viewer)
 			{
 				continue;
 			}

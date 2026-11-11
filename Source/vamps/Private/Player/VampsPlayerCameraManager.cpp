@@ -6,6 +6,7 @@
 #include "Components/PrimitiveComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "GameModes/VampsMatchGameMode.h"
 #include "HAL/IConsoleManager.h"
 
 namespace
@@ -373,9 +374,19 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 	bHasCameraState = true;
 	FVector PublishedEye = EyePosition;
 	FCollisionQueryParams CollisionParams(SCENE_QUERY_STAT(VampsCameraCollision), false, ViewingFighter);
-	for (const TWeakObjectPtr<AVampsCharacter>& Candidate : ViewingFighter->LockOn->GetCandidates())
+	if (const AVampsMatchGameMode* MatchMode = GetWorld()->GetAuthGameMode<AVampsMatchGameMode>())
 	{
-		CollisionParams.AddIgnoredActor(Candidate.Get());
+		for (const FVampsMatchParticipant& Participant : MatchMode->Participants)
+		{
+			CollisionParams.AddIgnoredActor(Participant.Fighter.Get());
+		}
+	}
+	else
+	{
+		for (const TWeakObjectPtr<AVampsCharacter>& Candidate : ViewingFighter->LockOn->GetCandidates())
+		{
+			CollisionParams.AddIgnoredActor(Candidate.Get());
+		}
 	}
 	FHitResult CameraHit;
 	if (GetWorld()->SweepSingleByChannel(CameraHit,

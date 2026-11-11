@@ -23,8 +23,7 @@
 #include "UI/VampsCharacterIndicatorWidget.h"
 
 AVampsCharacter::AVampsCharacter(const FObjectInitializer& ObjectInitializer)
-    : Super(ObjectInitializer.SetDefaultSubobjectClass<UVampsCombatMovementComponent>(
-          ACharacter::CharacterMovementComponentName))
+    : Super(ObjectInitializer.SetDefaultSubobjectClass<UVampsCombatMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	AutoPossessAI = EAutoPossessAI::Disabled;
 
@@ -88,6 +87,7 @@ void AVampsCharacter::BeginPlay()
 			IndicatorWidget->ObserveFighter(this);
 		}
 	}
+	LockOn->InitializeCandidates();
 }
 
 void AVampsCharacter::Tick(float DeltaSeconds)
@@ -362,7 +362,8 @@ bool AVampsCharacter::CanEngageEnemy(const AVampsCharacter* OtherFighter) const
 	}
 
 	const AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
-	return !MatchMode || MatchMode->AreEnemies(this, OtherFighter);
+	return !MatchMode ||
+	       (MatchMode->RoundPhase == EVampsMatchPhase::Active && MatchMode->AreEnemies(this, OtherFighter));
 }
 
 bool AVampsCharacter::CanHitCombatTarget(const AVampsCharacter* OtherFighter) const
@@ -857,20 +858,22 @@ void AVampsCharacter::HandleCombatHealthChanged(const FOnAttributeChangeData&)
 	if (bAliveNow)
 	{
 		RefreshCombatPermissions();
-		return;
 	}
+	else
+	{
+		ClearCombatTimers();
 
-	ClearCombatTimers();
+		CombatState.Reaction = EVampsCombatReaction::None;
+		CombatState.DefendedAttacker.Reset();
+		CombatState.Phase = EVampsActionPhase::Idle;
 
-	CombatState.Reaction = EVampsCombatReaction::None;
-	CombatState.DefendedAttacker.Reset();
-	CombatState.Phase = EVampsActionPhase::Idle;
+		ClearMobilityIntent();
+		CancelCombatOffense();
 
-	ClearMobilityIntent();
-	CancelCombatOffense();
-
-	GetWorld()->GetSubsystem<UVampsCombatResolver>()->DiscardPendingCombatFor(*this);
-	static_cast<UVampsCombatMovementComponent*>(GetCharacterMovement())->ResetCombatMotion();
+		GetWorld()->GetSubsystem<UVampsCombatResolver>()->DiscardPendingCombatFor(*this);
+		static_cast<UVampsCombatMovementComponent*>(GetCharacterMovement())->ResetCombatMotion();
+	}
+	OnCombatAliveChanged.Broadcast();
 }
 
 bool AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact, AVampsCharacter& Attacker)

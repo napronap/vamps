@@ -26,6 +26,7 @@ class VAMPS_API AVampsCharacter : public ACharacter, public IAbilitySystemInterf
 public:
 
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCombatFramingRequested, AVampsCharacter*);
+	DECLARE_MULTICAST_DELEGATE(FOnCombatAliveChanged);
 
 	AVampsCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	virtual void BeginPlay() override;
@@ -33,10 +34,7 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override
-	{
-		return AbilitySystem.Get();
-	}
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystem.Get(); }
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.f, bool bForce = false) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
@@ -57,7 +55,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	TObjectPtr<UVampsCombatSettings> CombatSettings;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
 	float StartingMaxHealth = 100.f;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
@@ -71,6 +69,7 @@ public:
 
 	// broadcasted on attack start and from an incoming attacker on a confirmed block
 	FOnCombatFramingRequested OnCombatFramingRequested;
+	FOnCombatAliveChanged OnCombatAliveChanged;
 
 	// lockon, AI and HUD can track an enemy even while spawn protection prevents hits
 	bool CanEngageEnemy(const AVampsCharacter* OtherFighter) const;
