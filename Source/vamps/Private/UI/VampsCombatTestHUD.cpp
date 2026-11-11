@@ -37,13 +37,3 @@ void AVampsCombatTestHUD::EndPlay(const EEndPlayReason::Type Reason)
 	}
 	Super::EndPlay(Reason);
 }
-
-#if !UE_BUILD_SHIPPING
-void AVampsCombatTestHUD::ToggleCombatHUD()
-{
-	if (HUDWidget)
-	{
-		HUDWidget->ToggleCombatDebug();
-	}
-}
-#endif

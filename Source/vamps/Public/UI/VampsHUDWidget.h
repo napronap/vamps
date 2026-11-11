@@ -22,10 +22,6 @@ class VAMPS_API UVampsHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
-
-	void ToggleCombatDebug();
-
 protected:
 
 	virtual void NativeOnInitialized() override;
@@ -38,19 +34,13 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UVampsEnemyWidget> EnemyWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UVampsFighterWidget> FighterWidgetClass;
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UVampsCharacterOptionWidget> CharacterOptionWidgetClass;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UScaleBox> LayoutScale;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UScaleBox> DebugScale;
-	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UWidget> SelectionView;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UWidget> CombatView;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UWidget> DebugView;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UWidget> MatchView;
 	UPROPERTY(meta = (BindWidget))
@@ -82,24 +72,15 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> NoTargetText;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> DebugHint;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> TestControlsText;
-	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UVampsFighterWidget> PlayerPanel;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UVampsFighterWidget> TargetPanel;
 	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UVampsFighterWidget> DebugPlayerPanel;
-	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UCanvasPanel> EnemyIndicators;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UVerticalBox> DebugOpponents;
 
 	TWeakObjectPtr<AVampsMatchGameMode> MatchMode;
 	TWeakObjectPtr<UVampsLockOnComponent> ObservedLockOn;
 	bool bHUDInitialized = false;
-	bool bShowCombatDebug = false;
 
 	static void ShowWidget(UWidget* Widget, bool bShow);
 	static FString FormatRatio(int32 Kills, int32 Deaths);
@@ -107,7 +88,7 @@ private:
 	void RefreshCharacterSelection(UVampsCombatSettings* CharacterSettings);
 	void RefreshTargetPanel(AVampsCharacter* TargetFighter);
 	void RefreshMatch();
-	void RefreshFighters(float LayoutHeight);
+	void RefreshEnemies(float LayoutHeight);
 	void RefreshResults();
 
 	UFUNCTION()

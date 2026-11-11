@@ -36,9 +36,6 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
 	EVampsCombatMotion CombatMotion = EVampsCombatMotion::None;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly)
-	bool bCombatMotionBlocked = false;
-
 	// When hitting an opponent, uses the resolved hit to align and push the recipient
 	// targets should always be aligned in front to make it easier to continue combo chains
 	// A block goes straight to knockback
@@ -80,6 +77,7 @@ private:
 	double CombatMotionStartedAt = 0;
 	float CombatMotionDuration = 0.f;
 	float PendingKnockbackDistance = 0.f;
+	bool bCombatMotionBlocked = false;
 
 	// Records the start, destination and duration for a new combat move
 	void BeginCombatMotion(EVampsCombatMotion NewMotion, const FVector& Destination, float Duration);

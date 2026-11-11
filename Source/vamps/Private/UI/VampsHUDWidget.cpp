@@ -2,8 +2,6 @@
 #include "UI/VampsCharacterOptionWidget.h"
 #include "UI/VampsEnemyWidget.h"
 #include "UI/VampsFighterWidget.h"
-#include "AI/VampsAIController.h"
-#include "Blueprint/WidgetLayoutLibrary.h"
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/VampsCombatLog.h"
@@ -18,7 +16,6 @@
 #include "Components/VerticalBoxSlot.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
-#include "GameModes/VampsCombatTestGameMode.h"
 #include "GameModes/VampsMatchGameMode.h"
 
 void UVampsHUDWidget::ShowWidget(UWidget* Widget, bool bShow)
@@ -49,11 +46,11 @@ void UVampsHUDWidget::NativeOnInitialized()
 	MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode());
 	StartButton->OnClicked.AddDynamic(this, &UVampsHUDWidget::StartRound);
 	RestartButton->OnClicked.AddDynamic(this, &UVampsHUDWidget::ReturnToSelection);
-	if (!EnemyWidgetClass || !FighterWidgetClass || !CharacterOptionWidgetClass)
+	if (!EnemyWidgetClass || !CharacterOptionWidgetClass)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: '%s' requires EnemyWidgetClass, FighterWidgetClass and CharacterOptionWidgetClass."),
+		       TEXT("%hs: '%s' requires EnemyWidgetClass and CharacterOptionWidgetClass."),
 		       __FUNCTION__,
 		       *GetPathName());
 		SetVisibility(ESlateVisibility::Collapsed);
@@ -145,15 +142,14 @@ void UVampsHUDWidget::HandleObservedPawnChanged(APawn*, APawn* NewPawn)
 		       *GetPathName(),
 		       *NewPawn->GetPathName());
 	}
-	PlayerPanel->ObserveFighter(LockOn ? Viewer : nullptr, TEXT("PLAYER"));
-	DebugPlayerPanel->ObserveFighter(LockOn ? Viewer : nullptr, TEXT("PLAYER"), true);
+	PlayerPanel->ObserveFighter(LockOn ? Viewer : nullptr);
 	RefreshTargetPanel(LockOn ? LockOn->GetCurrentTarget() : nullptr);
 	RefreshMatchViews();
 }
 
 void UVampsHUDWidget::RefreshTargetPanel(AVampsCharacter* TargetFighter)
 {
-	TargetPanel->ObserveFighter(TargetFighter, TEXT("TARGET"));
+	TargetPanel->ObserveFighter(TargetFighter);
 	ShowWidget(NoTargetText, !TargetFighter);
 }
 
@@ -176,16 +172,9 @@ void UVampsHUDWidget::RefreshMatchViews()
 	const bool bFinished = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Finished;
 	const bool bShowFighters = ObservedLockOn.IsValid() && !bSelecting && !bUnavailable;
 	ShowWidget(SelectionView, bSelecting);
-	ShowWidget(CombatView, bShowFighters && !bShowCombatDebug);
-	ShowWidget(DebugView, bShowFighters && bShowCombatDebug);
+	ShowWidget(CombatView, bShowFighters);
 	ShowWidget(MatchView, MatchMode.IsValid() && !bSelecting && !bUnavailable);
 	ShowWidget(ResultView, bFinished);
-#if !UE_BUILD_SHIPPING
-	ShowWidget(DebugHint, GetWorld()->WorldType == EWorldType::PIE && !bSelecting && !bUnavailable);
-	DebugHint->SetText(FText::FromString(bShowCombatDebug ? TEXT("F9 COMBAT HUD") : TEXT("F9 DEBUG HUD")));
-#else
-	ShowWidget(DebugHint, false);
-#endif
 	if (bUnavailable)
 	{
 		NoticeText->SetText(FText::FromString(TEXT("MATCH UNAVAILABLE - See LogVampsCombat")));
@@ -213,23 +202,6 @@ void UVampsHUDWidget::ReturnToSelection()
 	}
 }
 
-void UVampsHUDWidget::ToggleCombatDebug()
-{
-#if !UE_BUILD_SHIPPING
-	if (!bHUDInitialized || GetWorld()->WorldType != EWorldType::PIE)
-	{
-		return;
-	}
-	bShowCombatDebug = !bShowCombatDebug;
-	RefreshMatchViews();
-	UE_LOG(LogVampsCombat,
-	       Display,
-	       TEXT("%s: %s HUD (F9)."),
-	       *GetPathName(),
-	       bShowCombatDebug ? TEXT("debug") : TEXT("combat"));
-#endif
-}
-
 void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
@@ -240,14 +212,6 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	}
 	const float ViewScale = FMath::Min(ViewSize.X / 1280.f, ViewSize.Y / 720.f);
 	LayoutScale->SetUserSpecifiedScale(ViewScale);
-	const float DpiScale = UWidgetLayoutLibrary::GetViewportScale(this);
-	const FVector2D DebugSize = ViewSize * DpiScale;
-	DebugScale->SetUserSpecifiedScale(1.f / (ViewScale * DpiScale));
-	const float DebugWidth = FMath::Min(380.f, DebugSize.X * 0.43f);
-	Cast<UCanvasPanelSlot>(DebugPlayerPanel->Slot)->SetSize(FVector2D(DebugWidth, 425.f));
-	UCanvasPanelSlot* OpponentsSlot = Cast<UCanvasPanelSlot>(DebugOpponents->Slot);
-	OpponentsSlot->SetPosition(FVector2D(-DebugWidth - 20.f, 20.f));
-	OpponentsSlot->SetSize(FVector2D(DebugWidth, DebugOpponents->GetChildrenCount() * 445.f));
 	const bool bSelecting = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Selecting;
 	const bool bUnavailable = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Unavailable;
 	const bool bPreparing = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Preparing;
@@ -264,14 +228,14 @@ void UVampsHUDWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	{
 		return;
 	}
-	RefreshFighters(ViewSize.Y / ViewScale);
+	RefreshEnemies(ViewSize.Y / ViewScale);
 	if (MatchMode.IsValid())
 	{
 		RefreshMatch();
 	}
 }
 
-void UVampsHUDWidget::RefreshFighters(float LayoutHeight)
+void UVampsHUDWidget::RefreshEnemies(float LayoutHeight)
 {
 	AVampsCharacter* Viewer = Cast<AVampsCharacter>(GetOwningPlayerPawn());
 	UVampsLockOnComponent* LockOn = ObservedLockOn.Get();
@@ -280,53 +244,6 @@ void UVampsHUDWidget::RefreshFighters(float LayoutHeight)
 		return;
 	}
 	AVampsCharacter* SelectedFighter = LockOn->GetCurrentTarget();
-	if (bShowCombatDebug)
-	{
-		const AVampsMatchGameMode* LocalMatch = MatchMode.Get();
-		const TArray<TWeakObjectPtr<AVampsCharacter>>& Candidates = LockOn->GetCandidates();
-		const int32 FighterCount = LocalMatch ? LocalMatch->Participants.Num() : Candidates.Num();
-		int32 PanelIndex = 0;
-		for (int32 FighterIndex = 0; FighterIndex < FighterCount; ++FighterIndex)
-		{
-			AVampsCharacter* Fighter =
-			    LocalMatch ? LocalMatch->Participants[FighterIndex].Fighter.Get() : Candidates[FighterIndex].Get();
-			if (!IsValid(Fighter) || Fighter == Viewer)
-			{
-				continue;
-			}
-			if (PanelIndex == DebugOpponents->GetChildrenCount())
-			{
-				UVampsFighterWidget* NewPanel =
-				    CreateWidget<UVampsFighterWidget>(GetOwningPlayer(), FighterWidgetClass);
-				if (!NewPanel)
-				{
-					UE_LOG(LogVampsCombat,
-					       Error,
-					       TEXT("%hs: '%s' could not create a debug fighter panel."),
-					       __FUNCTION__,
-					       *GetPathName());
-					return;
-				}
-				DebugOpponents->AddChildToVerticalBox(NewPanel)->SetPadding(FMargin(0.f, 0.f, 0.f, 20.f));
-			}
-			Cast<UVampsFighterWidget>(DebugOpponents->GetChildAt(PanelIndex++))
-			    ->ObserveFighter(Fighter, Fighter->GetName(), true, Fighter == SelectedFighter);
-		}
-		while (DebugOpponents->GetChildrenCount() > PanelIndex)
-		{
-			DebugOpponents->RemoveChildAt(DebugOpponents->GetChildrenCount() - 1);
-		}
-		const AVampsCombatTestGameMode* TestMode = Cast<AVampsCombatTestGameMode>(GetWorld()->GetAuthGameMode());
-		if (TestMode && TestMode->OpponentAI)
-		{
-			TestControlsText->SetText(FText::FromString(
-			    TEXT("AI: ") + StaticEnum<EVampsAIMode>()->GetNameStringByValue(int64(TestMode->OpponentAI->Mode)) +
-			    TEXT(" | F6 next mode | R reset\nWASD move | Shift dash/hold sprint | RMB combat (click) | F next "
-			         "target")));
-		}
-		ShowWidget(TestControlsText, TestMode != nullptr);
-		return;
-	}
 	TArray<AVampsCharacter*> Enemies;
 	for (const TWeakObjectPtr<AVampsCharacter>& Candidate : LockOn->GetCandidates())
 	{

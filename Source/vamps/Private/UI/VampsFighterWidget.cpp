@@ -1,9 +1,7 @@
 #include "UI/VampsFighterWidget.h"
 #include "Characters/VampsCharacter.h"
-#include "Characters/VampsLockOnComponent.h"
 #include "Combat/Attributes/VampsAttributeSet.h"
 #include "Combat/Data/VampsCombatSettings.h"
-#include "Combat/VampsCombatMovementComponent.h"
 #include "Combat/VampsCombatLog.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -26,17 +24,9 @@ void UVampsFighterWidget::UpdateMeter(
 	Label->SetText(FText::FromString(FString::Printf(TEXT("%s %.0f / %.0f"), Caption, Value, Capacity)));
 }
 
-void UVampsFighterWidget::ObserveFighter(AVampsCharacter* NewFighter,
-                                         const FString& PanelLabel,
-                                         bool bDebug,
-                                         bool bSelected)
+void UVampsFighterWidget::ObserveFighter(AVampsCharacter* NewFighter)
 {
-	FighterLabel = PanelLabel;
-	bDebugView = bDebug;
-	SetMinimumDesiredSize(bDebug ? FVector2D(380.f, 425.f) : FVector2D(300.f, 160.f));
-	CombatView->SetVisibility(bDebug ? ESlateVisibility::Collapsed : ESlateVisibility::SelfHitTestInvisible);
-	DebugView->SetVisibility(bDebug ? ESlateVisibility::SelfHitTestInvisible : ESlateVisibility::Collapsed);
-	SelectionMark->SetVisibility(bSelected ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
+	SetMinimumDesiredSize(FVector2D(300.f, 160.f));
 	if (NewFighter && ObservedFighter.Get() == NewFighter)
 	{
 		return;
@@ -48,12 +38,11 @@ void UVampsFighterWidget::ObserveFighter(AVampsCharacter* NewFighter,
 	{
 		return;
 	}
-	if (!NewFighter->Attributes || !NewFighter->AbilitySystem || !NewFighter->LockOn ||
-	    !Cast<UVampsCombatMovementComponent>(NewFighter->GetCharacterMovement()))
+	if (!NewFighter->Attributes || !NewFighter->AbilitySystem)
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: '%s' cannot observe '%s'; combat components are missing."),
+		       TEXT("%hs: '%s' cannot observe '%s'; attributes or ability system missing."),
 		       __FUNCTION__,
 		       *GetPathName(),
 		       *GetPathNameSafe(NewFighter));
@@ -125,9 +114,6 @@ void UVampsFighterWidget::RefreshMeters()
 	UpdateMeter(HealthBar, HealthText, TEXT("HP"), Values->GetHealth(), Values->GetMaxHealth());
 	RefreshGuardMeter(*Fighter, true);
 	UpdateMeter(EnergyBar, EnergyText, TEXT("ENERGY"), Values->GetMobilityEnergy(), Values->GetMaxMobilityEnergy());
-	DebugHealthBar->SetPercent(HealthBar->GetPercent());
-	DebugTitle->SetText(FText::FromString(
-	    FString::Printf(TEXT("%s   %.0f / %.0f"), *FighterLabel, Values->GetHealth(), Values->GetMaxHealth())));
 }
 
 void UVampsFighterWidget::RefreshGuardMeter(const AVampsCharacter& Fighter, bool bAttributesChanged)
@@ -165,8 +151,6 @@ void UVampsFighterWidget::RefreshGuardMeter(const AVampsCharacter& Fighter, bool
 	}
 	const FLinearColor GuardColor = bStunned ? FLinearColor::Red : FLinearColor(0.3f, 0.6f, 1.f);
 	GuardBar->SetFillColorAndOpacity(GuardColor);
-	DebugGuardBar->SetPercent(GuardBar->GetPercent());
-	DebugGuardBar->SetFillColorAndOpacity(GuardColor);
 	bShowingStun = bStunned;
 }
 
@@ -179,67 +163,4 @@ void UVampsFighterWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 		return;
 	}
 	RefreshGuardMeter(*Fighter, false);
-	if (bDebugView)
-	{
-		RefreshDebugDetails();
-	}
-}
-
-void UVampsFighterWidget::RefreshDebugDetails()
-{
-	const AVampsCharacter* Fighter = ObservedFighter.Get();
-	const FVampsCombatState& State = Fighter->CombatState;
-	const UVampsCombatMovementComponent* Movement =
-	    Cast<UVampsCombatMovementComponent>(Fighter->GetCharacterMovement());
-	FString Contact;
-	if (State.LastIncomingContact != EVampsContactResult::None)
-	{
-		const TCHAR* Result =
-		    State.LastIncomingContact == EVampsContactResult::Blocked
-		        ? TEXT("BLOCK")
-		        : (State.LastIncomingContact == EVampsContactResult::GuardBreak ? TEXT("GUARD BREAK") : TEXT("HIT"));
-		Contact = FString::Printf(TEXT("LAST: %s -%.1f%s"),
-		                          Result,
-		                          State.LastDamageReceived,
-		                          State.bLastIncomingCritical ? TEXT(" CRITICAL") : TEXT(""));
-	}
-	ContactText->SetText(FText::FromString(Contact));
-	ContactText->SetColorAndOpacity(State.bLastIncomingCritical ? FLinearColor::Yellow : FLinearColor::White);
-	DebugDetails->SetText(FText::FromString(FString::Printf(
-	    TEXT("ACTION %d: %s\nSTART: %s | HIT: %s | GUARD: %s\nREQUEST #%d: %s\nOUT: %s | IN: %s\n")
-	        TEXT("LOCK ON: %s\nSTEP %d | WINDOW: %s | CONTACT: %s\nCONTINUATION: %s\nREACTION TIME: %.2f | NA: %.2f\n")
-	            TEXT("MOTION: %s | WALL: %s\nREACTION: %s | MOVE: %s\nGUARD LOAD: %.0f / %.0f"),
-	    State.ActionNumber,
-	    *StaticEnum<EVampsActionPhase>()->GetNameStringByValue(int64(State.Phase)),
-	    State.bCanStartAction ? TEXT("YES") : TEXT("NO"),
-	    State.bCanDealDamage ? TEXT("ON") : TEXT("OFF"),
-	    State.bCanDefend ? TEXT("ARMED") : TEXT("UNARMED"),
-	    State.RequestCount,
-	    *StaticEnum<EVampsCombatRequest>()->GetNameStringByValue(int64(State.LastRequest)),
-	    *StaticEnum<EVampsContactResult>()->GetNameStringByValue(int64(State.LastOutgoingContact)),
-	    *StaticEnum<EVampsContactResult>()->GetNameStringByValue(int64(State.LastIncomingContact)),
-	    *GetNameSafe(Fighter->LockOn->GetCurrentTarget()),
-	    State.ComboStep,
-	    State.bComboWindowOpen ? TEXT("OPEN") : TEXT("CLOSED"),
-	    State.bActionConnected ? TEXT("YES") : TEXT("NO"),
-	    State.bContinuationRequested ? TEXT("PENDING") : TEXT("NONE"),
-	    Fighter->GetCombatReactionTimeRemaining(),
-	    Fighter->GetNARecoveryTimeRemaining(),
-	    *StaticEnum<EVampsCombatMotion>()->GetNameStringByValue(int64(Movement->CombatMotion)),
-	    Movement->bCombatMotionBlocked ? TEXT("YES") : TEXT("NO"),
-	    *StaticEnum<EVampsCombatReaction>()->GetNameStringByValue(int64(State.Reaction)),
-	    State.bCanMove ? TEXT("YES") : TEXT("NO"),
-	    Fighter->Attributes->GetGuardLoad(),
-	    Fighter->Attributes->GetMaxGuardLoad())));
-	DebugContact->SetText(
-	    FText::FromString(FString::Printf(TEXT("DEFENSE: %s #%d\nMOBILITY ENERGY: %.0f / "
-	                                           "%.0f | SPRINT: %s\nDASH: %s | ACTIVE: %s | PENDING: %s"),
-	                                      *GetNameSafe(State.DefendedAttacker.Get()),
-	                                      State.DefendedActionNumber,
-	                                      Fighter->Attributes->GetMobilityEnergy(),
-	                                      Fighter->Attributes->GetMaxMobilityEnergy(),
-	                                      State.bIsSprinting ? TEXT("ON") : TEXT("OFF"),
-	                                      Fighter->CanStartCombatDash() ? TEXT("READY") : TEXT("NO"),
-	                                      State.bIsDashing ? TEXT("YES") : TEXT("NO"),
-	                                      State.bDashRequested ? TEXT("YES") : TEXT("NO"))));
 }

@@ -1,6 +1,5 @@
 #include "Combat/VampsWeapon.h"
 #include "Characters/VampsCharacter.h"
-#include "Combat/VampsCombatResolver.h"
 #include "Combat/VampsCombatLog.h"
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -233,6 +232,6 @@ void AVampsWeapon::SweepWeaponSegment(const FVector& SweepStart,
 			continue;
 		}
 		HitActors.Add(Target);
-		GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContact(*Fighter, *Target);
+		Fighter->QueueWeaponContact(*Target);
 	}
 }

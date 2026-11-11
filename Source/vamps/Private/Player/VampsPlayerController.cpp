@@ -6,12 +6,9 @@
 #include "EnhancedPlayerInput.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
-#include "Engine/World.h"
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "Combat/VampsCombatLog.h"
-#include "InputCoreTypes.h"
-#include "UI/VampsCombatTestHUD.h"
 
 AVampsPlayerController::AVampsPlayerController()
 {
@@ -122,31 +119,7 @@ void AVampsPlayerController::SetupInputComponent()
 	Input->BindAction(MobilityAction, ETriggerEvent::Started, this, &AVampsPlayerController::MobilityPressed);
 	Input->BindAction(MobilityAction, ETriggerEvent::Completed, this, &AVampsPlayerController::MobilityReleased);
 	Input->BindAction(MobilityAction, ETriggerEvent::Canceled, this, &AVampsPlayerController::MobilityReleased);
-#if !UE_BUILD_SHIPPING
-	if (GetWorld()->WorldType == EWorldType::PIE)
-	{
-		Input->BindDebugKey(FInputChord(EKeys::F9), IE_Pressed, this, &AVampsPlayerController::ToggleCombatHUD, false);
-	}
-#endif
 }
-
-#if !UE_BUILD_SHIPPING
-void AVampsPlayerController::ToggleCombatHUD(FKey, FInputActionValue)
-{
-	AVampsCombatTestHUD* CombatHUD = Cast<AVampsCombatTestHUD>(GetHUD());
-	if (!CombatHUD)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s': HUD toggle requires VampsCombatTestHUD; HUD='%s'."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(GetHUD()));
-		return;
-	}
-	CombatHUD->ToggleCombatHUD();
-}
-#endif
 
 void AVampsPlayerController::Move(const FInputActionValue& Value)
 {

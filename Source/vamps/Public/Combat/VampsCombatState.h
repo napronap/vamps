@@ -3,8 +3,6 @@
 #include "CoreMinimal.h"
 #include "VampsCombatState.generated.h"
 
-class AVampsCharacter;
-
 UENUM(BlueprintType)
 enum class EVampsCombatReaction : uint8
 {
@@ -22,28 +20,6 @@ enum class EVampsActionPhase : uint8
 	Contacts,
 	Recovery,
 	NARecovery
-};
-
-UENUM(BlueprintType)
-enum class EVampsCombatRequest : uint8
-{
-	None,
-	ActionStarted,
-	DefenseRearmed,
-	ContinuationRequested,
-	ComboAdvanced,
-	Rejected
-};
-
-UENUM(BlueprintType)
-enum class EVampsContactResult : uint8
-{
-	None,
-	Miss,
-	OpenHit,
-	Blocked,
-	GuardBreak,
-	Mixed
 };
 
 USTRUCT(BlueprintType)
@@ -68,9 +44,6 @@ struct VAMPS_API FVampsCombatState
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bCanDefend = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	bool bIsRecovering = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	int32 ComboStep = 0;
@@ -103,38 +76,11 @@ struct VAMPS_API FVampsCombatState
 	bool bDefenseRequestArmed = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TWeakObjectPtr<AVampsCharacter> DefendedAttacker;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	int32 DefendedActionNumber = INDEX_NONE;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
-	TWeakObjectPtr<AVampsCharacter> ReactionSource;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
-	bool bLastIncomingCritical = false;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
-	float LastDamageReceived = 0.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	int32 MontageInstanceID = INDEX_NONE;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
-	EVampsCombatRequest LastRequest = EVampsCombatRequest::None;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
-	EVampsContactResult LastOutgoingContact = EVampsContactResult::None;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
-	EVampsContactResult LastIncomingContact = EVampsContactResult::None;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
-	int32 RequestCount = 0;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	int32 ActionNumber = 0;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Debug")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bActionConnected = false;
 };

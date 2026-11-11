@@ -14,8 +14,11 @@ class AVampsWeapon;
 class UVampsLockOnComponent;
 class UVampsCombatSettings;
 class UWidgetComponent;
+class UAnimMontage;
+class UAnimInstance;
 struct FBranchingPointNotifyPayload;
 struct FOnAttributeChangeData;
+struct FVampsCombatResolution;
 struct FVampsPendingContact;
 
 UCLASS(Abstract)
@@ -34,7 +37,10 @@ public:
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void UnPossessed() override;
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystem.Get(); }
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override
+	{
+		return AbilitySystem.Get();
+	}
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.f, bool bForce = false) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
@@ -61,12 +67,7 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	FVampsCombatState CombatState;
 
-	// TODO: maybe try to come up with a better way to do this to stop using magic numbers
-	// CombatGeneration tracks the "version" of the current attack so that the combat resolver knows what to do when it requests any action
-	// it goes up any time the state is reset (ResetCombatState) or teardown so contacts, defense and camera can discard stale combat state
-	// (i.e number is different from the previous requested action)
-	// this is used so fighters can check who hit them and if they are hitting/defending from the same person
-	// CombatResolver uses this value
+	// Reset and EndPlay invalidate captured contacts and camera references from the previous combat state.
 	uint32 CombatGeneration = 0;
 
 	// broadcasted on attack start and from an incoming attacker on a confirmed block
@@ -77,6 +78,9 @@ public:
 	bool CanEngageEnemy(const AVampsCharacter* OtherFighter) const;
 	bool CanHitCombatTarget(const AVampsCharacter* OtherFighter) const;
 
+	// The weapon calls this after confirming an unobstructed hit on a valid target.
+	void QueueWeaponContact(AVampsCharacter& Recipient);
+
 	// the match mode stops the round. Both game modes and the AI can reset a fighter for reuse
 	void StopMatchCombat();
 	void ResetCombatState();
@@ -84,6 +88,7 @@ public:
 	// player input and AI request an attack, defense or combo continuation here
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestCombatAction();
+	void RequestCombatDefense();
 	bool CanRequestCombatContinuation() const;
 
 	// player input supplies movement intent and the shared dash/sprint button state
@@ -91,7 +96,6 @@ public:
 	void SetMobilityHeld(bool bHeld, const FVector& DashDirection = FVector::ZeroVector);
 
 	// consumed by HUD
-	bool CanStartCombatDash() const;
 	float GetCombatReactionTimeRemaining() const;
 	float GetNARecoveryTimeRemaining() const;
 
@@ -105,23 +109,21 @@ public:
 	void ResetCombatWeaponHits(const FBranchingPointNotifyPayload& Payload, const TArray<int32>& WeaponIndices);
 	void SetCombatComboWindow(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
 
+	// The combat resolver delivers contact outcomes here.
+	void ReactToCombatResolution(const FVampsCombatResolution& Resolution);
+
 private:
 
-	// TODO: these two use a lot from this class and I should move stuff around so they can
-	// preferably use public methods instead of having to define them as friends
+	// TODO: give GA_Dash a public entry point for movement state.
 	friend class UGA_Dash;
-	friend class UVampsCombatResolver;
+	friend class UGA_Defend;
 
 	FGameplayAbilitySpecHandle AttackHandle;
 	FGameplayAbilitySpecHandle DashHandle;
+	FGameplayAbilitySpecHandle DefendHandle;
 	FTimerHandle NARecoveryTimer;
 	FTimerHandle CombatReactionTimer;
-	FTimerHandle DefenseRequestTimer;
 	double GuardRecoveryStartsAt = 0;
-
-	// same as combat generation but for defenses
-	// TODO: this could be removed if combat didn't have any resets and the number would just change throughout the fighter's lifecycle
-	uint32 DefendedGeneration = 0;
 
 	int32 ReactionPlaybackInstanceID = INDEX_NONE;
 	bool bHasMobilityInput = false;
@@ -129,8 +131,8 @@ private:
 	double MobilityRecoveryStartsAt = 0;
 	FVector RequestedDashDirection = FVector::ZeroVector;
 
-	// combat resolver consumes dash intent after impacts, which may cancel it before energy is spent
-	void ResolveCombatDash();
+	void StartRequestedDash(uint32 RequestGeneration);
+	bool CanStartCombatDash() const;
 	void UpdateMobilityEnergy(float DeltaSeconds);
 	void ClearMobilityIntent();
 
@@ -142,26 +144,19 @@ private:
 	void ClearAttackPlayback();
 	bool IsCurrentCombatNotify(const FBranchingPointNotifyPayload& Payload) const;
 
-	// combat resolver tries a queued combo before ending Recovery for the same action number
-	void ResolveCombatContinuation();
-	void ResolveCombatRecoveryEnd(int32 RecoveryActionNumber);
-	void BeginNARecovery();
+	void TryContinueCombatCombo(uint32 RequestGeneration, int32 RequestedActionNumber);
+	void FinishAttackRecovery(uint32 RecoveryGeneration, int32 RecoveryActionNumber);
 	void FinishNARecovery();
 	void SetCombatPhase(EVampsActionPhase NewPhase);
 	bool IsMatchCombatAllowed() const;
 	void RefreshCombatPermissions();
 
 	void ClearCombatTimers();
-	void ArmDefenseRequest();
-	void ClearDefenseRequest();
-	void ExpireDefenseRequest();
-	bool MatchesDefendedContact(const FVampsPendingContact& Contact) const;
-	void RememberDefendedContact(const FVampsPendingContact& Contact);
 
-	// combat resolver passes validated contacts here and selects one reaction per recipient
-	void RegisterCombatContact(bool bBlocked);
 	void ReceiveCombatHit(const FVampsPendingContact& Contact, AVampsCharacter& Attacker);
 	void ApplyCombatReaction(const FVampsPendingContact& Contact);
+	bool PlayCombatReactionMontage(UAnimInstance* Animation, UAnimMontage* ReactionMontage, float Duration);
+	void HandleGuardMontageEnded(UAnimMontage* Montage, bool bInterrupted, int32 PlaybackInstanceID);
 	void FinishCombatReaction();
 	void StopCombatReactionMontage();
 	void HandleCombatHealthChanged(const FOnAttributeChangeData& AttributeChange);

@@ -17,10 +17,7 @@ class VAMPS_API UVampsFighterWidget : public UUserWidget
 
 public:
 
-	void ObserveFighter(AVampsCharacter* NewFighter,
-	                    const FString& PanelLabel,
-	                    bool bDebug = false,
-	                    bool bSelected = false);
+	void ObserveFighter(AVampsCharacter* NewFighter);
 
 protected:
 
@@ -29,10 +26,6 @@ protected:
 
 private:
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UWidget> CombatView;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UWidget> DebugView;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UTextBlock> HealthText;
 	UPROPERTY(meta = (BindWidget))
@@ -45,25 +38,9 @@ private:
 	TObjectPtr<UProgressBar> GuardBar;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UProgressBar> EnergyBar;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> ContactText;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> DebugTitle;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> DebugDetails;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UTextBlock> DebugContact;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UProgressBar> DebugHealthBar;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UProgressBar> DebugGuardBar;
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<UWidget> SelectionMark;
 
 	TWeakObjectPtr<AVampsCharacter> ObservedFighter;
 	TWeakObjectPtr<UAbilitySystemComponent> ObservedAbilitySystem;
-	FString FighterLabel;
-	bool bDebugView = false;
 	bool bShowingStun = false;
 	TArray<FDelegateHandle> AttributeHandles;
 
@@ -73,5 +50,4 @@ private:
 	void RefreshMeters();
 	void RefreshGuardMeter(const AVampsCharacter& Fighter, bool bAttributesChanged);
 	void HandleAttributeChanged(const FOnAttributeChangeData& AttributeChange);
-	void RefreshDebugDetails();
 };

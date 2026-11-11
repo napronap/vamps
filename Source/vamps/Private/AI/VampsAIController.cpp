@@ -150,11 +150,7 @@ void AVampsAIController::Decide()
 
 		return;
 	case EVampsAIMode::Guard:
-		if (FighterState.bCanRequestCombat && !FighterState.bDefenseRequestArmed)
-		{
-			ControlledFighter.RequestCombatAction();
-		}
-
+		ControlledFighter.RequestCombatDefense();
 		return;
 	case EVampsAIMode::Sidestep:
 		MoveDirection = FVector::CrossProduct(FVector::UpVector, ToTarget.GetSafeNormal2D());

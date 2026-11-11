@@ -15,10 +15,6 @@ public:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
-#if !UE_BUILD_SHIPPING
-	void ToggleCombatHUD();
-#endif
-
 private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
