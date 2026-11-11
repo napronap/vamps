@@ -10,6 +10,7 @@
 void UVampsCombatResolver::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
+
 	PostActorTickHandle =
 	    FWorldDelegates::OnWorldPostActorTick.AddUObject(this, &UVampsCombatResolver::ResolveCombatFrame);
 }
@@ -21,6 +22,7 @@ void UVampsCombatResolver::Deinitialize()
 	PendingDashes.Reset();
 	PendingContinuations.Reset();
 	PendingRecoveryEnds.Reset();
+
 	Super::Deinitialize();
 }
 
@@ -31,23 +33,12 @@ bool UVampsCombatResolver::DoesSupportWorldType(const EWorldType::Type WorldType
 
 void UVampsCombatResolver::QueueCombatContact(AVampsCharacter& Attacker, AVampsCharacter& Recipient)
 {
-	if (!Attacker.HasAuthority() || !Recipient.HasAuthority() || Attacker.GetWorld() != GetWorld() ||
-	    Recipient.GetWorld() != GetWorld())
-	{
-		UE_LOG(
-		    LogVampsCombat,
-		    Error,
-		    TEXT(
-		        "%hs: contact rejected: attacker='%s', recipient='%s'. Expected authoritative fighters in world '%s'."),
-		    __FUNCTION__,
-		    *Attacker.GetPathName(),
-		    *Recipient.GetPathName(),
-		    *GetPathNameSafe(GetWorld()));
-		return;
-	}
-	const UVampsCombatSettings* AttackSettings = Attacker.CombatSettings;
+	const UVampsCombatSettings& AttackSettings = *Attacker.CombatSettings;
 	const int32 StepIndex = Attacker.CombatState.ComboStep - 1;
-	if (!AttackSettings || !AttackSettings->ComboSteps.IsValidIndex(StepIndex))
+
+	// The montage sets the number of combo steps. The data asset supplies settings for each step
+	// This should probably never happen but I had errors with this at some point
+	if (!AttackSettings.ComboSteps.IsValidIndex(StepIndex))
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
@@ -55,35 +46,27 @@ void UVampsCombatResolver::QueueCombatContact(AVampsCharacter& Attacker, AVampsC
 		       __FUNCTION__,
 		       *Attacker.GetPathName(),
 		       Attacker.CombatState.ComboStep,
-		       *GetPathNameSafe(AttackSettings));
+		       *AttackSettings.GetPathName());
 		return;
 	}
-	const UVampsCombatSettings* DefenseSettings = Recipient.CombatSettings;
-	if (!Recipient.AttackHandle.IsValid() || !DefenseSettings || !Recipient.LockOn || !Recipient.Attributes)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: contact rejected: recipient '%s' has incomplete combat initialization with settings '%s'."),
-		       __FUNCTION__,
-		       *Recipient.GetPathName(),
-		       *GetPathNameSafe(DefenseSettings));
-		return;
-	}
+
+	// Capture the action, damage and geometry now (on contact). Either fighter can change state before resolution
 	FVampsPendingContact& Contact = PendingContacts.AddDefaulted_GetRef();
+
 	Contact.Attacker = &Attacker;
 	Contact.Recipient = &Recipient;
 	Contact.ActionNumber = Attacker.CombatState.ActionNumber;
 	Contact.AttackerGeneration = Attacker.CombatGeneration;
 	Contact.RecipientGeneration = Recipient.CombatGeneration;
 	Contact.bCritical =
-	    AttackSettings->CriticalChancePercent >= 100.f ||
-	    (AttackSettings->CriticalChancePercent > 0.f && FMath::FRand() * 100.f < AttackSettings->CriticalChancePercent);
-	Contact.ContactDamage = Contact.bCritical ? AttackSettings->CriticalDamage : AttackSettings->AttackDamage;
-	Contact.BlockReduction = DefenseSettings->BlockDamageReduction;
-	Contact.GuardLoad = AttackSettings->GuardLoadPerHit;
+	    AttackSettings.CriticalChancePercent >= 100.f ||
+	    (AttackSettings.CriticalChancePercent > 0.f && FMath::FRand() * 100.f < AttackSettings.CriticalChancePercent);
+	Contact.ContactDamage = Contact.bCritical ? AttackSettings.CriticalDamage : AttackSettings.AttackDamage;
+	Contact.BlockReduction = Recipient.CombatSettings->BlockDamageReduction;
+	Contact.GuardLoad = AttackSettings.GuardLoadPerHit;
 	Contact.AttackOrigin = Attacker.GetActorLocation();
 	Contact.AttackDirection = Attacker.GetActorForwardVector().GetSafeNormal2D();
-	Contact.StepSettings = AttackSettings->ComboSteps[StepIndex];
+	Contact.StepSettings = AttackSettings.ComboSteps[StepIndex];
 }
 
 void UVampsCombatResolver::QueueCombatDash(AVampsCharacter& Fighter)
@@ -104,102 +87,124 @@ void UVampsCombatResolver::QueueCombatRecoveryEnd(AVampsCharacter& Fighter)
 void UVampsCombatResolver::DiscardPendingCombatFor(AVampsCharacter& Fighter)
 {
 	const TWeakObjectPtr<AVampsCharacter> FighterRef(&Fighter);
-	PendingContacts.RemoveAll(
-	    [&FighterRef](const FVampsPendingContact& Contact)
-	    {
-		    return Contact.Attacker.HasSameIndexAndSerialNumber(FighterRef) ||
-		           Contact.Recipient.HasSameIndexAndSerialNumber(FighterRef);
-	    });
 	PendingContinuations.Remove(FighterRef);
 	PendingRecoveryEnds.Remove(FighterRef);
 	PendingDashes.Remove(FighterRef);
 }
 
+int32 UVampsCombatResolver::GetContactRank(const FVampsPendingContact& Contact)
+{
+	// Favor the recipient's current lock-on target, then follow its target cycle
+	const UVampsLockOnComponent* Selection = Contact.Recipient->LockOn;
+
+	if (Selection->GetCurrentTarget() == Contact.Attacker.Get())
+	{
+		return -1;
+	}
+
+	const TArray<TWeakObjectPtr<AVampsCharacter>>& Candidates = Selection->GetCandidates();
+	const int32 CandidateIndex = Candidates.Find(Contact.Attacker);
+	return CandidateIndex == INDEX_NONE ? Candidates.Num() : CandidateIndex;
+}
+
 void UVampsCombatResolver::ResolvePendingContacts()
 {
-	// A death callback clears queued work without removing exchanges already captured for this frame.
+	// Consume the contacts queued by weapon ticks and leave the queue empty for the next frame
 	TArray<FVampsPendingContact> Contacts = MoveTemp(PendingContacts);
+
+	// Drop contacts for dead or invalid fighters. A generation change marks a reset or EndPlay
 	Contacts.RemoveAll(
 	    [](const FVampsPendingContact& Contact)
 	    {
 		    return !Contact.Attacker.IsValid() || !Contact.Recipient.IsValid() ||
-		           Contact.Attacker->IsActorBeingDestroyed() || Contact.Recipient->IsActorBeingDestroyed() ||
 		           !Contact.Attacker->CombatState.bIsAlive || !Contact.Recipient->CombatState.bIsAlive ||
 		           Contact.Attacker->CombatGeneration != Contact.AttackerGeneration ||
 		           Contact.Recipient->CombatGeneration != Contact.RecipientGeneration;
 	    });
-	const auto ContactRank = [](const FVampsPendingContact& Contact)
-	{
-		const UVampsLockOnComponent* Selection = Contact.Recipient->LockOn;
-		if (Selection->GetCurrentTarget() == Contact.Attacker.Get())
-		{
-			return -1;
-		}
-		const int32 CandidateIndex = Selection->GetCandidates().IndexOfByPredicate(
-		    [&Contact](const TWeakObjectPtr<AVampsCharacter>& Candidate)
-		    {
-			    return Candidate == Contact.Attacker;
-		    });
-		return CandidateIndex == INDEX_NONE ? MAX_int32 : CandidateIndex;
-	};
+
+	// Group hits by recipient, then sort each group by lock-on priority and use attacker name for ties
 	Contacts.StableSort(
-	    [&ContactRank](const FVampsPendingContact& Left, const FVampsPendingContact& Right)
+	    [](const FVampsPendingContact& Left, const FVampsPendingContact& Right)
 	    {
 		    if (Left.Recipient != Right.Recipient)
 		    {
-			    return Left.Recipient->GetPathName() < Right.Recipient->GetPathName();
+			    return Left.Recipient->GetUniqueID() < Right.Recipient->GetUniqueID();
 		    }
-		    const int32 LeftRank = ContactRank(Left);
-		    const int32 RightRank = ContactRank(Right);
-		    return LeftRank != RightRank ? LeftRank < RightRank
-		                                 : Left.Attacker->GetPathName() < Right.Attacker->GetPathName();
+		    const int32 LeftRank = GetContactRank(Left);
+		    const int32 RightRank = GetContactRank(Right);
+		    return LeftRank != RightRank ? LeftRank < RightRank : Left.Attacker->GetName() < Right.Attacker->GetName();
 	    });
 
-	// Classify defense and guard breaks before any contact changes health or reactions.
+	// Classify defense for the whole batch before any hit changes health or reactions
 	for (int32 GroupStart = 0; GroupStart < Contacts.Num();)
 	{
 		AVampsCharacter* Recipient = Contacts[GroupStart].Recipient.Get();
+
 		int32 GroupEnd = GroupStart + 1;
+
 		while (GroupEnd < Contacts.Num() && Contacts[GroupEnd].Recipient.Get() == Recipient)
 		{
 			++GroupEnd;
 		}
-		FVampsPendingContact* RequestedDefense = nullptr;
-		if (Recipient->CombatState.bCanDefend && Recipient->CombatState.bDefenseRequestArmed)
+
+		if (!Recipient->CombatState.bCanDefend)
 		{
+			GroupStart = GroupEnd;
+			continue;
+		}
+
+		// A fresh request favors the first incoming action the fighter is not already guarding
+		const FVampsPendingContact* RequestedDefense = nullptr;
+
+		if (Recipient->CombatState.bDefenseRequestArmed)
+		{
+			RequestedDefense = &Contacts[GroupStart];
 			for (int32 ContactIndex = GroupStart; ContactIndex < GroupEnd; ++ContactIndex)
 			{
-				FVampsPendingContact& Candidate = Contacts[ContactIndex];
-				if (!RequestedDefense || (Recipient->MatchesDefendedContact(*RequestedDefense) &&
-				                          !Recipient->MatchesDefendedContact(Candidate)))
+				const FVampsPendingContact& Candidate = Contacts[ContactIndex];
+				if (!Recipient->MatchesDefendedContact(Candidate))
 				{
 					RequestedDefense = &Candidate;
+					break;
 				}
 			}
 		}
-		float ProjectedLoad = Recipient->Attributes->GetGuardLoad();
-		bool bGuardBroken = false;
+
+		// The hit that reaches capacity still blocks and breaks guard. Later hits stay open
+		float GuardLoadToDecrease = Recipient->Attributes->GetGuardLoad();
+
 		for (int32 ContactIndex = GroupStart; ContactIndex < GroupEnd; ++ContactIndex)
 		{
 			FVampsPendingContact& Contact = Contacts[ContactIndex];
-			const bool bMatchesRequest = RequestedDefense && Contact.Attacker == RequestedDefense->Attacker &&
-			                             Contact.ActionNumber == RequestedDefense->ActionNumber;
-			Contact.bBlocked = Recipient->CombatState.bCanDefend && !bGuardBroken &&
-			                   (RequestedDefense ? bMatchesRequest : Recipient->MatchesDefendedContact(Contact));
-			if (Contact.bBlocked)
+
+			// Block the selected action, or keep blocking the action remembered from a previous contact
+			Contact.bBlocked = RequestedDefense ? Contact.Attacker == RequestedDefense->Attacker && Contact.ActionNumber == RequestedDefense->ActionNumber
+			                                    : Recipient->MatchesDefendedContact(Contact);
+			if (!Contact.bBlocked)
 			{
-				ProjectedLoad += Contact.GuardLoad;
-				Contact.bGuardBreak = ProjectedLoad >= Recipient->Attributes->GetMaxGuardLoad();
-				bGuardBroken |= Contact.bGuardBreak;
+				continue;
+			}
+
+			GuardLoadToDecrease += Contact.GuardLoad;
+
+			if (GuardLoadToDecrease >= Recipient->Attributes->GetMaxGuardLoad())
+			{
+				Contact.bGuardBreak = true;
+				break;
 			}
 		}
-		if (RequestedDefense && RequestedDefense->bBlocked)
+
+		// The first contact of the requested action blocks, so consume the request and remember the action
+		if (RequestedDefense)
 		{
 			Recipient->RememberDefendedContact(*RequestedDefense);
 		}
+
 		GroupStart = GroupEnd;
 	}
 
+	// Credit the contact to the combo step only if its attack is still registered 
+	// (fighters can continue combos only if they hit a target)
 	for (const FVampsPendingContact& Contact : Contacts)
 	{
 		if (Contact.Attacker->CombatState.ActionNumber == Contact.ActionNumber &&
@@ -208,35 +213,50 @@ void UVampsCombatResolver::ResolvePendingContacts()
 			Contact.Attacker->RegisterCombatContact(Contact.bBlocked);
 		}
 	}
+
+	// Apply each recipient's damage and select one reaction for the group
 	for (int32 GroupStart = 0; GroupStart < Contacts.Num();)
 	{
 		AVampsCharacter* Recipient = Contacts[GroupStart].Recipient.Get();
 		int32 GroupEnd = GroupStart;
 		const FVampsPendingContact* ReactionContact = nullptr;
+
 		while (GroupEnd < Contacts.Num() && Contacts[GroupEnd].Recipient.Get() == Recipient)
 		{
 			const FVampsPendingContact& Contact = Contacts[GroupEnd++];
 			AVampsCharacter* Attacker = Contact.Attacker.Get();
-			if (!Recipient || !Recipient->CombatState.bIsAlive ||
-			    Recipient->CombatGeneration != Contact.RecipientGeneration || !Attacker ||
-			    Attacker->CombatGeneration != Contact.AttackerGeneration ||
-			    !Recipient->ReceiveCombatHit(Contact, *Attacker))
+
+			// Earlier hits can kill this recipient and run callbacks that change either fighter
+			// An attacker who died in this batch can still land their captured hit
+			if (!Attacker || !Recipient || !Recipient->CombatState.bIsAlive ||
+			    Recipient->CombatGeneration != Contact.RecipientGeneration ||
+			    Attacker->CombatGeneration != Contact.AttackerGeneration)
 			{
 				continue;
 			}
+
+			Recipient->ReceiveCombatHit(Contact, *Attacker);
+
+			// Guard breaks outrank open hits, which outrank blocks. Keep the first hit at equal severity
 			const int32 Severity = Contact.bGuardBreak ? 2 : (Contact.bBlocked ? 0 : 1);
+
 			const int32 PreviousSeverity =
 			    ReactionContact ? (ReactionContact->bGuardBreak ? 2 : (ReactionContact->bBlocked ? 0 : 1)) : -1;
+
 			if (Severity > PreviousSeverity)
 			{
 				ReactionContact = &Contact;
 			}
 		}
+
+		// Apply reaction and displacement together if the recipient survived without a reset
 		if (ReactionContact && ReactionContact->Recipient.IsValid() && Recipient->CombatState.bIsAlive &&
 		    Recipient->CombatGeneration == ReactionContact->RecipientGeneration)
 		{
 			Recipient->ApplyCombatReaction(*ReactionContact);
+
 			auto* CombatMovement = static_cast<UVampsCombatMovementComponent*>(Recipient->GetCharacterMovement());
+
 			CombatMovement->ReceiveCombatDisplacement(ReactionContact->AttackOrigin,
 			                                          ReactionContact->AttackDirection,
 			                                          ReactionContact->StepSettings,
@@ -248,36 +268,46 @@ void UVampsCombatResolver::ResolvePendingContacts()
 
 void UVampsCombatResolver::ResolveCombatFrame(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds)
 {
+	// The world tick delegate is shared across worlds. Each resolver should consume its own queues
 	if (TickedWorld != GetWorld())
 	{
 		return;
 	}
-	// An impact can interrupt a continuation or cancel a dash before it costs energy.
+
+	// An impact can interrupt a continuation or cancel a dash before it costs energy
 	ResolvePendingContacts();
+
+	// Let accepted continuations start the next step before checking the queued recovery ends
 	const TArray<TWeakObjectPtr<AVampsCharacter>> Continuations = MoveTemp(PendingContinuations);
-	for (const TWeakObjectPtr<AVampsCharacter>& Fighter : Continuations)
+	for (const TWeakObjectPtr<AVampsCharacter>& FighterRef : Continuations)
 	{
-		if (Fighter.IsValid() && !Fighter->IsActorBeingDestroyed())
+		if (AVampsCharacter* Fighter = FighterRef.Get())
 		{
 			Fighter->ResolveCombatContinuation();
 		}
 	}
+
+	// The character uses the captured action number to ignore recovery ends from a previous step
 	const TMap<TWeakObjectPtr<AVampsCharacter>, int32> RecoveryEnds = MoveTemp(PendingRecoveryEnds);
 	for (const auto& RecoveryEnd : RecoveryEnds)
 	{
-		if (RecoveryEnd.Key.IsValid() && !RecoveryEnd.Key->IsActorBeingDestroyed())
+		if (AVampsCharacter* Fighter = RecoveryEnd.Key.Get())
 		{
-			RecoveryEnd.Key->ResolveCombatRecoveryEnd(RecoveryEnd.Value);
+			Fighter->ResolveCombatRecoveryEnd(RecoveryEnd.Value);
 		}
 	}
+
+	// A reaction or a new attack step can clear the dash request before we get here
 	const TArray<TWeakObjectPtr<AVampsCharacter>> Dashes = MoveTemp(PendingDashes);
-	for (const TWeakObjectPtr<AVampsCharacter>& Fighter : Dashes)
+	for (const TWeakObjectPtr<AVampsCharacter>& FighterRef : Dashes)
 	{
-		if (Fighter.IsValid() && !Fighter->IsActorBeingDestroyed() && Fighter->CombatState.bDashRequested)
+		if (AVampsCharacter* Fighter = FighterRef.Get(); Fighter && Fighter->CombatState.bDashRequested)
 		{
 			Fighter->ResolveCombatDash();
 		}
 	}
+
+	// The match settles deaths, scores and round progression once this frame's combat is resolved
 	if (AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode()))
 	{
 		MatchMode->CompleteCombatFrame();

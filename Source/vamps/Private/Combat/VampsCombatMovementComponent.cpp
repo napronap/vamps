@@ -4,16 +4,13 @@
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/Data/VampsCombatSettings.h"
-#include "Combat/VampsCombatLog.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 
 float UVampsCombatMovementComponent::GetMaxSpeed() const
 {
 	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
-	return Fighter && Fighter->CombatSettings && Fighter->CombatState.bIsSprinting
-	           ? Fighter->CombatSettings->SprintSpeed
-	           : Super::GetMaxSpeed();
+	return Fighter && Fighter->CombatState.bIsSprinting ? Fighter->CombatSettings->SprintSpeed : Super::GetMaxSpeed();
 }
 
 void UVampsCombatMovementComponent::StopVoluntaryMotion()
@@ -31,23 +28,32 @@ void UVampsCombatMovementComponent::BeginOffensiveAdvance()
 	StopVoluntaryMotion();
 	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
 	const AVampsCharacter* TargetFighter = Fighter && Fighter->LockOn ? Fighter->LockOn->GetCurrentTarget() : nullptr;
+
 	if (!IsValid(TargetFighter) || !TargetFighter->CombatState.bIsAlive || !IsMovingOnGround())
 	{
 		return;
 	}
-	const FVector ToTarget = TargetFighter->GetActorLocation() - UpdatedComponent->GetComponentLocation();
-	const float AdvanceLength =
-	    FMath::Min(Fighter->CombatSettings->ApproachDistance,
-	               FMath::Max(0.f, float(ToTarget.Size2D()) - Fighter->CombatSettings->ApproachStopDistance));
-	if (ToTarget.GetSafeNormal2D().IsNearlyZero())
+
+	const FVector StartLocation = UpdatedComponent->GetComponentLocation();
+	const FVector ToTarget = TargetFighter->GetActorLocation() - StartLocation;
+	const FVector AdvanceDirection = ToTarget.GetSafeNormal2D();
+
+	if (AdvanceDirection.IsNearlyZero())
 	{
 		return;
 	}
+
+	const float DistanceToTarget = float(ToTarget.Size2D());
+	const float StopDistance = Fighter->CombatSettings->ApproachStopDistance;
+	const float MaxAdvanceDistance = Fighter->CombatSettings->ApproachDistance;
+	const float DistanceBeforeStop = FMath::Max(0.f, DistanceToTarget - StopDistance);
+	const float AdvanceDistance = FMath::Min(MaxAdvanceDistance, DistanceBeforeStop);
+	const FVector AdvanceGoal = StartLocation + AdvanceDirection * AdvanceDistance;
+
 	CombatFacingStart = UpdatedComponent->GetComponentQuat();
-	CombatFacingGoal = ToTarget.GetSafeNormal2D().ToOrientationQuat();
-	BeginCombatMotion(EVampsCombatMotion::Advance,
-	                  UpdatedComponent->GetComponentLocation() + ToTarget.GetSafeNormal2D() * AdvanceLength,
-	                  Fighter->CombatSettings->ApproachDuration);
+	CombatFacingGoal = AdvanceDirection.ToOrientationQuat();
+
+	BeginCombatMotion(EVampsCombatMotion::Advance, AdvanceGoal, Fighter->CombatSettings->ApproachDuration);
 }
 
 void UVampsCombatMovementComponent::ReceiveCombatDisplacement(const FVector& AttackOrigin,
@@ -55,50 +61,15 @@ void UVampsCombatMovementComponent::ReceiveCombatDisplacement(const FVector& Att
                                                               const FVampsCombatStepSettings& StepSettings,
                                                               bool bBlocked)
 {
-	AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
-	if (!IsValid(Fighter) || !UpdatedComponent || !Fighter->HasAuthority())
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: displacement requires a valid authoritative VampsCharacter and UpdatedComponent; "
-		            "owner='%s', component='%s'."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(CharacterOwner),
-		       *GetPathNameSafe(UpdatedComponent));
-		return;
-	}
-	if (!FMath::IsFinite(StepSettings.TargetAlignmentDistance) || !FMath::IsFinite(StepSettings.KnockbackDistance) ||
-	    StepSettings.TargetAlignmentDistance <= 0.f || StepSettings.KnockbackDistance < 0.f ||
-	    AttackOrigin.ContainsNaN() || AttackDirection.ContainsNaN() || AttackDirection.GetSafeNormal2D().IsNearlyZero())
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: invalid displacement: alignment=%f, knockback=%f, origin=%s, direction=%s. Expected "
-		            "positive alignment, nonnegative knockback and finite horizontal direction."),
-		       __FUNCTION__,
-		       *Fighter->GetPathName(),
-		       StepSettings.TargetAlignmentDistance,
-		       StepSettings.KnockbackDistance,
-		       *AttackOrigin.ToString(),
-		       *AttackDirection.ToString());
-		return;
-	}
-	if (!Fighter->CombatSettings)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: cannot resolve combat displacement without CombatSettings."),
-		       __FUNCTION__,
-		       *Fighter->GetPathName());
-		return;
-	}
 	CombatPushDirection = AttackDirection.GetSafeNormal2D();
+
 	StopVoluntaryMotion();
+
 	PendingKnockbackDistance = StepSettings.KnockbackDistance;
 	bCombatMotionBlocked = false;
 	CombatFacingStart = UpdatedComponent->GetComponentQuat();
 	CombatFacingGoal = (-CombatPushDirection).ToOrientationQuat();
+
 	if (bBlocked)
 	{
 		BeginCombatKnockback();
@@ -107,6 +78,7 @@ void UVampsCombatMovementComponent::ReceiveCombatDisplacement(const FVector& Att
 
 	FVector AlignmentGoal = AttackOrigin + CombatPushDirection * StepSettings.TargetAlignmentDistance;
 	AlignmentGoal.Z = UpdatedComponent->GetComponentLocation().Z;
+
 	BeginCombatMotion(EVampsCombatMotion::Alignment, AlignmentGoal, 0.08f);
 }
 
@@ -153,30 +125,20 @@ void UVampsCombatMovementComponent::BeginCombatKnockback()
 
 void UVampsCombatMovementComponent::TickCharacterPose(float DeltaTime)
 {
-	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
-	const bool bControlledPose = CombatMotion != EVampsCombatMotion::None ||
-	                             (Fighter && (Fighter->CombatState.Reaction != EVampsCombatReaction::None ||
-	                                          Fighter->CombatState.MontageInstanceID != INDEX_NONE));
-	Super::TickCharacterPose(DeltaTime);
-	UAnimInstance* Animation = Fighter ? Fighter->GetMesh()->GetAnimInstance() : nullptr;
-	if (!Fighter || !Fighter->CombatSettings || !Animation)
+	const AVampsCharacter& Fighter = *static_cast<const AVampsCharacter*>(CharacterOwner.Get());
+	const auto HasCombatMotionOrReaction = [this, &Fighter]()
 	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: root motion update requires VampsCharacter, CombatSettings and AnimInstance; owner='%s', "
-		            "animation='%s'. Movement tick disabled."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(CharacterOwner),
-		       *GetPathNameSafe(Animation));
-		RootMotionParams.Clear();
-		SetComponentTickEnabled(false);
-		return;
-	}
-	const FAnimMontageInstance* RootPlayback = Animation->GetRootMotionMontageInstance();
-	if (bControlledPose || CombatMotion != EVampsCombatMotion::None ||
-	    Fighter->CombatState.Reaction != EVampsCombatReaction::None ||
-	    (RootPlayback && RootPlayback->Montage == Fighter->CombatSettings->AttackMontage))
+		return CombatMotion != EVampsCombatMotion::None || Fighter.CombatState.Reaction != EVampsCombatReaction::None;
+	};
+
+	// The pose tick can end the attack after extracting its last root motion frame
+	const bool bSuppressRootMotionBeforeTick = HasCombatMotionOrReaction() || Fighter.CombatState.MontageInstanceID != INDEX_NONE;
+
+	Super::TickCharacterPose(DeltaTime);
+
+	const FAnimMontageInstance* RootPlayback = Fighter.GetRootMotionAnimMontageInstance();
+	const bool bAttackRootMotion = RootPlayback && RootPlayback->Montage == Fighter.CombatSettings->AttackMontage;
+	if (bSuppressRootMotionBeforeTick || HasCombatMotionOrReaction() || bAttackRootMotion)
 	{
 		RootMotionParams.Clear();
 	}
@@ -185,9 +147,13 @@ void UVampsCombatMovementComponent::TickCharacterPose(float DeltaTime)
 void UVampsCombatMovementComponent::ApplyRootMotionToVelocity(float DeltaTime)
 {
 	Super::ApplyRootMotionToVelocity(DeltaTime);
+
+	// only calculate a combat velocity when a move is active and the time step is large enough to divide by
 	if (CombatMotion == EVampsCombatMotion::None || DeltaTime < MIN_TICK_TIME)
 	{
 		const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+
+		// clear horizontal drift when the character cannot move or is still in an attack montage
 		if (Fighter && (!Fighter->CombatState.bCanMove || Fighter->CombatState.MontageInstanceID != INDEX_NONE))
 		{
 			Velocity.X = 0.f;
@@ -195,23 +161,30 @@ void UVampsCombatMovementComponent::ApplyRootMotionToVelocity(float DeltaTime)
 		}
 		return;
 	}
+
 	const float Progress =
 	    FMath::Clamp(float((GetWorld()->GetTimeSeconds() - CombatMotionStartedAt) / CombatMotionDuration), 0.f, 1.f);
+
 	const FVector DesiredPosition = FMath::Lerp(CombatMotionStart, CombatMotionGoal, Progress);
 	const FVector DesiredVelocity = (DesiredPosition - UpdatedComponent->GetComponentLocation()) / DeltaTime;
+
 	Velocity.X = DesiredVelocity.X;
 	Velocity.Y = DesiredVelocity.Y;
 }
 
 void UVampsCombatMovementComponent::PhysicsRotation(float DeltaTime)
 {
+	// during the advance, turn toward the direction captured at the start of the attack.
 	if (CombatMotion == EVampsCombatMotion::Advance)
 	{
 		const FRotator Facing = FMath::RInterpConstantTo(
 		    UpdatedComponent->GetComponentRotation(), CombatFacingGoal.Rotator(), DeltaTime, 500.f);
+
 		MoveUpdatedComponent(FVector::ZeroVector, Facing, true);
+
 		return;
 	}
+	// use normal locomotion rotation unless the dash or attack has already chosen a facing
 	if (CombatMotion == EVampsCombatMotion::None)
 	{
 		const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
@@ -219,13 +192,18 @@ void UVampsCombatMovementComponent::PhysicsRotation(float DeltaTime)
 		{
 			return;
 		}
+
 		Super::PhysicsRotation(DeltaTime);
+
 		return;
 	}
+
+	// during a hit displacement, turn the recipient against the push direction over the move's duration.
 	if (CombatMotion == EVampsCombatMotion::Alignment || CombatMotion == EVampsCombatMotion::Knockback)
 	{
 		const float Progress = FMath::Clamp(
 		    float((GetWorld()->GetTimeSeconds() - CombatMotionStartedAt) / CombatMotionDuration), 0.f, 1.f);
+
 		MoveUpdatedComponent(FVector::ZeroVector, FQuat::Slerp(CombatFacingStart, CombatFacingGoal, Progress), true);
 	}
 }
@@ -235,6 +213,8 @@ void UVampsCombatMovementComponent::OnMovementUpdated(float DeltaSeconds,
                                                       const FVector& OldVelocity)
 {
 	Super::OnMovementUpdated(DeltaSeconds, OldLocation, OldVelocity);
+
+	// finish the current move after a blocking hit or when its allotted time expires
 	if (CombatMotion != EVampsCombatMotion::None &&
 	    (bCombatMotionBlocked || GetWorld()->GetTimeSeconds() >= CombatMotionStartedAt + CombatMotionDuration))
 	{
@@ -248,6 +228,7 @@ void UVampsCombatMovementComponent::HandleImpact(const FHitResult& Hit, float Ti
 	{
 		bCombatMotionBlocked = true;
 	}
+
 	Super::HandleImpact(Hit, TimeSlice, MoveDelta);
 }
 
@@ -258,6 +239,7 @@ float UVampsCombatMovementComponent::SlideAlongSurface(
 	{
 		return 0.f;
 	}
+
 	return Super::SlideAlongSurface(Delta, Time, Normal, Hit, bHandleImpact);
 }
 
@@ -267,19 +249,13 @@ void UVampsCombatMovementComponent::ResetCombatMotion()
 	CombatMotion = EVampsCombatMotion::None;
 	PendingKnockbackDistance = 0.f;
 	bCombatMotionBlocked = false;
-	UAnimInstance* Animation = CharacterOwner ? CharacterOwner->GetMesh()->GetAnimInstance() : nullptr;
-	if (Animation)
+
+	if (UAnimInstance* Animation = CharacterOwner->GetMesh()->GetAnimInstance())
 	{
 		Animation->StopAllMontages(0.f);
 	}
-	else if (CharacterOwner && CharacterOwner->HasActorBegunPlay() && !CharacterOwner->IsActorBeingDestroyed())
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: cannot stop combat montages; mesh has no AnimInstance."),
-		       __FUNCTION__,
-		       *CharacterOwner->GetPathName());
-	}
+
 	RootMotionParams.Clear();
+
 	StopMovementImmediately();
 }

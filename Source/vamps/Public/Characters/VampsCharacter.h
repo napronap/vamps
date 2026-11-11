@@ -65,6 +65,8 @@ public:
 	// CombatGeneration tracks the "version" of the current attack so that the combat resolver knows what to do when it requests any action
 	// it goes up any time the state is reset (ResetCombatState) or teardown so contacts, defense and camera can discard stale combat state
 	// (i.e number is different from the previous requested action)
+	// this is used so fighters can check who hit them and if they are hitting/defending from the same person
+	// CombatResolver uses this value
 	uint32 CombatGeneration = 0;
 
 	// broadcasted on attack start and from an incoming attacker on a confirmed block
@@ -105,6 +107,8 @@ public:
 
 private:
 
+	// TODO: these two use a lot from this class and I should move stuff around so they can
+	// preferably use public methods instead of having to define them as friends
 	friend class UGA_Dash;
 	friend class UVampsCombatResolver;
 
@@ -114,7 +118,11 @@ private:
 	FTimerHandle CombatReactionTimer;
 	FTimerHandle DefenseRequestTimer;
 	double GuardRecoveryStartsAt = 0;
+
+	// same as combat generation but for defenses
+	// TODO: this could be removed if combat didn't have any resets and the number would just change throughout the fighter's lifecycle
 	uint32 DefendedGeneration = 0;
+
 	int32 ReactionPlaybackInstanceID = INDEX_NONE;
 	bool bHasMobilityInput = false;
 	bool bMobilityHeld = false;
@@ -152,7 +160,7 @@ private:
 
 	// combat resolver passes validated contacts here and selects one reaction per recipient
 	void RegisterCombatContact(bool bBlocked);
-	bool ReceiveCombatHit(const FVampsPendingContact& Contact, AVampsCharacter& Attacker);
+	void ReceiveCombatHit(const FVampsPendingContact& Contact, AVampsCharacter& Attacker);
 	void ApplyCombatReaction(const FVampsPendingContact& Contact);
 	void FinishCombatReaction();
 	void StopCombatReactionMontage();

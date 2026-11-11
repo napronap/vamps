@@ -60,6 +60,28 @@ Se retira `ValidateAttackConfiguration` de cada activación. `GA_Attack.h` docum
 
 Se elimina `VampsCombatSettings.cpp`, que solo implementaba las validaciones de reacción, muerte y movilidad. Se retiran sus declaraciones nativas de `VampsCombatSettings.h` y las llamadas de `AVampsMatchGameMode::CreateParticipants`. El GameMode sigue comprobando las referencias al Blend Space, montage de ataque y armas que requiere para crear los participantes. El header conserva la clase reflejada y los campos que usan los cuatro Data Assets del selector.
 
+## GE_VampsDamage
+
+Se comenta el constructor del efecto instantáneo. El modificador suma a `Health` la magnitud que `ReceiveCombatHit` escribe con signo negativo bajo `VampsTags::Damage` en el spec de cada golpe.
+
+## VampsCombatMovementComponent
+
+El componente lee la velocidad de sprint del perfil y calcula el avance con variables separadas para distancia al objetivo, margen de frenado y límite de avance. El resolver entrega al componente el golpe del atacante y ya comprueba autoridad y vigencia del destinatario. El desplazamiento usa la cápsula que `ACharacter` asigna como `UpdatedComponent` al crearse. Las distancias de alineación y retroceso quedan a cargo de la configuración de cada paso.
+
+El tick de animación conserva el filtro de root motion antes y después de actualizar la pose. Un notify puede terminar el ataque durante esa actualización, con una muestra de root motion ya extraída. El reset detiene los montages cuando hay una instancia de animación y limpia el desplazamiento. El header documenta las responsabilidades del componente, sus métodos y los puntos de entrada de Unreal.
+
+## VampsCombatResolver
+
+Al encolar contactos, el resolver confía en la traza de arma autoritativa y en los perfiles ya asignados. Conserva la comprobación de índice de `ComboSteps` porque el combo avanza según las secciones del montage. Un perfil con menos entradas rechaza ese contacto antes de leer el array.
+
+El header documenta cada dato de `FVampsPendingContact` y los métodos del resolver. El código explica el orden de defensa por lock-on, el cálculo de carga de guardia antes de aplicar daño, los intercambios simultáneos y la selección de una reacción por receptor. El cierre del frame procesa contactos, continuaciones, fin de Recovery y dashes antes de actualizar la partida.
+
+El ordenamiento agrupa los contactos por ID de receptor. Dentro de cada grupo, el método privado `GetContactRank` calcula la prioridad según el lock-on y el nombre del atacante desempata. Un atacante ausente del ciclo usa el tamaño de la lista como rango, que lo deja después del último índice válido.
+
+`DiscardPendingCombatFor` retira las continuaciones, los fines de Recovery y los dashes pendientes. El filtro al inicio de `ResolvePendingContacts` descarta los contactos encolados según la validez, la vida y la generación de cada luchador. Un reset de la IA entre la traza del arma y el cierre del frame invalida así los contactos de la generación anterior.
+
+La defensa comprueba el permiso una vez por receptor, elige la primera acción nueva en el orden de prioridad y deja de simular carga de guardia al romperla. El orden del lock-on se usa en la partida local 2 contra 2. El nombre solo desempata. Se retiraron las comprobaciones duplicadas de destrucción y del resultado del bloqueo elegido. `ReceiveCombatHit` devuelve `void` porque GAS recibe la clase nativa fija de daño. La aplicación vuelve a leer las referencias débiles después de los callbacks y conserva el filtro de vida del receptor para omitir golpes posteriores a la muerte sin impedir intercambios letales.
+
 ## Verificación
 
 Se revisaron las rutas de posesión, destrucción, foco, lock-on, solicitud de ataque, inicialización de animación, permisos y resolución de contactos. Se aplicó `clang-format` y pasó `git diff --check`. Quedan la compilación en frío por el cambio de propiedades reflejadas y la comprobación en Unreal. Ver la [guía del editor](editor.md).

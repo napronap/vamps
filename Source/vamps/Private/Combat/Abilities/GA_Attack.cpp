@@ -91,7 +91,7 @@ void UGA_Attack::EndAbility(const FGameplayAbilitySpecHandle Handle,
 	if (AVampsCharacter* Fighter = Cast<AVampsCharacter>(GetAvatarActorFromActorInfo());
 	    Fighter && Fighter->CombatState.MontageInstanceID != INDEX_NONE)
 	{
-		// A registered playback ended early. Clear its combat state while GAS ends the ability.
+		// A registered playback ended early (defense, etc). Clear its combat state while GAS ends the ability
 		Fighter->CancelCombatOffense(false);
 	}
 

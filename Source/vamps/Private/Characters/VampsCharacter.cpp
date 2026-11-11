@@ -724,7 +724,7 @@ void AVampsCharacter::RegisterCombatContact(bool bBlocked)
 
 	CombatState.LastOutgoingContact = CombatState.bActionConnected && CombatState.LastOutgoingContact != ContactResult
 	                                ? EVampsContactResult::Mixed
-																	: ContactResult;
+									: ContactResult;
 
 	CombatState.bActionConnected = true;
 }
@@ -872,20 +872,17 @@ void AVampsCharacter::HandleCombatHealthChanged(const FOnAttributeChangeData&)
 	OnCombatAliveChanged.Broadcast();
 }
 
-bool AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact, AVampsCharacter& Attacker)
+void AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact, AVampsCharacter& Attacker)
 {
-	const float DamageAmount = Contact.bBlocked ? FMath::Max(0.f, Contact.ContactDamage - Contact.BlockReduction) : Contact.ContactDamage;
+	const float DamageAmount =
+	    Contact.bBlocked ? FMath::Max(0.f, Contact.ContactDamage - Contact.BlockReduction) : Contact.ContactDamage;
 
 	FGameplayEffectContextHandle EffectContext = Attacker.AbilitySystem->MakeEffectContext();
 
 	EffectContext.AddSourceObject(&Attacker);
 
-	FGameplayEffectSpecHandle DamageSpec = Attacker.AbilitySystem->MakeOutgoingSpec(UGE_VampsDamage::StaticClass(), 1, EffectContext);
-
-	if (!DamageSpec.IsValid())
-	{
-		return false;
-	}
+	FGameplayEffectSpecHandle DamageSpec =
+	    Attacker.AbilitySystem->MakeOutgoingSpec(UGE_VampsDamage::StaticClass(), 1, EffectContext);
 
 	CombatState.LastIncomingContact =
 	    Contact.bGuardBreak ? EVampsContactResult::GuardBreak
@@ -897,7 +894,8 @@ bool AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact, AVam
 
 	if (Contact.bBlocked)
 	{
-		AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetGuardLoadAttribute(),
+		AbilitySystem->SetNumericAttributeBase(
+		    UVampsAttributeSet::GetGuardLoadAttribute(),
 		    FMath::Min(Attributes->GetMaxGuardLoad(), Attributes->GetGuardLoad() + Contact.GuardLoad));
 		GuardRecoveryStartsAt = GetWorld()->GetTimeSeconds() + CombatSettings->GuardRecoveryDelay;
 	}
@@ -915,8 +913,6 @@ bool AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact, AVam
 			MatchMode->RegisterCombatDeath(this, &Attacker);
 		}
 	}
-
-	return true;
 }
 
 void AVampsCharacter::ApplyCombatReaction(const FVampsPendingContact& Contact)
