@@ -3,6 +3,9 @@
 #include "Abilities/GameplayAbility.h"
 #include "GA_Dash.generated.h"
 
+// Similar to Attack, the montage is the ability
+// Assign the forward and backward dash montages in CombatSettings DA
+// Both need root motion and auto blend out so playback can finish the ability
 UCLASS()
 class VAMPS_API UGA_Dash : public UGameplayAbility
 {

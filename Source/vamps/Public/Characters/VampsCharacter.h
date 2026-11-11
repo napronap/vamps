@@ -93,9 +93,9 @@ public:
 	float GetCombatReactionTimeRemaining() const;
 	float GetNARecoveryTimeRemaining() const;
 
-	// consumed by GA_Attack, registers the montage playback and closes the action when the ability ends
+	// GA_Attack registers its playback and cleans up any attack that ends early
 	bool BeginCombatAction(int32 PlaybackInstanceID);
-	void FinishCombatAction();
+	void CancelCombatOffense(bool bCancelAbility = true);
 
 	// montage callbacks are scoped to the current playback instance and combo section
 	void EndCombatRecovery(const FBranchingPointNotifyPayload& Payload);
@@ -131,6 +131,7 @@ private:
 	void SetCombatWeaponTracing(bool bEnabled);
 
 	void BeginCombatStep();
+	void ClearAttackPlayback();
 	bool IsCurrentCombatNotify(const FBranchingPointNotifyPayload& Payload) const;
 
 	// combat resolver tries a queued combo before ending Recovery for the same action number
@@ -138,7 +139,6 @@ private:
 	void ResolveCombatRecoveryEnd(int32 RecoveryActionNumber);
 	void BeginNARecovery();
 	void FinishNARecovery();
-	void CancelCombatOffense();
 	void SetCombatPhase(EVampsActionPhase NewPhase);
 	bool IsMatchCombatAllowed() const;
 	void RefreshCombatPermissions();

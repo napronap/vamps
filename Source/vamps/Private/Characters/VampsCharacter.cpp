@@ -448,38 +448,13 @@ void AVampsCharacter::BeginCombatStep()
 	}
 }
 
-void AVampsCharacter::FinishCombatAction()
+void AVampsCharacter::ClearAttackPlayback()
 {
-	if (CombatState.MontageInstanceID == INDEX_NONE)
-	{
-		return;
-	}
-
-	if (!CombatState.bActionConnected)
-	{
-		CombatState.LastOutgoingContact = EVampsContactResult::Miss;
-	}
-
 	static_cast<UVampsCombatMovementComponent*>(GetCharacterMovement())->StopVoluntaryMotion();
 
 	CombatState.MontageInstanceID = INDEX_NONE;
 	CombatState.bComboWindowOpen = false;
 	CombatState.bContinuationRequested = false;
-
-	if (CombatState.Phase != EVampsActionPhase::NARecovery)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s': attack montage '%s', step %d ended without AN_EndRecovery. Attack aborted."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *CombatSettings->AttackMontage->GetPathName(),
-		       CombatState.ComboStep
-		);
-
-		CombatState.ComboStep = 0;
-		SetCombatPhase(EVampsActionPhase::Idle);
-	}
 }
 
 void AVampsCharacter::EndCombatRecovery(const FBranchingPointNotifyPayload& Payload)
@@ -497,18 +472,26 @@ void AVampsCharacter::EndCombatRecovery(const FBranchingPointNotifyPayload& Payl
 
 void AVampsCharacter::ResolveCombatRecoveryEnd(int32 RecoveryActionNumber)
 {
-	if (!CombatState.bIsAlive || CombatState.ActionNumber != RecoveryActionNumber || CombatState.Phase != EVampsActionPhase::Recovery)
+	if (!CombatState.bIsAlive || CombatState.ActionNumber != RecoveryActionNumber ||
+	    CombatState.Phase != EVampsActionPhase::Recovery)
 	{
 		return;
 	}
 
+	if (!CombatState.bActionConnected)
+	{
+		CombatState.LastOutgoingContact = EVampsContactResult::Miss;
+	}
+
+	ClearAttackPlayback();
 	BeginNARecovery();
 	AbilitySystem->CancelAbilityHandle(AttackHandle);
 }
 
 void AVampsCharacter::BeginNARecovery()
 {
-	GetWorldTimerManager().SetTimer(NARecoveryTimer, this, &AVampsCharacter::FinishNARecovery, CombatSettings->NARecoveryDuration);
+	GetWorldTimerManager().SetTimer(
+	    NARecoveryTimer, this, &AVampsCharacter::FinishNARecovery, CombatSettings->NARecoveryDuration);
 	SetCombatPhase(EVampsActionPhase::NARecovery);
 }
 
@@ -531,7 +514,7 @@ void AVampsCharacter::SetCombatContacts(const FBranchingPointNotifyPayload& Payl
 
 	if (CombatState.Phase != ExpectedPhase)
 	{
-		AbilitySystem->CancelAbilityHandle(AttackHandle);
+		CancelCombatOffense();
 		return;
 	}
 
@@ -547,6 +530,19 @@ void AVampsCharacter::ResetCombatWeaponHits(const FBranchingPointNotifyPayload& 
 
 	for (int32 WeaponIndex : WeaponIndices)
 	{
+		if (!Weapons.IsValidIndex(WeaponIndex))
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s': weapon index %d is outside the equipped weapon list (%d entries) for '%s'."),
+			       __FUNCTION__,
+			       *GetPathName(),
+			       WeaponIndex,
+			       Weapons.Num(),
+			       *GetPathNameSafe(CombatSettings));
+			return;
+		}
+
 		AVampsWeapon* EquippedWeapon = Weapons[WeaponIndex];
 		if (IsValid(EquippedWeapon))
 		{
@@ -592,7 +588,7 @@ void AVampsCharacter::ResolveCombatContinuation()
 
 	if (!Playback || !Playback->IsValid())
 	{
-		AbilitySystem->CancelAbilityHandle(AttackHandle);
+		CancelCombatOffense();
 		return;
 	}
 
@@ -671,18 +667,18 @@ void AVampsCharacter::RememberDefendedContact(const FVampsPendingContact& Contac
 	OnCombatFramingRequested.Broadcast(Contact.Attacker.Get());
 }
 
-void AVampsCharacter::CancelCombatOffense()
+void AVampsCharacter::CancelCombatOffense(bool bCancelAbility)
 {
-	static_cast<UVampsCombatMovementComponent*>(GetCharacterMovement())->StopVoluntaryMotion();
-
-	CombatState.MontageInstanceID = INDEX_NONE;
-	CombatState.bComboWindowOpen = false;
-	CombatState.bContinuationRequested = false;
+	ClearAttackPlayback();
 	CombatState.ComboStep = 0;
 
-	SetCombatPhase(CombatState.Phase == EVampsActionPhase::NARecovery ? EVampsActionPhase::NARecovery : EVampsActionPhase::Idle);
+	SetCombatPhase(CombatState.Phase == EVampsActionPhase::NARecovery ? EVampsActionPhase::NARecovery
+	                                                                  : EVampsActionPhase::Idle);
 
-	AbilitySystem->CancelAbilityHandle(AttackHandle);
+	if (bCancelAbility)
+	{
+		AbilitySystem->CancelAbilityHandle(AttackHandle);
+	}
 }
 
 void AVampsCharacter::FinishCombatReaction()
@@ -841,7 +837,7 @@ void AVampsCharacter::SetCombatWeaponTracing(bool bEnabled)
 		}
 		if (bEnabled)
 		{
-			AbilitySystem->CancelAbilityHandle(AttackHandle);
+			CancelCombatOffense();
 			return;
 		}
 	}

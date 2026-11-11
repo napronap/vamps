@@ -44,11 +44,13 @@ private:
 	UFUNCTION()
 	void HandleCandidateEndPlay(AActor* EndingActor, EEndPlayReason::Type Reason);
 
-	// runs when fighters enter or leave play, die or respawn, or when the round phase changes
-	// InitializeCandidates and HandleCandidateEndPlay call it directly
+	// runs when fighters enter play, die or respawn, or when the round phase changes
+	// InitializeCandidates calls it directly
 	// bound to OnCombatAliveChanged and OnRoundPhaseChanged
 	// UVampsHUDWidget listens to OnTargetChanged. camera and AI read GetCurrentTarget
 	void RefreshTarget();
+
+	void CycleTargetStartingAt(int32 FirstCandidateIndex);
 
 	// Stores the chosen target and notifies listeners when it changes
 	void SetCurrentTarget(AVampsCharacter* NewTarget);

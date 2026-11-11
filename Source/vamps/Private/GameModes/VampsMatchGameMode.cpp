@@ -150,14 +150,13 @@ bool AVampsMatchGameMode::CreateParticipants(const TArray<TObjectPtr<UVampsComba
 			return false;
 		}
 		if (!CharacterSettings->LocomotionBlendSpace || !CharacterSettings->AttackMontage ||
-		    CharacterSettings->Weapons.IsEmpty() || !CharacterSettings->HasValidReactionSettings() ||
-		    !CharacterSettings->HasValidDeathMontages() || !CharacterSettings->HasValidMobilitySettings())
+		    CharacterSettings->Weapons.IsEmpty())
 		{
 			UE_LOG(LogVampsCombat,
 			       Error,
 			       TEXT("%hs: '%s': participant %d asset '%s' is incomplete; requires LocomotionBlendSpace, "
-			            "AttackMontage, weapons and valid reaction, death and mobility settings; blendSpace='%s', "
-			            "attack='%s', weapons=%d. Round remains in character selection."),
+			            "AttackMontage and weapons (blend space='%s', attack='%s', weapons=%d). "
+			            "Round remains in character selection."),
 			       __FUNCTION__,
 			       *GetPathName(),
 			       ParticipantIndex,

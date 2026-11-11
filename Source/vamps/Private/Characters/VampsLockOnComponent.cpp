@@ -75,9 +75,14 @@ void UVampsLockOnComponent::CycleTarget()
 		    return Candidate.HasSameIndexAndSerialNumber(CurrentTarget);
 	    });
 
-	for (int32 Offset = 1; Offset <= Candidates.Num(); ++Offset)
+	CycleTargetStartingAt(CurrentIndex + 1);
+}
+
+void UVampsLockOnComponent::CycleTargetStartingAt(int32 FirstCandidateIndex)
+{
+	for (int32 Offset = 0; Offset < Candidates.Num(); ++Offset)
 	{
-		AVampsCharacter* Candidate = Candidates[(CurrentIndex + Offset) % Candidates.Num()].Get();
+		AVampsCharacter* Candidate = Candidates[(FirstCandidateIndex + Offset) % Candidates.Num()].Get();
 
 		if (IsEligible(Candidate))
 		{
@@ -121,17 +126,30 @@ void UVampsLockOnComponent::RegisterCandidate(AVampsCharacter& Candidate)
 void UVampsLockOnComponent::HandleCandidateEndPlay(AActor* EndingActor, EEndPlayReason::Type)
 {
 	AVampsCharacter& Fighter = *static_cast<AVampsCharacter*>(EndingActor);
+	const TWeakObjectPtr<AVampsCharacter> EndingFighter(&Fighter);
+	const int32 EndingIndex = Candidates.IndexOfByKey(EndingFighter);
+	if (EndingIndex == INDEX_NONE)
+	{
+		return;
+	}
 
-	// Keep the old slot until selection advances past it
-	RefreshTarget();
-
-	Candidates.Remove(&Fighter);
-
+	Candidates.RemoveAt(EndingIndex);
 	Fighter.OnCombatAliveChanged.RemoveAll(this);
 	Fighter.OnEndPlay.RemoveDynamic(this, &UVampsLockOnComponent::HandleCandidateEndPlay);
+
+	if (CurrentTarget.HasSameIndexAndSerialNumber(EndingFighter))
+	{
+		CycleTargetStartingAt(EndingIndex);
+	}
 }
 
 bool UVampsLockOnComponent::IsEligible(const AVampsCharacter* Candidate) const
 {
-	return static_cast<const AVampsCharacter*>(GetOwner())->CanEngageEnemy(Candidate);
+	if (!Candidate || !Candidate->CombatState.bIsAlive)
+	{
+		return false;
+	}
+
+	const AVampsMatchGameMode* MatchMode = GetWorld()->GetAuthGameMode<AVampsMatchGameMode>();
+	return !MatchMode || MatchMode->RoundPhase == EVampsMatchPhase::Active;
 }

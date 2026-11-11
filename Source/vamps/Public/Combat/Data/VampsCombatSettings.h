@@ -136,8 +136,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mobility", meta = (ClampMin = "0.001", Units = "cm/s"))
 	float SprintSpeed = 700.f;
-
-	bool HasValidReactionSettings() const;
-	bool HasValidMobilitySettings() const;
-	bool HasValidDeathMontages() const;
 };
