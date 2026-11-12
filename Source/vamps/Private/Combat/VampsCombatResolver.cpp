@@ -27,14 +27,17 @@ bool UVampsCombatResolver::DoesSupportWorldType(const EWorldType::Type WorldType
 	return WorldType == EWorldType::Game || WorldType == EWorldType::PIE;
 }
 
-bool UVampsCombatResolver::FAttackPlayback::IsActive() const
+bool UVampsCombatResolver::IsAttackPlaybackActive(const FAttackPlayback& Playback)
 {
-	const AVampsCharacter* ActiveFighter = Fighter.Get();
-	if (!ActiveFighter || !ActiveFighter->CombatState.bIsAlive)
+	const AVampsCharacter* PlaybackFighter = Playback.Fighter.Get();
+
+	// A registered playback can stay active only while its fighter exists and is alive
+	if (!PlaybackFighter || !PlaybackFighter->CombatState.bIsAlive)
 	{
 		return false;
 	}
-	return ActiveFighter->CombatState.MontageInstanceID == MontageInstanceID;
+
+	return PlaybackFighter->CombatState.MontageInstanceID == Playback.MontageInstanceID;
 }
 
 void UVampsCombatResolver::StartAttack(AVampsCharacter& Fighter)
@@ -52,10 +55,32 @@ void UVampsCombatResolver::RunAfterCombatResolution(FSimpleDelegate Callback)
 	AfterCombatResolutionCallbacks.Add(MoveTemp(Callback));
 }
 
+void UVampsCombatResolver::DiscardPendingCombatFor(AVampsCharacter& Fighter)
+{
+	const TWeakObjectPtr<AVampsCharacter> FighterReference(&Fighter);
+	PendingContacts.RemoveAll(
+	    [&FighterReference](const FVampsPendingContact& Contact)
+	    {
+		    return Contact.Attacker.HasSameIndexAndSerialNumber(FighterReference) ||
+		           Contact.Recipient.HasSameIndexAndSerialNumber(FighterReference);
+	    });
+	AttackPlaybacks.RemoveAll(
+	    [&FighterReference](const FAttackPlayback& Playback)
+	    {
+		    return Playback.Fighter.HasSameIndexAndSerialNumber(FighterReference);
+	    });
+	AfterCombatResolutionCallbacks.RemoveAll(
+	    [&Fighter](const FSimpleDelegate& Callback)
+	    {
+		    return Callback.IsBoundToObject(&Fighter);
+	    });
+}
+
 void UVampsCombatResolver::ResolvePendingContacts()
 {
-	// Detach this frame's contacts before any callbacks can queue more.
+	// Detach this frame's contacts before any callbacks can queue more
 	const TArray<FVampsPendingContact> Contacts = MoveTemp(PendingContacts);
+
 	if (Contacts.IsEmpty())
 	{
 		return;
@@ -67,12 +92,15 @@ void UVampsCombatResolver::ResolvePendingContacts()
 
 	for (const FAttackPlayback& Playback : AttackPlaybacks)
 	{
+		// An earlier accepted hit suppresses this fighter's remaining outgoing contacts
 		if (InterruptedAttackers.Contains(Playback.Fighter))
 		{
 			continue;
 		}
 
 		const AVampsCharacter* Attacker = Playback.Fighter.Get();
+
+		// A fighter must still exist and be alive for its contacts to be accepted into the batch
 		if (!Attacker || !Attacker->CombatState.bIsAlive)
 		{
 			continue;
@@ -80,26 +108,21 @@ void UVampsCombatResolver::ResolvePendingContacts()
 
 		for (const FVampsPendingContact& Contact : Contacts)
 		{
+			// Resolve only contacts captured for this fighter and this exact attack montage instance
 			if (Contact.Attacker != Playback.Fighter || Contact.AttackerMontageInstanceID != Playback.MontageInstanceID)
-			{
-				continue;
-			}
-			if (Attacker->CombatGeneration != Contact.AttackerGeneration)
 			{
 				continue;
 			}
 
 			const AVampsCharacter* Recipient = Contact.Recipient.Get();
+
+			// Admit the hit only if the recipient still exists and is alive
 			if (!Recipient || !Recipient->CombatState.bIsAlive)
 			{
 				continue;
 			}
-			if (Recipient->CombatGeneration != Contact.RecipientGeneration)
-			{
-				continue;
-			}
 
-			// The earlier attack takes priority if its trace was armed when this hit was captured.
+			// An earlier, uninterrupted attack protects the recipient if its damage window was open at capture
 			if (EarlierAttackPlaybacks.FindPair(Contact.Recipient, Contact.RecipientAttackMontageInstanceID))
 			{
 				continue;
@@ -112,7 +135,7 @@ void UVampsCombatResolver::ResolvePendingContacts()
 		EarlierAttackPlaybacks.Add(Playback.Fighter, Playback.MontageInstanceID);
 	}
 
-	// Classify and credit the accepted hits before damage can change either fighter's state.
+	// Classify and credit the accepted hits before damage can change either fighter's state
 	for (auto& RecipientContacts : ContactsByRecipient)
 	{
 		TArray<FVampsPendingContact>& ContactGroup = RecipientContacts.Value;
@@ -134,12 +157,14 @@ void UVampsCombatResolver::ClassifyDefense(TArray<FVampsPendingContact>& Contact
 {
 	FVampsPendingContact& Contact = Contacts[0];
 	AVampsCharacter& Recipient = *Contact.Recipient.Get();
+
+	// The first hit stays unblocked unless the recipient can use an armed defense request
 	if (!Recipient.CombatState.bCanDefend)
 	{
 		return;
 	}
 
-	// One request blocks the first hit in attack order and is consumed even during Guard.
+	// One request blocks the first hit in attack order and is consumed even during Guard
 	Contact.bBlocked = true;
 	const float ProjectedGuardLoad = Recipient.Attributes->GetGuardLoad() + Contact.GuardLoad;
 	Contact.bGuardBreak = ProjectedGuardLoad >= Recipient.Attributes->GetMaxGuardLoad();
@@ -154,52 +179,50 @@ void UVampsCombatResolver::ApplyContactGroup(const TArray<FVampsPendingContact>&
 	{
 		AVampsCharacter* Recipient = Contact.Recipient.Get();
 
-		// Stop the whole group if a damage callback invalidated its recipient.
+		// Stop this group if earlier damage killed or invalidated the recipient
 		if (!Recipient || !Recipient->CombatState.bIsAlive)
 		{
 			return;
 		}
-		if (Recipient->CombatGeneration != Contact.RecipientGeneration)
-		{
-			return;
-		}
 
-		// A dead attacker can still land a hit that was captured in this batch.
-		const AVampsCharacter* Attacker = Contact.Attacker.Get();
-		if (!Attacker || Attacker->CombatGeneration != Contact.AttackerGeneration)
+		// The attacker must still exist. A fighter who died during the batch can land an accepted hit
+		if (!Contact.Attacker.IsValid())
 		{
 			continue;
 		}
 
 		Recipient->ReactToCombatResolution({EVampsCombatResolution::ApplyDamage, Contact});
 
-		// Guard break beats an open hit, which beats a block. The first contact wins ties.
+		// Use the first contact that reached the damage step as the initial reaction candidate
 		if (!ReactionContact)
 		{
 			ReactionContact = &Contact;
 			continue;
 		}
+
+		// A guard break already selected has the highest priority, including ties with later guard breaks
 		if (ReactionContact->bGuardBreak)
 		{
 			continue;
 		}
+
+		// Prefer a guard break over either outcome, or an unblocked hit over a normal block
 		if (Contact.bGuardBreak || (ReactionContact->bBlocked && !Contact.bBlocked))
 		{
 			ReactionContact = &Contact;
 		}
 	}
 
+	// A reaction requires at least one contact to reach the damage step
 	if (!ReactionContact)
 	{
 		return;
 	}
 
 	AVampsCharacter* Recipient = ReactionContact->Recipient.Get();
+
+	// The last hit may have killed or invalidated the recipient before the reaction is applied
 	if (!Recipient || !Recipient->CombatState.bIsAlive)
-	{
-		return;
-	}
-	if (Recipient->CombatGeneration != ReactionContact->RecipientGeneration)
 	{
 		return;
 	}
@@ -209,7 +232,7 @@ void UVampsCombatResolver::ApplyContactGroup(const TArray<FVampsPendingContact>&
 
 void UVampsCombatResolver::ResolveCombatFrame(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds)
 {
-	// The world tick delegate is shared across worlds. Each resolver should consume its own queues
+	// The post-actor tick delegate is shared across worlds. Process only this resolver's world
 	if (TickedWorld != GetWorld())
 	{
 		return;
@@ -223,7 +246,7 @@ void UVampsCombatResolver::ResolveCombatFrame(UWorld* TickedWorld, ELevelTick Ti
 		Callback.ExecuteIfBound();
 	}
 
-	// The match settles deaths, scores and round progression once this frame's combat is resolved
+	// When the world runs a match, settle deaths, scores, and round progression after combat
 	if (AVampsMatchGameMode* MatchMode = Cast<AVampsMatchGameMode>(GetWorld()->GetAuthGameMode()))
 	{
 		MatchMode->CompleteCombatFrame();
@@ -232,6 +255,6 @@ void UVampsCombatResolver::ResolveCombatFrame(UWorld* TickedWorld, ELevelTick Ti
 	AttackPlaybacks.RemoveAll(
 	    [](const FAttackPlayback& Playback)
 	    {
-		    return !Playback.IsActive();
+		    return !IsAttackPlaybackActive(Playback);
 	    });
 }

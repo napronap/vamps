@@ -108,15 +108,16 @@ void AVampsPlayerCameraManager::HandleObservedPawnChanged(APawn*, APawn* NewPawn
 	if (AVampsCharacter* PreviousFighter = ObservedFighter.Get())
 	{
 		PreviousFighter->OnCombatFramingRequested.RemoveAll(this);
+		PreviousFighter->OnCombatReset.RemoveAll(this);
 	}
 	ResetCameraState();
 	AVampsCharacter* ViewingFighter = Cast<AVampsCharacter>(NewPawn);
 	ObservedFighter = ViewingFighter;
 	if (ViewingFighter)
 	{
-		ObservedGeneration = ViewingFighter->CombatGeneration;
 		ViewingFighter->OnCombatFramingRequested.AddUObject(this,
 		                                                    &AVampsPlayerCameraManager::HandleCombatFramingRequested);
+		ViewingFighter->OnCombatReset.AddUObject(this, &AVampsPlayerCameraManager::ResetCameraState);
 	}
 }
 
@@ -136,13 +137,7 @@ void AVampsPlayerCameraManager::HandleCombatFramingRequested(AVampsCharacter* Ch
 		       *GetPathNameSafe(ChainSource));
 		return;
 	}
-	if (ObservedGeneration != ObservedFighter->CombatGeneration)
-	{
-		ResetCameraState();
-		ObservedGeneration = ObservedFighter->CombatGeneration;
-	}
 	FramingSource = ChainSource;
-	FramingGeneration = ChainSource->CombatGeneration;
 	FramingMontageID = ChainSource->CombatState.MontageInstanceID;
 }
 
@@ -194,8 +189,7 @@ void AVampsPlayerCameraManager::EndPlay(const EEndPlayReason::Type Reason)
 void AVampsPlayerCameraManager::UpdateViewTarget(FTViewTarget& OutVT, float DeltaTime)
 {
 	const AVampsCharacter* PreviouslyViewedFighter = ObservedFighter.Get();
-	if (bHasCameraState && PreviouslyViewedFighter && !PreviouslyViewedFighter->CombatState.bIsAlive &&
-	    ObservedGeneration == PreviouslyViewedFighter->CombatGeneration && PCOwner &&
+	if (bHasCameraState && PreviouslyViewedFighter && !PreviouslyViewedFighter->CombatState.bIsAlive && PCOwner &&
 	    PCOwner->IsLocalPlayerController() && PCOwner->GetPawn() == PreviouslyViewedFighter &&
 	    OutVT.Target == PreviouslyViewedFighter)
 	{
@@ -256,11 +250,6 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 		       *ViewingFighter->GetPathName());
 		return;
 	}
-	if (ObservedGeneration != ViewingFighter->CombatGeneration)
-	{
-		ResetCameraState();
-		ObservedGeneration = ViewingFighter->CombatGeneration;
-	}
 	if (!ViewingFighter->CombatState.bIsAlive)
 	{
 		FramingSource.Reset();
@@ -270,9 +259,8 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 	{
 		const FVampsCombatState& ChainState = ChainSource->CombatState;
 		const bool bSameMontage = ChainState.MontageInstanceID == FramingMontageID && FramingMontageID != INDEX_NONE;
-		if (!ChainState.bIsAlive || ChainSource->CombatGeneration != FramingGeneration ||
-		    ChainState.Phase == EVampsActionPhase::NARecovery || ChainState.Phase == EVampsActionPhase::Idle ||
-		    !bSameMontage)
+		if (!ChainState.bIsAlive || ChainState.Phase == EVampsActionPhase::NARecovery ||
+		    ChainState.Phase == EVampsActionPhase::Idle || !bSameMontage)
 		{
 			FramingSource.Reset();
 		}

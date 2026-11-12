@@ -8,6 +8,8 @@
 
 `/Game/Vamps/Blueprints/BP_VampsAIController` conserva su padre nativo y sus defaults. `BP_VampsCombatTestGameMode` selecciona el controller del rival en `L_CharacterBasic`. `AVampsMatchGameMode` instancia el controller nativo para los bots de `L_LocalMatch`. El cambio se limita a C++.
 
+La [iteración 073](../073-cancelacion-ia-reset-combate/reporte.md) reemplaza el reset al cambiar de conducta por una cancelación de la acción anterior.
+
 ## Notifies de combate
 
 `UAN_EndRecovery` obtiene al dueño del mesh en la condición del `if` y entrega el payload a `AVampsCharacter` cuando el dueño es un combatiente. Se retira el log del wrapper. El personaje pausa el montage y programa el cierre del paso. Después de los contactos y la posible continuación, comprueba si el paso sigue en Recovery y entra en NA.

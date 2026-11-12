@@ -40,8 +40,6 @@ private:
 
 	TWeakObjectPtr<AVampsCharacter> ObservedFighter;
 	TWeakObjectPtr<AVampsCharacter> ObservedTarget;
-	uint32 ObservedGeneration = 0;
-	uint32 FramingGeneration = 0;
 	int32 FramingMontageID = INDEX_NONE;
 	bool bHasCameraState = false;
 	double OrbitalYaw = 0;

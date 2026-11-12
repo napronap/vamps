@@ -60,7 +60,7 @@ void AVampsAIController::SetMode(EVampsAIMode NewMode)
 
 	if (AVampsCharacter* ControlledFighter = GetPawn<AVampsCharacter>())
 	{
-		ResetFighterActions(*ControlledFighter);
+		CancelFighterActions(*ControlledFighter);
 
 		if (Mode != EVampsAIMode::Passive)
 		{
@@ -69,9 +69,9 @@ void AVampsAIController::SetMode(EVampsAIMode NewMode)
 	}
 }
 
-void AVampsAIController::ResetFighterActions(AVampsCharacter& ControlledFighter)
+void AVampsAIController::CancelFighterActions(AVampsCharacter& ControlledFighter)
 {
-	ControlledFighter.ResetCombatState();
+	ControlledFighter.CancelCombatAction();
 	ControlledFighter.ConsumeMovementInputVector();
 }
 
@@ -109,7 +109,7 @@ void AVampsAIController::Decide()
 
 	if (Behavior != ActiveBehavior)
 	{
-		ResetFighterActions(ControlledFighter);
+		CancelFighterActions(ControlledFighter);
 		ActiveBehavior = Behavior;
 	}
 

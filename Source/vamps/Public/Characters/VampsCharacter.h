@@ -30,6 +30,7 @@ public:
 
 	DECLARE_MULTICAST_DELEGATE_OneParam(FOnCombatFramingRequested, AVampsCharacter*);
 	DECLARE_MULTICAST_DELEGATE(FOnCombatAliveChanged);
+	DECLARE_MULTICAST_DELEGATE(FOnCombatReset);
 
 	AVampsCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	virtual void BeginPlay() override;
@@ -67,12 +68,10 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Combat")
 	FVampsCombatState CombatState;
 
-	// Reset and EndPlay invalidate captured contacts and camera references from the previous combat state.
-	uint32 CombatGeneration = 0;
-
 	// broadcasted on attack start and from an incoming attacker on a confirmed block
 	FOnCombatFramingRequested OnCombatFramingRequested;
 	FOnCombatAliveChanged OnCombatAliveChanged;
+	FOnCombatReset OnCombatReset;
 
 	// lockon, AI and HUD can track an enemy even while spawn protection prevents hits
 	bool CanEngageEnemy(const AVampsCharacter* OtherFighter) const;
@@ -81,7 +80,7 @@ public:
 	// The weapon calls this after confirming an unobstructed hit on a valid target.
 	void QueueWeaponContact(AVampsCharacter& Recipient);
 
-	// the match mode stops the round. Both game modes and the AI can reset a fighter for reuse
+	// the match mode stops the round. Both game modes can reset a fighter for reuse
 	void StopMatchCombat();
 	void ResetCombatState();
 
@@ -89,6 +88,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void RequestCombatAction();
 	void RequestCombatDefense();
+	void CancelCombatAction();
 	bool CanRequestCombatContinuation() const;
 
 	// player input supplies movement intent and the shared dash/sprint button state
@@ -131,7 +131,7 @@ private:
 	double MobilityRecoveryStartsAt = 0;
 	FVector RequestedDashDirection = FVector::ZeroVector;
 
-	void StartRequestedDash(uint32 RequestGeneration);
+	void StartRequestedDash();
 	bool CanStartCombatDash() const;
 	void UpdateMobilityEnergy(float DeltaSeconds);
 	void ClearMobilityIntent();
@@ -144,8 +144,8 @@ private:
 	void ClearAttackPlayback();
 	bool IsCurrentCombatNotify(const FBranchingPointNotifyPayload& Payload) const;
 
-	void TryContinueCombatCombo(uint32 RequestGeneration, int32 RequestedActionNumber);
-	void FinishAttackRecovery(uint32 RecoveryGeneration, int32 RecoveryActionNumber);
+	void TryContinueCombatCombo(int32 RequestedActionNumber);
+	void FinishAttackRecovery(int32 RecoveryActionNumber);
 	void FinishNARecovery();
 	void SetCombatPhase(EVampsActionPhase NewPhase);
 	bool IsMatchCombatAllowed() const;

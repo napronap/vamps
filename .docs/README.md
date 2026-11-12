@@ -21,6 +21,10 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+[074 — Legibilidad del resolver de combate](reports/074-legibilidad-resolver-combate/reporte.md) · [Guía del editor](reports/074-legibilidad-resolver-combate/editor.md).
+
+[073 — Cancelación de acciones de IA y reset de combate](reports/073-cancelacion-ia-reset-combate/reporte.md) · [Guía del editor](reports/073-cancelacion-ia-reset-combate/editor.md).
+
 [072 — Revisión de código](reports/072-revision-codigo/reporte.md) · [Guía del editor](reports/072-revision-codigo/editor.md).
 
 [071 — Simplificación del combate y la presentación](reports/071-simplificacion-combate/reporte.md) · [Guía del editor](reports/071-simplificacion-combate/editor.md).

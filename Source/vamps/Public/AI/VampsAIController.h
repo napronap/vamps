@@ -55,5 +55,5 @@ private:
 	double NextAttackAt = 0;
 
 	void Decide();
-	void ResetFighterActions(AVampsCharacter& ControlledFighter);
+	void CancelFighterActions(AVampsCharacter& ControlledFighter);
 };
