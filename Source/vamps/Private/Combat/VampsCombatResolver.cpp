@@ -143,13 +143,13 @@ void UVampsCombatResolver::ResolvePendingContacts()
 
 		for (const FVampsPendingContact& Contact : ContactGroup)
 		{
-			Contact.Attacker->ReactToCombatResolution({EVampsCombatResolution::CreditContact, Contact});
+			Contact.Attacker->CreditCombatContact(Contact);
 		}
 	}
 
 	for (const auto& RecipientContacts : ContactsByRecipient)
 	{
-		ApplyContactGroup(RecipientContacts.Value);
+		ResolveContactGroup(RecipientContacts.Value);
 	}
 }
 
@@ -168,66 +168,43 @@ void UVampsCombatResolver::ClassifyDefense(TArray<FVampsPendingContact>& Contact
 	Contact.bBlocked = true;
 	const float ProjectedGuardLoad = Recipient.Attributes->GetGuardLoad() + Contact.GuardLoad;
 	Contact.bGuardBreak = ProjectedGuardLoad >= Recipient.Attributes->GetMaxGuardLoad();
-	Recipient.ReactToCombatResolution({EVampsCombatResolution::ConfirmDefense, Contact});
+	Recipient.ConfirmCombatDefense(Contact);
 }
 
-void UVampsCombatResolver::ApplyContactGroup(const TArray<FVampsPendingContact>& Contacts)
+void UVampsCombatResolver::ResolveContactGroup(const TArray<FVampsPendingContact>& Contacts)
 {
-	const FVampsPendingContact* ReactionContact = nullptr;
-
-	for (const FVampsPendingContact& Contact : Contacts)
-	{
-		AVampsCharacter* Recipient = Contact.Recipient.Get();
-
-		// Stop this group if earlier damage killed or invalidated the recipient
-		if (!Recipient || !Recipient->CombatState.bIsAlive)
-		{
-			return;
-		}
-
-		// The attacker must still exist. A fighter who died during the batch can land an accepted hit
-		if (!Contact.Attacker.IsValid())
-		{
-			continue;
-		}
-
-		Recipient->ReactToCombatResolution({EVampsCombatResolution::ApplyDamage, Contact});
-
-		// Use the first contact that reached the damage step as the initial reaction candidate
-		if (!ReactionContact)
-		{
-			ReactionContact = &Contact;
-			continue;
-		}
-
-		// A guard break already selected has the highest priority, including ties with later guard breaks
-		if (ReactionContact->bGuardBreak)
-		{
-			continue;
-		}
-
-		// Prefer a guard break over either outcome, or an unblocked hit over a normal block
-		if (Contact.bGuardBreak || (ReactionContact->bBlocked && !Contact.bBlocked))
-		{
-			ReactionContact = &Contact;
-		}
-	}
-
-	// A reaction requires at least one contact to reach the damage step
-	if (!ReactionContact)
-	{
-		return;
-	}
-
-	AVampsCharacter* Recipient = ReactionContact->Recipient.Get();
-
-	// The last hit may have killed or invalidated the recipient before the reaction is applied
+	AVampsCharacter* Recipient = Contacts[0].Recipient.Get();
 	if (!Recipient || !Recipient->CombatState.bIsAlive)
 	{
 		return;
 	}
 
-	Recipient->ReactToCombatResolution({EVampsCombatResolution::ApplyReaction, *ReactionContact});
+	const FVampsPendingContact* ReactionContact = nullptr;
+
+	for (const FVampsPendingContact& Contact : Contacts)
+	{
+		if (!Contact.Attacker.IsValid())
+		{
+			continue;
+		}
+
+		// Prefer a guard break over an unblocked hit or a normal block
+		if (Contact.bGuardBreak)
+		{
+			ReactionContact = &Contact;
+			break;
+		}
+
+		if (!ReactionContact || (ReactionContact->bBlocked && !Contact.bBlocked))
+		{
+			ReactionContact = &Contact;
+		}
+	}
+
+	if (ReactionContact)
+	{
+		Recipient->ReactToCombatResolution({Contacts, *ReactionContact});
+	}
 }
 
 void UVampsCombatResolver::ResolveCombatFrame(UWorld* TickedWorld, ELevelTick TickType, float DeltaSeconds)

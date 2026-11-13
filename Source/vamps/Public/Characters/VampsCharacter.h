@@ -109,12 +109,13 @@ public:
 	void ResetCombatWeaponHits(const FBranchingPointNotifyPayload& Payload, const TArray<int32>& WeaponIndices);
 	void SetCombatComboWindow(const FBranchingPointNotifyPayload& Payload, bool bEnabled);
 
-	// The combat resolver delivers contact outcomes here.
+	void ConfirmCombatDefense(const FVampsPendingContact& Contact);
+	void CreditCombatContact(const FVampsPendingContact& Contact);
 	void ReactToCombatResolution(const FVampsCombatResolution& Resolution);
 
 private:
 
-	// TODO: give GA_Dash a public entry point for movement state.
+	// TODO: give GA_Dash and GA_Defend a public entry point for movement state
 	friend class UGA_Dash;
 	friend class UGA_Defend;
 

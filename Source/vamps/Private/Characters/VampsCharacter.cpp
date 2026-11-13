@@ -257,8 +257,13 @@ bool AVampsCharacter::InitializeCombatWeapons()
 
 		Weapons.Add(EquippedWeapon);
 
-		EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSettings.AttachSocket);
+		EquippedWeapon->AttachToComponent(
+		    GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSettings.AttachSocket);
 		EquippedWeapon->SetActorRelativeTransform(WeaponSettings.RelativeTransform);
+		if (!EquippedWeapon->InitializeCombatTrace(*this))
+		{
+			return false;
+		}
 	}
 	return true;
 }
@@ -402,48 +407,70 @@ bool AVampsCharacter::CanRequestCombatContinuation() const
 	return CombatState.ComboStep < CombatSettings->AttackMontage->GetNumSections();
 }
 
-void AVampsCharacter::ReactToCombatResolution(const FVampsCombatResolution& Resolution)
+void AVampsCharacter::ConfirmCombatDefense(const FVampsPendingContact& Contact)
 {
-	const FVampsPendingContact& Contact = Resolution.Contact;
+	AbilitySystem->CancelAbilityHandle(DefendHandle);
 
-	switch (Resolution.Type)
+	if (CombatState.Reaction == EVampsCombatReaction::Guard)
 	{
-	case EVampsCombatResolution::ConfirmDefense:
-		AbilitySystem->CancelAbilityHandle(DefendHandle);
-
-		if (CombatState.Reaction == EVampsCombatReaction::Guard)
-		{
-			return;
-		}
-
-		LockOn->SelectTarget(Contact.Attacker.Get());
-		OnCombatFramingRequested.Broadcast(Contact.Attacker.Get());
-
-		return;
-	case EVampsCombatResolution::CreditContact:
-		if (CombatState.ActionNumber != Contact.ActionNumber)
-		{
-			return;
-		}
-
-		if (CombatState.MontageInstanceID != Contact.AttackerMontageInstanceID)
-		{
-			return;
-		}
-
-		CombatState.bActionConnected = true;
-		return;
-	case EVampsCombatResolution::ApplyDamage:
-		ReceiveCombatHit(Contact, *Contact.Attacker.Get());
-		return;
-	case EVampsCombatResolution::ApplyReaction:
-		ApplyCombatReaction(Contact);
-
-		auto* CombatMovement = static_cast<UVampsCombatMovementComponent*>(GetCharacterMovement());
-
-		CombatMovement->ReceiveCombatDisplacement(Contact.AttackOrigin, Contact.AttackDirection, Contact.StepSettings, Contact.bBlocked);
 		return;
 	}
+
+	LockOn->SelectTarget(Contact.Attacker.Get());
+	OnCombatFramingRequested.Broadcast(Contact.Attacker.Get());
+}
+
+void AVampsCharacter::CreditCombatContact(const FVampsPendingContact& Contact)
+{
+	if (CombatState.ActionNumber != Contact.ActionNumber)
+	{
+		return;
+	}
+
+	if (CombatState.MontageInstanceID != Contact.AttackerMontageInstanceID)
+	{
+		return;
+	}
+
+	CombatState.bActionConnected = true;
+}
+
+void AVampsCharacter::ReactToCombatResolution(const FVampsCombatResolution& Resolution)
+{
+	const FVampsPendingContact& ReactionContact = Resolution.ReactionContact;
+	bool bReactionContactApplied = false;
+
+	for (const FVampsPendingContact& Contact : Resolution.Contacts)
+	{
+		AVampsCharacter* Attacker = Contact.Attacker.Get();
+		if (!Attacker)
+		{
+			continue;
+		}
+
+		ReceiveCombatHit(Contact, *Attacker);
+		if (!Contact.Recipient.IsValid() || !CombatState.bIsAlive)
+		{
+			return;
+		}
+
+		if (&Contact == &ReactionContact)
+		{
+			bReactionContactApplied = true;
+		}
+	}
+
+	if (!bReactionContactApplied)
+	{
+		return;
+	}
+
+	ApplyCombatReaction(ReactionContact);
+	auto* CombatMovement = static_cast<UVampsCombatMovementComponent*>(GetCharacterMovement());
+	CombatMovement->ReceiveCombatDisplacement(ReactionContact.AttackOrigin,
+	                                          ReactionContact.AttackDirection,
+	                                          ReactionContact.StepSettings,
+	                                          ReactionContact.bBlocked);
 }
 
 bool AVampsCharacter::CanEngageEnemy(const AVampsCharacter* OtherFighter) const
@@ -937,13 +964,15 @@ void AVampsCharacter::RefreshCombatPermissions()
 
 void AVampsCharacter::SetCombatWeaponTracing(bool bEnabled)
 {
+	const bool bEnableOnAuthority = bEnabled && HasAuthority();
 	for (AVampsWeapon* EquippedWeapon : Weapons)
 	{
-		if (IsValid(EquippedWeapon) && EquippedWeapon->SetTracingEnabled(bEnabled))
+		if (IsValid(EquippedWeapon))
 		{
+			EquippedWeapon->SetTracingEnabled(bEnableOnAuthority);
 			continue;
 		}
-		if (bEnabled)
+		if (bEnableOnAuthority)
 		{
 			CancelCombatOffense();
 			return;

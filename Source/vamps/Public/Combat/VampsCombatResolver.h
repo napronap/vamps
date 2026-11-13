@@ -2,6 +2,7 @@
 
 #include "Subsystems/WorldSubsystem.h"
 #include "Combat/Data/VampsCombatSettings.h"
+#include "Containers/ArrayView.h"
 #include "Delegates/Delegate.h"
 #include "VampsCombatResolver.generated.h"
 
@@ -28,18 +29,10 @@ struct FVampsPendingContact
 	bool bGuardBreak = false;							// Set on the blocked contact that fills the guard meter
 };
 
-enum class EVampsCombatResolution : uint8
-{
-	ConfirmDefense,
-	CreditContact,
-	ApplyDamage,
-	ApplyReaction
-};
-
 struct FVampsCombatResolution
 {
-	EVampsCombatResolution Type;
-	const FVampsPendingContact& Contact; // Borrowed for the synchronous call
+	TConstArrayView<FVampsPendingContact> Contacts;
+	const FVampsPendingContact& ReactionContact;
 };
 
 UCLASS()
@@ -92,7 +85,7 @@ private:
 	// Determines which contacts are blocked before applying damage and selecting one reaction per recipient
 	void ResolvePendingContacts();
 	void ClassifyDefense(TArray<FVampsPendingContact>& Contacts);
-	void ApplyContactGroup(const TArray<FVampsPendingContact>& Contacts);
+	void ResolveContactGroup(const TArray<FVampsPendingContact>& Contacts);
 
 	// Attack montage instances in start order (basically active attackers)
 	// The resolver uses this order to evaluate contact priority

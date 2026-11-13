@@ -4,9 +4,9 @@
 #include "VampsWeapon.generated.h"
 
 class AVampsCharacter;
+class UBoxComponent;
 class USceneComponent;
 class UStaticMeshComponent;
-struct FCollisionQueryParams;
 
 UCLASS(Abstract, Blueprintable)
 class VAMPS_API AVampsWeapon : public AActor
@@ -30,27 +30,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	TObjectPtr<USceneComponent> TraceEnd;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon", meta = (ClampMin = "0.1", Units = "cm"))
-	float TraceRadius = 8.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<UBoxComponent> TraceBox;
 
+	bool InitializeCombatTrace(AVampsCharacter& Fighter);
 	void ResetSectionHits();
 	void ResetImpactHits();
-	bool SetTracingEnabled(bool bEnabled);
-
-protected:
-
-	virtual void BeginPlay() override;
+	void SetTracingEnabled(bool bEnabled);
 
 private:
 
-	FTransform PreviousTraceTransform;
-	bool bHasPreviousTrace = false;
+	TWeakObjectPtr<AVampsCharacter> OwningFighter;
 	TSet<TWeakObjectPtr<AVampsCharacter>> HitActors;
-
-	bool ValidateTraceConfiguration() const;
-	void SweepWeaponSegment(const FVector& SweepStart,
-	                        const FVector& SweepEnd,
-	                        float Radius,
-	                        AVampsCharacter* Fighter,
-	                        const FCollisionQueryParams& Query);
 };
