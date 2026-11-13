@@ -23,6 +23,7 @@ AVampsCombatTestGameMode::AVampsCombatTestGameMode()
 void AVampsCombatTestGameMode::StartPlay()
 {
 	Super::StartPlay();
+
 	if (!OpponentClass || OpponentClass->HasAnyClassFlags(CLASS_Abstract) || !OpponentControllerClass ||
 	    OpponentControllerClass->HasAnyClassFlags(CLASS_Abstract))
 	{
@@ -36,9 +37,12 @@ void AVampsCombatTestGameMode::StartPlay()
 		       *GetPathNameSafe(OpponentControllerClass.Get()));
 		return;
 	}
+
+	UWorld& CombatWorld = *GetWorld();
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	Opponent = GetWorld()->SpawnActor<AVampsCharacter>(OpponentClass, OpponentSpawn, SpawnParameters);
+	Opponent = CombatWorld.SpawnActor<AVampsCharacter>(OpponentClass, OpponentSpawn, SpawnParameters);
+
 	if (!IsValid(Opponent))
 	{
 		UE_LOG(LogVampsCombat,
@@ -49,7 +53,9 @@ void AVampsCombatTestGameMode::StartPlay()
 		       *OpponentClass->GetPathName());
 		return;
 	}
-	OpponentAI = GetWorld()->SpawnActor<AVampsAIController>(OpponentControllerClass);
+
+	OpponentAI = CombatWorld.SpawnActor<AVampsAIController>(OpponentControllerClass);
+
 	if (!IsValid(OpponentAI))
 	{
 		UE_LOG(LogVampsCombat,
@@ -62,6 +68,7 @@ void AVampsCombatTestGameMode::StartPlay()
 		Opponent = nullptr;
 		return;
 	}
+
 	OpponentAI->Mode = InitialAIMode;
 	OpponentAI->Possess(Opponent);
 	ResetCombat();
@@ -69,66 +76,71 @@ void AVampsCombatTestGameMode::StartPlay()
 
 void AVampsCombatTestGameMode::CycleAIMode()
 {
-	if (!IsValid(OpponentAI) || OpponentAI->Mode > EVampsAIMode::Mixed)
+	if (!IsValid(OpponentAI))
 	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: %s: cannot cycle AI mode; OpponentAI '%s' is missing or has an invalid mode."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(OpponentAI));
 		return;
 	}
-	OpponentAI->SetMode(EVampsAIMode((int32(OpponentAI->Mode) + 1) % 5));
+
+	const EVampsAIMode CurrentMode = OpponentAI->Mode;
+	if (CurrentMode == EVampsAIMode::Mixed)
+	{
+		OpponentAI->SetMode(EVampsAIMode::Passive);
+		return;
+	}
+
+	if (CurrentMode < EVampsAIMode::Mixed)
+	{
+		OpponentAI->SetMode(static_cast<EVampsAIMode>(static_cast<uint8>(CurrentMode) + 1));
+	}
 }
 
 void AVampsCombatTestGameMode::ResetCombat()
 {
+	if (!IsValid(Opponent) || !IsValid(OpponentAI))
+	{
+		return;
+	}
+
 	APlayerController* TestPlayerController = GetWorld()->GetFirstPlayerController();
-	AVampsCharacter* PlayerCharacter =
-	    TestPlayerController ? Cast<AVampsCharacter>(TestPlayerController->GetPawn()) : nullptr;
-	if (!IsValid(PlayerCharacter) || !IsValid(Opponent) || !IsValid(OpponentAI))
+	if (!TestPlayerController)
+	{
+		return;
+	}
+
+	AVampsCharacter* PlayerCharacter = TestPlayerController->GetPawn<AVampsCharacter>();
+	if (!IsValid(PlayerCharacter))
 	{
 		UE_LOG(LogVampsCombat,
 		       Error,
-		       TEXT("%hs: %s: reset requires a VampsCharacter player, opponent and AI; player='%s', opponent='%s', "
-		            "AI='%s'."),
+		       TEXT("%hs: %s: reset requires a VampsCharacter player pawn; controller='%s', pawn='%s'."),
 		       __FUNCTION__,
 		       *GetPathName(),
-		       *GetPathNameSafe(PlayerCharacter),
-		       *GetPathNameSafe(Opponent),
-		       *GetPathNameSafe(OpponentAI));
+		       *TestPlayerController->GetPathName(),
+		       *GetPathNameSafe(TestPlayerController->GetPawn()));
 		return;
 	}
-	for (AVampsCharacter* Fighter : {PlayerCharacter, Opponent.Get()})
-	{
-		if (!Fighter->AbilitySystem || !Fighter->Attributes || !Fighter->GetCharacterMovement())
-		{
-			UE_LOG(LogVampsCombat,
-			       Error,
-			       TEXT("%hs: %s: reset cancelled; fighter '%s' requires AbilitySystem, Attributes and movement."),
-			       __FUNCTION__,
-			       *GetPathName(),
-			       *Fighter->GetPathName());
-			return;
-		}
-	}
+
 	for (AVampsCharacter* Fighter : {PlayerCharacter, Opponent.Get()})
 	{
 		const bool bWasDead = !Fighter->CombatState.bIsAlive;
+		const FTransform& SpawnTransform = Fighter == PlayerCharacter ? PlayerSpawn : OpponentSpawn;
+		UCharacterMovementComponent* Movement = Fighter->GetCharacterMovement();
+
 		Fighter->ResetCombatState();
 		Fighter->AbilitySystem->SetNumericAttributeBase(UVampsAttributeSet::GetHealthAttribute(),
 		                                                Fighter->Attributes->GetMaxHealth());
-		Fighter->SetActorTransform(
-		    Fighter == PlayerCharacter ? PlayerSpawn : OpponentSpawn, false, nullptr, ETeleportType::TeleportPhysics);
+		Fighter->SetActorTransform(SpawnTransform, false, nullptr, ETeleportType::TeleportPhysics);
+
 		if (bWasDead)
 		{
 			Fighter->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			Fighter->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+			Movement->SetMovementMode(MOVE_Walking);
 		}
+
 		Fighter->ConsumeMovementInputVector();
-		Fighter->GetCharacterMovement()->StopMovementImmediately();
+		Movement->StopMovementImmediately();
 	}
+
 	TestPlayerController->SetControlRotation(PlayerSpawn.Rotator());
 	OpponentAI->SetFocus(PlayerCharacter);
 	OpponentAI->SetMode(OpponentAI->Mode);

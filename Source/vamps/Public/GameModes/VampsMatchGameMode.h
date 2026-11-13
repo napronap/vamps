@@ -4,7 +4,6 @@
 #include "VampsMatchGameMode.generated.h"
 
 class AVampsCharacter;
-class AVampsMatchPlayerController;
 class AVampsTeamSpawnPoint;
 class UVampsCombatSettings;
 
@@ -118,6 +117,9 @@ public:
 
 private:
 
+	static constexpr int32 TeamCount = 2;
+	static constexpr int32 FightersPerTeam = 2;
+
 	UPROPERTY()
 	TArray<TObjectPtr<AVampsTeamSpawnPoint>> TeamSpawnPoints;
 
@@ -131,12 +133,12 @@ private:
 	TArray<FPendingMatchDeath> PendingDeaths;
 
 	int32 FindParticipantIndex(const AVampsCharacter* Fighter) const;
-	bool ValidateCharacterCatalog() const;
-	bool CreateParticipants(const TArray<TObjectPtr<UVampsCombatSettings>>& RoundCharacters,
-	                        AVampsMatchPlayerController* LocalController);
+	void SpawnParticipants(const TArray<TObjectPtr<UVampsCombatSettings>>& RoundCharacters);
 	void ClearParticipants();
-	bool RestoreParticipant(int32 ParticipantIndex, bool bRespawn);
-	void FinishLocalRound(bool bTimeExpired);
+	FTransform GetFormationTransform(int32 ParticipantIndex) const;
+	void RespawnParticipant(int32 ParticipantIndex, double Now);
+	void FinishLocalRound();
+	int32 DetermineWinningTeam() const;
 	void SetRoundPhase(EVampsMatchPhase NewPhase);
-	bool EnableMatchMenuInput();
+	void EnableMatchMenuInput();
 };

@@ -21,6 +21,8 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+[076 — Limpieza de GameModes](reports/076-limpieza-gamemodes/reporte.md) · [Guía del editor](reports/076-limpieza-gamemodes/editor.md).
+
 [075 — Barrido de caja para armas](reports/075-barrido-caja-armas/reporte.md) · [Guía del editor](reports/075-barrido-caja-armas/editor.md).
 
 [074 — Legibilidad del resolver de combate](reports/074-legibilidad-resolver-combate/reporte.md) · [Guía del editor](reports/074-legibilidad-resolver-combate/editor.md).
