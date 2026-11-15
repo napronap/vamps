@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Delegates/Delegate.h"
 #include "Widgets/SCompoundWidget.h"
 
 class SBorder;
@@ -13,6 +14,7 @@ public:
 	SLATE_BEGIN_ARGS(SVampsMatchInstructions)
 	{
 	}
+	SLATE_EVENT(FSimpleDelegate, OnQuit)
 	SLATE_END_ARGS()
 
 	void Construct(const FArguments& InArgs);

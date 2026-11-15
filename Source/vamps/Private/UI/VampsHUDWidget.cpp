@@ -3,6 +3,7 @@
 #include "UI/VampsEnemyWidget.h"
 #include "UI/VampsFighterWidget.h"
 #include "UI/VampsMatchInstructions.h"
+#include "UI/VampsPauseMenu.h"
 #include "Blueprint/WidgetTree.h"
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
@@ -20,6 +21,8 @@
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GameModes/VampsMatchGameMode.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Player/VampsMatchPlayerController.h"
 
 void UVampsHUDWidget::ShowWidget(UWidget* Widget, bool bShow)
 {
@@ -84,26 +87,7 @@ void UVampsHUDWidget::NativeOnInitialized()
 			CharacterOptions->AddChildToVerticalBox(CharacterOption)->SetPadding(FMargin(0.f, 0.f, 0.f, 8.f));
 		}
 
-		if (UCanvasPanel* SelectionCanvas = Cast<UCanvasPanel>(SelectionView))
-		{
-			UNativeWidgetHost* InstructionsHost = WidgetTree->ConstructWidget<UNativeWidgetHost>();
-			InstructionsHost->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-			MatchInstructionsHost = InstructionsHost;
-			InstructionsHost->SetContent(SAssignNew(MatchInstructions, SVampsMatchInstructions));
-
-			UCanvasPanelSlot* InstructionsSlot = SelectionCanvas->AddChildToCanvas(InstructionsHost);
-			InstructionsSlot->SetAnchors(FAnchors(0.f, 0.f, 1.f, 1.f));
-			InstructionsSlot->SetOffsets(FMargin(0.f));
-			InstructionsSlot->SetZOrder(10);
-		}
-		else
-		{
-			UE_LOG(LogVampsCombat,
-			       Error,
-			       TEXT("%hs: '%s' requires a CanvasPanel for the instructions menu."),
-			       __FUNCTION__,
-			       *GetPathName());
-		}
+		InitializeMatchMenus();
 	}
 	bHUDInitialized = true;
 }
@@ -119,6 +103,14 @@ void UVampsHUDWidget::NativeConstruct()
 	{
 		InstructionsHost->SetContent(MatchInstructions.ToSharedRef());
 	}
+	if (UNativeWidgetHost* MenuHost = PauseMenuHost.Get())
+	{
+		MenuHost->SetContent(PauseMenu.ToSharedRef());
+	}
+	if (AVampsMatchPlayerController* MatchController = GetOwningPlayer<AVampsMatchPlayerController>())
+	{
+		MatchController->OnPauseRequested.AddUObject(this, &UVampsHUDWidget::PauseRound);
+	}
 	if (AVampsMatchGameMode* LocalMatch = MatchMode.Get())
 	{
 		LocalMatch->OnRoundPhaseChanged.AddUObject(this, &UVampsHUDWidget::RefreshMatchViews);
@@ -131,6 +123,10 @@ void UVampsHUDWidget::NativeConstruct()
 
 void UVampsHUDWidget::NativeDestruct()
 {
+	if (AVampsMatchPlayerController* MatchController = GetOwningPlayer<AVampsMatchPlayerController>())
+	{
+		MatchController->OnPauseRequested.RemoveAll(this);
+	}
 	if (MatchInstructions)
 	{
 		MatchInstructions->Close();
@@ -150,6 +146,90 @@ void UVampsHUDWidget::NativeDestruct()
 		LocalMatch->OnSelectedCharacterChanged.RemoveAll(this);
 	}
 	Super::NativeDestruct();
+}
+
+void UVampsHUDWidget::InitializeMatchMenus()
+{
+	UCanvasPanel* SelectionCanvas = Cast<UCanvasPanel>(SelectionView);
+	UCanvasPanel* LayoutCanvas = Cast<UCanvasPanel>(SelectionView->GetParent());
+	if (!SelectionCanvas || !LayoutCanvas)
+	{
+		UE_LOG(LogVampsCombat,
+		       Error,
+		       TEXT("%hs: '%s' requires a CanvasPanel for SelectionView and its parent layout."),
+		       __FUNCTION__,
+		       *GetPathName());
+		return;
+	}
+
+	MatchInstructions =
+	    SNew(SVampsMatchInstructions).OnQuit(FSimpleDelegate::CreateUObject(this, &UVampsHUDWidget::QuitGame));
+	MatchInstructionsHost =
+	    AddMenuHost(*SelectionCanvas, MatchInstructions.ToSharedRef(), ESlateVisibility::SelfHitTestInvisible);
+
+	PauseMenu = SNew(SVampsPauseMenu)
+	                .OnResume(FSimpleDelegate::CreateUObject(this, &UVampsHUDWidget::ResumeRound))
+	                .OnQuit(FSimpleDelegate::CreateUObject(this, &UVampsHUDWidget::QuitGame));
+	PauseMenuHost = AddMenuHost(*LayoutCanvas, PauseMenu.ToSharedRef(), ESlateVisibility::Collapsed);
+}
+
+UNativeWidgetHost* UVampsHUDWidget::AddMenuHost(UCanvasPanel& Canvas,
+                                                TSharedRef<SWidget> Content,
+                                                ESlateVisibility MenuVisibility)
+{
+	UNativeWidgetHost* Host = WidgetTree->ConstructWidget<UNativeWidgetHost>();
+	Host->SetVisibility(MenuVisibility);
+	Host->SetContent(MoveTemp(Content));
+	UCanvasPanelSlot* MenuSlot = Canvas.AddChildToCanvas(Host);
+	MenuSlot->SetAnchors(FAnchors(0.f, 0.f, 1.f, 1.f));
+	MenuSlot->SetOffsets(FMargin(0.f));
+	MenuSlot->SetZOrder(10);
+	return Host;
+}
+
+void UVampsHUDWidget::PauseRound()
+{
+	if (!MatchMode.IsValid() || !PauseMenuHost.IsValid() ||
+	    (MatchMode->RoundPhase != EVampsMatchPhase::Preparing && MatchMode->RoundPhase != EVampsMatchPhase::Active))
+	{
+		return;
+	}
+
+	APlayerController* MatchController = GetOwningPlayer();
+	if (!MatchController->SetPause(true))
+	{
+		return;
+	}
+
+	if (AVampsCharacter* ControlledFighter = GetOwningPlayerPawn<AVampsCharacter>())
+	{
+		ControlledFighter->SetMobilityHeld(false);
+		ControlledFighter->SetMobilityInput(false);
+		ControlledFighter->ConsumeMovementInputVector();
+	}
+	MatchController->FlushPressedKeys();
+	PauseMenuHost->SetVisibility(ESlateVisibility::Visible);
+
+	FInputModeUIOnly PauseInput;
+	PauseInput.SetWidgetToFocus(PauseMenu->GetResumeButton());
+	MatchController->SetInputMode(PauseInput);
+	MatchController->bShowMouseCursor = true;
+}
+
+void UVampsHUDWidget::ResumeRound()
+{
+	APlayerController* MatchController = GetOwningPlayer();
+	if (MatchController->SetPause(false))
+	{
+		PauseMenuHost->SetVisibility(ESlateVisibility::Collapsed);
+		MatchController->SetInputMode(FInputModeGameOnly());
+		MatchController->bShowMouseCursor = false;
+	}
+}
+
+void UVampsHUDWidget::QuitGame()
+{
+	UKismetSystemLibrary::QuitGame(this, GetOwningPlayer(), EQuitPreference::Quit, false);
 }
 
 void UVampsHUDWidget::HandleObservedPawnChanged(APawn*, APawn* NewPawn)

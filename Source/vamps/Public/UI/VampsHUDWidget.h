@@ -7,6 +7,7 @@ class APawn;
 class AVampsCharacter;
 class AVampsMatchGameMode;
 class SVampsMatchInstructions;
+class SVampsPauseMenu;
 class UButton;
 class UCanvasPanel;
 class UNativeWidgetHost;
@@ -84,10 +85,17 @@ private:
 	TWeakObjectPtr<UVampsLockOnComponent> ObservedLockOn;
 	TWeakObjectPtr<UNativeWidgetHost> MatchInstructionsHost;
 	TSharedPtr<SVampsMatchInstructions> MatchInstructions;
+	TWeakObjectPtr<UNativeWidgetHost> PauseMenuHost;
+	TSharedPtr<SVampsPauseMenu> PauseMenu;
 	bool bHUDInitialized = false;
 
 	static void ShowWidget(UWidget* Widget, bool bShow);
 	static FString FormatRatio(int32 Kills, int32 Deaths);
+	void InitializeMatchMenus();
+	UNativeWidgetHost* AddMenuHost(UCanvasPanel& Canvas, TSharedRef<SWidget> Content, ESlateVisibility MenuVisibility);
+	void PauseRound();
+	void ResumeRound();
+	void QuitGame();
 	void RefreshMatchViews();
 	void RefreshCharacterSelection(UVampsCombatSettings* CharacterSettings);
 	void RefreshTargetPanel(AVampsCharacter* TargetFighter);

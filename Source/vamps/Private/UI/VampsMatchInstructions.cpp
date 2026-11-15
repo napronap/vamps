@@ -12,7 +12,7 @@
 #include "Widgets/SOverlay.h"
 #include "Widgets/Text/STextBlock.h"
 
-void SVampsMatchInstructions::Construct(const FArguments&)
+void SVampsMatchInstructions::Construct(const FArguments& InArgs)
 {
 	SetVisibility(EVisibility::SelfHitTestInvisible);
 	const FSlateBrush* SolidBrush = FCoreStyle::Get().GetBrush("WhiteBrush");
@@ -21,6 +21,16 @@ void SVampsMatchInstructions::Construct(const FArguments&)
 	                                         .ButtonColorAndOpacity(FLinearColor(0.36f, 0.61f, 0.73f))
 	                                         .OnClicked(this, &SVampsMatchInstructions::OpenFromInput);
 	Launcher->SetContent(MakeText(LocalizedText(TEXT("遊び方"), TEXT("How to play")), "Bold", 15));
+
+	const TSharedRef<SButton> Quit = SNew(SButton)
+	                                     .ContentPadding(FMargin(18.f, 9.f))
+	                                     .OnClicked_Lambda(
+	                                         [QuitAction = InArgs._OnQuit]()
+	                                         {
+		                                         QuitAction.ExecuteIfBound();
+		                                         return FReply::Handled();
+	                                         });
+	Quit->SetContent(MakeText(LocalizedText(TEXT("ゲームを終了"), TEXT("Quit Game")), "Bold", 15));
 
 	const TSharedRef<SButton> LanguageToggle = SAssignNew(LanguageButton, SButton)
 	                                               .ContentPadding(FMargin(16.f, 7.f))
@@ -67,8 +77,11 @@ void SVampsMatchInstructions::Construct(const FArguments&)
 	                                         .VAlign(VAlign_Center);
 	Backdrop->SetContent(Sheet);
 
+	const TSharedRef<SHorizontalBox> Actions = SNew(SHorizontalBox);
+	Actions->AddSlot().AutoWidth().Padding(0.f, 0.f, 8.f, 0.f)[Launcher];
+	Actions->AddSlot().AutoWidth()[Quit];
 	const TSharedRef<SOverlay> Layout = SNew(SOverlay).Visibility(EVisibility::SelfHitTestInvisible);
-	Layout->AddSlot().HAlign(HAlign_Right).VAlign(VAlign_Top).Padding(24.f)[Launcher];
+	Layout->AddSlot().HAlign(HAlign_Right).VAlign(VAlign_Top).Padding(24.f)[Actions];
 	Layout->AddSlot()[Backdrop];
 	ChildSlot[Layout];
 }
@@ -83,6 +96,7 @@ TSharedRef<SWidget> SVampsMatchInstructions::MakeInstructions()
 	    TEXT("RMB"), TEXT("右クリックで攻撃・ガード"), TEXT("Right-click to attack or guard"))];
 	Instructions->AddSlot()
 	    .AutoHeight()[MakeControlRow(TEXT("F"), TEXT("ロックオン対象を切り替え"), TEXT("Switch targets"))];
+	Instructions->AddSlot().AutoHeight()[MakeControlRow(TEXT("Esc"), TEXT("ポーズ"), TEXT("Pause"))];
 	Instructions->AddSlot()
 	    .AutoHeight()[MakeControlRow(TEXT("Left Shift"),
 	                                 TEXT("押すとダッシュ。方向入力がなければ後退。移動しながら長押しでスプリント"),
