@@ -1,4 +1,4 @@
-日本語版は下にあります
+[日本語版は下にあります](#日本語)
 
 ## Vamps
 
@@ -53,7 +53,7 @@ AI was used in some of the more tedious parts so I could focus on doing the part
 
 ---
 
-## 日本語版
+## 日本語
 
 ### Vamps
 
