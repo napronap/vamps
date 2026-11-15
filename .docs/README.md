@@ -21,6 +21,8 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+[083 — Instrucciones de juego en el README](reports/083-readme-juego/reporte.md) · [Guía del editor](reports/083-readme-juego/editor.md).
+
 [082 — Pausa y salida de partida](reports/082-pausa-y-salida/reporte.md) · [Guía del editor](reports/082-pausa-y-salida/editor.md).
 
 [081 — Instrucciones en el selector](reports/081-instrucciones-selector/reporte.md) · [Guía del editor](reports/081-instrucciones-selector/editor.md).

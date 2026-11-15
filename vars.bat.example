@@ -1,0 +1,12 @@
+@echo off
+
+set ROOTDIR=%~dp0
+set ROOTDIR=%ROOTDIR:~0,-1%
+
+set PROJECT=vamps
+set PROJECT_DIR=%ROOTDIR%\%PROJECT%
+set UPROJECT_PATH=%ROOTDIR%\%PROJECT%.uproject
+
+set UE58_DIR=YOUR_UE_5.8_DIR
+set UE58_EDITOR_EXE=%UE58_DIR%\Engine\Binaries\Win64\UnrealEditor.exe
+set BUILD_BAT=%UE58_DIR%\Engine\Build\BatchFiles\Build.bat
