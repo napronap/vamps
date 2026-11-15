@@ -1,5 +1,0 @@
-# Editor — Retiro de RelativeTransform de las armas
-
-1. **Hecho — Codex por MCP.** Antes de cambiar el código, `ObjectTools.search_subclasses` y `AssetTools.find_assets` encontraron cuatro perfiles y ninguna clase derivada. Se usó `ObjectTools.list_properties` y `get_properties` para [capturar los valores completos](data-assets-antes.json). `AssetTools.save_assets` confirmó el guardado. La relectura coincidió con la captura y `AssetTools.is_dirty` devolvió falso para los cuatro perfiles.
-2. **Hecho — usuario.** Compiló `vampsEditor` y reabrió `C:\dev\vamps\vamps.uproject` con MCP activo. Se verificó el arranque con el módulo recompilado y la estructura reflejada actualizada.
-3. **Hecho — Codex por MCP.** `AssetTools.find_assets` confirmó los cuatro perfiles. `ObjectTools.list_properties` y `get_properties` confirmaron la ausencia del campo retirado y la coincidencia de los demás valores con la captura previa. `AssetTools.is_dirty` devolvió falso en los cuatro, por lo que no fue necesario restaurar ni volver a guardar. [Relectura final](data-assets-despues.json).

@@ -1,8 +1,0 @@
-{
-  "content": [
-    {
-      "type": "text",
-      "text": "{\"returnValue\":\"Result: Success\\n\\nCompile Output:\\nStarting Live Coding compile.\\nUbaCli v5.8.1-Uba_v1.0.0-56050371 (Rootdir: \\\"C:\\\\ProgramData\\\\Epic\\\\UbaCli\\\", StoreCapacity: 0Gb)\\r\\n\\r\\n---- Starting trace: Debugaed155e2-0e1d-4342-9e9e-e21fc8e3991e ----\\r\\nRunning C:\\\\Program Files (x86)\\\\Microsoft Visual Studio\\\\2022\\\\BuildTools\\\\VC\\\\Tools\\\\MSVC\\\\14.44.35207\\\\bin\\\\Hostx64\\\\x64\\\\link.exe @C:\\\\Users\\\\franc\\\\AppData\\\\Local\\\\Temp\\\\C7DD.tmp\\r\\n   Creating library C:\\\\dev\\\\vamps\\\\Binaries\\\\Win64\\\\UnrealEditor-vamps.patch_0.lib and object C:\\\\dev\\\\vamps\\\\Binaries\\\\Win64\\\\UnrealEditor-vamps.patch_0.exp\\r\\nDetoured run took 1.1s\\nLive coding succeeded, data type changes may cause packaging to fail if assets reference the new or updated data types\"}"
-    }
-  ]
-}
