@@ -21,6 +21,14 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+[080 — Retiro de RelativeTransform de las armas](reports/080-retiro-transform-armas/reporte.md) · [Guía del editor](reports/080-retiro-transform-armas/editor.md).
+
+[079 — Comentarios de CombatSettings](reports/079-comentarios-combat-settings/reporte.md) · [Guía del editor](reports/079-comentarios-combat-settings/editor.md).
+
+[078 — Comentarios de CombatState](reports/078-comentarios-combat-state/reporte.md) · [Guía del editor](reports/078-comentarios-combat-state/editor.md).
+
+[077 — Limpieza del CameraManager](reports/077-limpieza-camera-manager/reporte.md) · [Guía del editor](reports/077-limpieza-camera-manager/editor.md).
+
 [076 — Limpieza de GameModes](reports/076-limpieza-gamemodes/reporte.md) · [Guía del editor](reports/076-limpieza-gamemodes/editor.md).
 
 [075 — Barrido de caja para armas](reports/075-barrido-caja-armas/reporte.md) · [Guía del editor](reports/075-barrido-caja-armas/editor.md).

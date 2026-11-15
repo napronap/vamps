@@ -258,8 +258,7 @@ bool AVampsCharacter::InitializeCombatWeapons()
 		Weapons.Add(EquippedWeapon);
 
 		EquippedWeapon->AttachToComponent(
-		    GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSettings.AttachSocket);
-		EquippedWeapon->SetActorRelativeTransform(WeaponSettings.RelativeTransform);
+		    GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSettings.AttachSocket);
 		if (!EquippedWeapon->InitializeCombatTrace(*this))
 		{
 			return false;

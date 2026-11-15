@@ -1,96 +1,17 @@
 #include "Player/VampsPlayerCameraManager.h"
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
-#include "Combat/VampsCombatLog.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 #include "GameModes/VampsMatchGameMode.h"
-#include "HAL/IConsoleManager.h"
-
-namespace
-{
-	float FollowDistance = 600.f;
-	float CombatDistance = 425.f;
-	float FollowEyeHeight = 70.f;
-	float CombatEyeHeight = 30.f;
-	float FollowInterestHeight = 30.f;
-	float CombatInterestHeight = -20.f;
-	float FollowVerticalFov = 38.f;
-	float CombatVerticalFov = 32.4f;
-	float CombatInteriorDistance = 95.f;
-	float CombatYawOffset = 20.f;
-	float PositionRadius = 180.f;
-	float AngularSpeed = 6.f;
-	float TransitionDuration = 0.3f;
-
-#if !UE_BUILD_SHIPPING
-	FAutoConsoleVariableRef FollowDistanceSetting(TEXT("vamps.Camera.FollowDistance"),
-	                                              FollowDistance,
-	                                              TEXT("Follow distance in cm."),
-	                                              ECVF_Cheat);
-	FAutoConsoleVariableRef CombatDistanceSetting(TEXT("vamps.Camera.CombatDistance"),
-	                                              CombatDistance,
-	                                              TEXT("Combat distance in cm."),
-	                                              ECVF_Cheat);
-	FAutoConsoleVariableRef FollowEyeSetting(TEXT("vamps.Camera.FollowEyeHeight"),
-	                                         FollowEyeHeight,
-	                                         TEXT("Follow eye height above capsule center in cm."),
-	                                         ECVF_Cheat);
-	FAutoConsoleVariableRef CombatEyeSetting(TEXT("vamps.Camera.CombatEyeHeight"),
-	                                         CombatEyeHeight,
-	                                         TEXT("Combat eye height above capsule center in cm."),
-	                                         ECVF_Cheat);
-	FAutoConsoleVariableRef FollowInterestSetting(TEXT("vamps.Camera.FollowInterestHeight"),
-	                                              FollowInterestHeight,
-	                                              TEXT("Follow interest height in cm."),
-	                                              ECVF_Cheat);
-	FAutoConsoleVariableRef CombatInterestSetting(TEXT("vamps.Camera.CombatInterestHeight"),
-	                                              CombatInterestHeight,
-	                                              TEXT("Combat interest height in cm."),
-	                                              ECVF_Cheat);
-	FAutoConsoleVariableRef FollowFovSetting(TEXT("vamps.Camera.FollowVerticalFOV"),
-	                                         FollowVerticalFov,
-	                                         TEXT("Follow vertical FOV in degrees."),
-	                                         ECVF_Cheat);
-	FAutoConsoleVariableRef CombatFovSetting(TEXT("vamps.Camera.CombatVerticalFOV"),
-	                                         CombatVerticalFov,
-	                                         TEXT("Combat vertical FOV in degrees."),
-	                                         ECVF_Cheat);
-	FAutoConsoleVariableRef InteriorSetting(TEXT("vamps.Camera.InteriorDistance"),
-	                                        CombatInteriorDistance,
-	                                        TEXT("Combat pivot displacement toward target in cm."),
-	                                        ECVF_Cheat);
-	FAutoConsoleVariableRef YawSetting(TEXT("vamps.Camera.CombatYawOffset"),
-	                                   CombatYawOffset,
-	                                   TEXT("Combat composition yaw offset in degrees."),
-	                                   ECVF_Cheat);
-	FAutoConsoleVariableRef RadiusSetting(TEXT("vamps.Camera.PositionRadius"),
-	                                      PositionRadius,
-	                                      TEXT("Spatial filter radius in cm; zero disables it."),
-	                                      ECVF_Cheat);
-	FAutoConsoleVariableRef AngularSetting(TEXT("vamps.Camera.AngularSpeed"),
-	                                       AngularSpeed,
-	                                       TEXT("Angular response per second."),
-	                                       ECVF_Cheat);
-	FAutoConsoleVariableRef TransitionSetting(TEXT("vamps.Camera.TransitionDuration"),
-	                                          TransitionDuration,
-	                                          TEXT("Framing and target transition duration in seconds."),
-	                                          ECVF_Cheat);
-#endif
-} // namespace
-
 FVector AVampsPlayerCameraManager::SpatialFollow(const FVector& PreviousPosition,
                                                  const FVector& DesiredPosition,
                                                  float DeltaTime)
 {
-	if (PositionRadius == 0.f)
-	{
-		return DesiredPosition;
-	}
-	const float ReferenceAlpha = FMath::Square(FMath::Min(
-	    float(FVector::Distance(PreviousPosition, DesiredPosition)) / FMath::Max(PositionRadius, 0.1f), 1.f));
+	const float Distance = FVector::Distance(PreviousPosition, DesiredPosition);
+	const float ReferenceAlpha = FMath::Square(FMath::Min(Distance / PositionRadius, 1.f));
 	const float TimeAlpha = 1.f - FMath::Pow(1.f - ReferenceAlpha, DeltaTime * 60.f);
 	return FMath::Lerp(PreviousPosition, DesiredPosition, TimeAlpha);
 }
@@ -127,14 +48,8 @@ void AVampsPlayerCameraManager::HandleCombatFramingRequested(AVampsCharacter* Ch
 	{
 		return;
 	}
-	if (!IsValid(ChainSource) || ChainSource->GetWorld() != GetWorld())
+	if (!ChainSource)
 	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s': framing requires a valid chain source in this world; source='%s'."),
-		       __FUNCTION__,
-		       *GetPathName(),
-		       *GetPathNameSafe(ChainSource));
 		return;
 	}
 	FramingSource = ChainSource;
@@ -172,6 +87,7 @@ void AVampsPlayerCameraManager::ResetCameraState()
 	FadedComponents.Reset();
 	ObservedTarget.Reset();
 	FramingSource.Reset();
+	FramingMontageID = INDEX_NONE;
 	bHasCameraState = false;
 	bCombatFraming = false;
 }
@@ -212,44 +128,7 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 		Super::UpdateViewTargetInternal(OutVT, DeltaTime);
 		return;
 	}
-	const float CameraValues[] = {FollowDistance,
-	                              CombatDistance,
-	                              FollowEyeHeight,
-	                              CombatEyeHeight,
-	                              FollowInterestHeight,
-	                              CombatInterestHeight,
-	                              FollowVerticalFov,
-	                              CombatVerticalFov,
-	                              CombatInteriorDistance,
-	                              CombatYawOffset,
-	                              PositionRadius,
-	                              AngularSpeed,
-	                              TransitionDuration,
-	                              DeltaTime};
-	for (float CameraValue : CameraValues)
-	{
-		if (!FMath::IsFinite(CameraValue))
-		{
-			UE_LOG(LogVampsCombat,
-			       Error,
-			       TEXT("%hs: '%s': camera update rejected; camera settings and DeltaTime must be finite."),
-			       __FUNCTION__,
-			       *GetPathName());
-			return;
-		}
-	}
-	if (!ViewingFighter->LockOn || FollowDistance <= 12.f || CombatDistance <= 12.f || FollowVerticalFov <= 0.f ||
-	    FollowVerticalFov >= 170.f || CombatVerticalFov <= 0.f || CombatVerticalFov >= 170.f || PositionRadius < 0.f ||
-	    CombatInteriorDistance < 0.f || AngularSpeed <= 0.f || TransitionDuration < 0.f || DeltaTime < 0.f)
-	{
-		UE_LOG(LogVampsCombat,
-		       Error,
-		       TEXT("%hs: '%s': missing LockOn or invalid camera settings. Distances must exceed 12 cm, FOV must be in "
-		            "(0,170), speed positive and radius/interior/duration/time nonnegative."),
-		       __FUNCTION__,
-		       *ViewingFighter->GetPathName());
-		return;
-	}
+
 	if (!ViewingFighter->CombatState.bIsAlive)
 	{
 		FramingSource.Reset();
@@ -258,21 +137,15 @@ void AVampsPlayerCameraManager::UpdateViewTargetInternal(FTViewTarget& OutVT, fl
 	if (ChainSource)
 	{
 		const FVampsCombatState& ChainState = ChainSource->CombatState;
-		const bool bSameMontage = ChainState.MontageInstanceID == FramingMontageID && FramingMontageID != INDEX_NONE;
-		if (!ChainState.bIsAlive || ChainState.Phase == EVampsActionPhase::NARecovery ||
-		    ChainState.Phase == EVampsActionPhase::Idle || !bSameMontage)
+		if (!ChainState.bIsAlive || FramingMontageID == INDEX_NONE || ChainState.MontageInstanceID != FramingMontageID)
 		{
 			FramingSource.Reset();
 		}
 	}
 	const bool bNextCombatFraming = FramingSource.IsValid();
 	AVampsCharacter* LockedFighter = ViewingFighter->LockOn->GetCurrentTarget();
-	if (!IsValid(LockedFighter) || !LockedFighter->CombatState.bIsAlive)
-	{
-		LockedFighter = nullptr;
-	}
 	const bool bTargetChanged =
-	    LockedFighter ? ObservedTarget.Get() != LockedFighter : !ObservedTarget.IsExplicitlyNull();
+	    !ObservedTarget.HasSameIndexAndSerialNumber(TWeakObjectPtr<AVampsCharacter>(LockedFighter));
 	if (!LockedFighter && (!bHasCameraState || bTargetChanged))
 	{
 		UnlockedHeadingYaw =
@@ -406,10 +279,7 @@ void AVampsPlayerCameraManager::UpdateOccluders(const FVector& PublishedEye,
 	const FCollisionObjectQueryParams ObjectParams(FCollisionObjectQueryParams::AllObjects);
 	FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(VampsCameraFade), false, &ViewingFighter);
 	QueryParams.bFindInitialOverlaps = true;
-	if (LockedFighter)
-	{
-		QueryParams.AddIgnoredActor(LockedFighter);
-	}
+	QueryParams.AddIgnoredActor(LockedFighter);
 	TArray<FHitResult> ViewHits;
 	TSet<TWeakObjectPtr<UPrimitiveComponent>> CurrentOccluders;
 	for (const AVampsCharacter* Subject : {&ViewingFighter, LockedFighter})
@@ -432,18 +302,6 @@ void AVampsPlayerCameraManager::UpdateOccluders(const FVector& PublishedEye,
 			UPrimitiveComponent* Occluder = ViewHit.GetComponent();
 			if (!Occluder || !Occluder->ComponentHasTag(OccluderTag) || CurrentOccluders.Contains(Occluder))
 			{
-				continue;
-			}
-			if (Occluder->GetCollisionResponseToChannel(ECC_Camera) != ECR_Ignore ||
-			    Occluder->GetCustomPrimitiveDataIndexForScalarParameter(OccluderTag) != 0)
-			{
-				UE_LOG(
-				    LogVampsCombat,
-				    Error,
-				    TEXT("%hs: '%s': prepared occluder must ignore Camera and expose material scalar VampsCameraFade "
-				         "at custom primitive data index 0."),
-				    __FUNCTION__,
-				    *Occluder->GetPathName());
 				continue;
 			}
 			CurrentOccluders.Add(Occluder);
@@ -470,14 +328,6 @@ void AVampsPlayerCameraManager::UpdateOccluders(const FVector& PublishedEye,
 		const float NextFade = FMath::Lerp(CurrentFade, FadeTarget, OccluderBlendAlpha);
 		const bool bFadeComplete = FMath::IsNearlyEqual(NextFade, FadeTarget, 0.001f);
 		Occluder->SetCustomPrimitiveDataFloat(0, bFadeComplete ? FadeTarget : NextFade);
-		if (bFadeComplete && CurrentFade != FadeTarget)
-		{
-			UE_LOG(LogVampsCombat,
-			       VeryVerbose,
-			       TEXT("Camera fade reached %.2f for '%s'."),
-			       FadeTarget,
-			       *Occluder->GetPathName());
-		}
 		if (bFadeComplete && !bOccluded)
 		{
 			FadeIterator.RemoveCurrent();
