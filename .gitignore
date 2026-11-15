@@ -4,6 +4,9 @@
 /Intermediate/
 /Saved/
 
+# Generated asset load order logs
+/Build/Windows/FileOpenOrder/
+
 # Generated plugin files
 /Plugins/**/Intermediate/
 /Plugins/**/Saved/
@@ -29,6 +32,9 @@
 .vs/
 .idea/
 .fleet/
+
+# Local Unreal Editor preferences
+/Config/DefaultEditorPerProjectUserSettings.ini
 
 # Local Unreal Engine installation settings
 /vars.bat
