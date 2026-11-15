@@ -57,7 +57,7 @@ AI was used in some of the more tedious parts so I could focus on doing the part
 
 ### Vamps
 
-Vamps は、[稼働を終了した TYPE-MOON の『Fate/Grand Order Arcade』](https://info-arcade-fate-go.sega.jp/2026/2026-01-29-1/)に影響を受けた、ボットが参加するローカルの 2 対 2 アリーナ対戦ゲームです。
+Vamps は、[稼働を終了した TYPE-MOON の『Fate/Grand Order Arcade』](https://info-arcade-fate-go.sega.jp/2026/2026-01-29-1/)に影響を受けた、ボットが参加するローカルの2対2アリーナ対戦ゲームです。
 
 このプロジェクトは、UEのGASや戦闘システム、敵AIなどをいじりながら勉強するための遊び場みたいなものです。かなり簡略化していますが、FGO アーケードの戦闘システムや駆け引きを再現してみたくて作りました。いずれはオンライン機能も追加したいですが、まずは戦闘を気持ちよく遊べるようにしたいです。
 
