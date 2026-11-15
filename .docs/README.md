@@ -21,6 +21,8 @@ Cada funcionalidad ocupa una carpeta con `functional.md` y `technical.md`. Las s
 
 ## Orden de trabajo
 
+[081 — Instrucciones en el selector](reports/081-instrucciones-selector/reporte.md) · [Guía del editor](reports/081-instrucciones-selector/editor.md).
+
 [080 — Retiro de RelativeTransform de las armas](reports/080-retiro-transform-armas/reporte.md) · [Guía del editor](reports/080-retiro-transform-armas/editor.md).
 
 [079 — Comentarios de CombatSettings](reports/079-comentarios-combat-settings/reporte.md) · [Guía del editor](reports/079-comentarios-combat-settings/editor.md).

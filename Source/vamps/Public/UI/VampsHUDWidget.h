@@ -6,8 +6,10 @@
 class APawn;
 class AVampsCharacter;
 class AVampsMatchGameMode;
+class SVampsMatchInstructions;
 class UButton;
 class UCanvasPanel;
+class UNativeWidgetHost;
 class UScaleBox;
 class UTextBlock;
 class UVerticalBox;
@@ -80,6 +82,8 @@ private:
 
 	TWeakObjectPtr<AVampsMatchGameMode> MatchMode;
 	TWeakObjectPtr<UVampsLockOnComponent> ObservedLockOn;
+	TWeakObjectPtr<UNativeWidgetHost> MatchInstructionsHost;
+	TSharedPtr<SVampsMatchInstructions> MatchInstructions;
 	bool bHUDInitialized = false;
 
 	static void ShowWidget(UWidget* Widget, bool bShow);

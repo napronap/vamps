@@ -2,6 +2,8 @@
 #include "UI/VampsCharacterOptionWidget.h"
 #include "UI/VampsEnemyWidget.h"
 #include "UI/VampsFighterWidget.h"
+#include "UI/VampsMatchInstructions.h"
+#include "Blueprint/WidgetTree.h"
 #include "Characters/VampsCharacter.h"
 #include "Characters/VampsLockOnComponent.h"
 #include "Combat/VampsCombatLog.h"
@@ -10,6 +12,7 @@
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/NativeWidgetHost.h"
 #include "Components/ScaleBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
@@ -80,6 +83,27 @@ void UVampsHUDWidget::NativeOnInitialized()
 			}
 			CharacterOptions->AddChildToVerticalBox(CharacterOption)->SetPadding(FMargin(0.f, 0.f, 0.f, 8.f));
 		}
+
+		if (UCanvasPanel* SelectionCanvas = Cast<UCanvasPanel>(SelectionView))
+		{
+			UNativeWidgetHost* InstructionsHost = WidgetTree->ConstructWidget<UNativeWidgetHost>();
+			InstructionsHost->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			MatchInstructionsHost = InstructionsHost;
+			InstructionsHost->SetContent(SAssignNew(MatchInstructions, SVampsMatchInstructions));
+
+			UCanvasPanelSlot* InstructionsSlot = SelectionCanvas->AddChildToCanvas(InstructionsHost);
+			InstructionsSlot->SetAnchors(FAnchors(0.f, 0.f, 1.f, 1.f));
+			InstructionsSlot->SetOffsets(FMargin(0.f));
+			InstructionsSlot->SetZOrder(10);
+		}
+		else
+		{
+			UE_LOG(LogVampsCombat,
+			       Error,
+			       TEXT("%hs: '%s' requires a CanvasPanel for the instructions menu."),
+			       __FUNCTION__,
+			       *GetPathName());
+		}
 	}
 	bHUDInitialized = true;
 }
@@ -90,6 +114,10 @@ void UVampsHUDWidget::NativeConstruct()
 	if (!bHUDInitialized)
 	{
 		return;
+	}
+	if (UNativeWidgetHost* InstructionsHost = MatchInstructionsHost.Get())
+	{
+		InstructionsHost->SetContent(MatchInstructions.ToSharedRef());
 	}
 	if (AVampsMatchGameMode* LocalMatch = MatchMode.Get())
 	{
@@ -103,6 +131,10 @@ void UVampsHUDWidget::NativeConstruct()
 
 void UVampsHUDWidget::NativeDestruct()
 {
+	if (MatchInstructions)
+	{
+		MatchInstructions->Close();
+	}
 	if (UVampsLockOnComponent* LockOn = ObservedLockOn.Get())
 	{
 		LockOn->OnTargetChanged.RemoveAll(this);
@@ -171,6 +203,10 @@ void UVampsHUDWidget::RefreshMatchViews()
 	const bool bUnavailable = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Unavailable;
 	const bool bFinished = MatchMode.IsValid() && MatchMode->RoundPhase == EVampsMatchPhase::Finished;
 	const bool bShowFighters = ObservedLockOn.IsValid() && !bSelecting && !bUnavailable;
+	if (!bSelecting && MatchInstructions)
+	{
+		MatchInstructions->Close();
+	}
 	ShowWidget(SelectionView, bSelecting);
 	ShowWidget(CombatView, bShowFighters);
 	ShowWidget(MatchView, MatchMode.IsValid() && !bSelecting && !bUnavailable);
