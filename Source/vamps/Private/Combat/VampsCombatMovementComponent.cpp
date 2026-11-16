@@ -7,6 +7,19 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 
+void UVampsCombatMovementComponent::TickComponent(float DeltaTime,
+                                                  ELevelTick TickType,
+                                                  FActorComponentTickFunction* ThisTickFunction)
+{
+	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
+	if (Fighter && !Fighter->CombatState.bInHitstop)
+	{
+		CombatMotionElapsed += DeltaTime;
+	}
+
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
 float UVampsCombatMovementComponent::GetMaxSpeed() const
 {
 	const AVampsCharacter* Fighter = Cast<AVampsCharacter>(CharacterOwner);
@@ -89,7 +102,7 @@ void UVampsCombatMovementComponent::BeginCombatMotion(EVampsCombatMotion NewMoti
 	CombatMotion = NewMotion;
 	CombatMotionStart = UpdatedComponent->GetComponentLocation();
 	CombatMotionGoal = Destination;
-	CombatMotionStartedAt = GetWorld()->GetTimeSeconds();
+	CombatMotionElapsed = 0.f;
 	CombatMotionDuration = Duration;
 	bCombatMotionBlocked = false;
 	Velocity.X = 0.f;
@@ -162,8 +175,7 @@ void UVampsCombatMovementComponent::ApplyRootMotionToVelocity(float DeltaTime)
 		return;
 	}
 
-	const float Progress =
-	    FMath::Clamp(float((GetWorld()->GetTimeSeconds() - CombatMotionStartedAt) / CombatMotionDuration), 0.f, 1.f);
+	const float Progress = FMath::Clamp(CombatMotionElapsed / CombatMotionDuration, 0.f, 1.f);
 
 	const FVector DesiredPosition = FMath::Lerp(CombatMotionStart, CombatMotionGoal, Progress);
 	const FVector DesiredVelocity = (DesiredPosition - UpdatedComponent->GetComponentLocation()) / DeltaTime;
@@ -201,8 +213,7 @@ void UVampsCombatMovementComponent::PhysicsRotation(float DeltaTime)
 	// during a hit displacement, turn the recipient against the push direction over the move's duration.
 	if (CombatMotion == EVampsCombatMotion::Alignment || CombatMotion == EVampsCombatMotion::Knockback)
 	{
-		const float Progress = FMath::Clamp(
-		    float((GetWorld()->GetTimeSeconds() - CombatMotionStartedAt) / CombatMotionDuration), 0.f, 1.f);
+		const float Progress = FMath::Clamp(CombatMotionElapsed / CombatMotionDuration, 0.f, 1.f);
 
 		MoveUpdatedComponent(FVector::ZeroVector, FQuat::Slerp(CombatFacingStart, CombatFacingGoal, Progress), true);
 	}
@@ -216,7 +227,7 @@ void UVampsCombatMovementComponent::OnMovementUpdated(float DeltaSeconds,
 
 	// finish the current move after a blocking hit or when its allotted time expires
 	if (CombatMotion != EVampsCombatMotion::None &&
-	    (bCombatMotionBlocked || GetWorld()->GetTimeSeconds() >= CombatMotionStartedAt + CombatMotionDuration))
+	    (bCombatMotionBlocked || CombatMotionElapsed >= CombatMotionDuration))
 	{
 		FinishCombatMotion();
 	}

@@ -110,6 +110,6 @@ void AVampsWeapon::Tick(float DeltaSeconds)
 		}
 
 		HitActors.Add(Target);
-		Fighter->QueueWeaponContact(*Target);
+		Fighter->QueueWeaponContact(*Target, Hit.ImpactPoint);
 	}
 }

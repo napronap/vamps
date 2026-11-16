@@ -20,7 +20,9 @@
 #include "Components/WidgetComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "GameModes/VampsMatchGameMode.h"
+#include "NiagaraFunctionLibrary.h"
 #include "UI/VampsCharacterIndicatorWidget.h"
 
 AVampsCharacter::AVampsCharacter(const FObjectInitializer& ObjectInitializer)
@@ -497,7 +499,7 @@ bool AVampsCharacter::CanHitCombatTarget(const AVampsCharacter* OtherFighter) co
 	return !MatchMode || (MatchMode->AllowsCombat(this) && !MatchMode->IsSpawnProtected(OtherFighter));
 }
 
-void AVampsCharacter::QueueWeaponContact(AVampsCharacter& Recipient)
+void AVampsCharacter::QueueWeaponContact(AVampsCharacter& Recipient, const FVector& ImpactLocation)
 {
 	const UVampsCombatSettings& AttackSettings = *CombatSettings;
 	const float CriticalChance = AttackSettings.CriticalChancePercent;
@@ -522,6 +524,7 @@ void AVampsCharacter::QueueWeaponContact(AVampsCharacter& Recipient)
 	Contact.AttackOrigin = GetActorLocation();
 	Contact.AttackDirection = GetActorForwardVector().GetSafeNormal2D();
 	Contact.StepSettings = AttackSettings.ComboSteps[CombatState.ComboStep - 1];
+	Contact.ImpactLocation = ImpactLocation;
 
 	GetWorld()->GetSubsystem<UVampsCombatResolver>()->QueueCombatContact(MoveTemp(Contact));
 }
@@ -782,6 +785,7 @@ void AVampsCharacter::ClearCombatTimers()
 	GetWorldTimerManager().ClearTimer(NARecoveryTimer);
 	GetWorldTimerManager().ClearTimer(CombatReactionTimer);
 	ReactionPlaybackInstanceID = INDEX_NONE;
+	EndCombatHitstop();
 }
 
 float AVampsCharacter::GetCombatReactionTimeRemaining() const
@@ -1026,6 +1030,7 @@ void AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact, AVam
 
 	DamageSpec.Data->SetSetByCallerMagnitude(VampsTags::Damage, -DamageAmount);
 	Attacker.AbilitySystem->ApplyGameplayEffectSpecToTarget(*DamageSpec.Data, AbilitySystem);
+	PresentCombatImpact(Contact, Attacker);
 
 	if (CombatState.bIsAlive)
 	{
@@ -1038,6 +1043,53 @@ void AVampsCharacter::ReceiveCombatHit(const FVampsPendingContact& Contact, AVam
 	{
 		MatchMode->RegisterCombatDeath(this, &Attacker);
 	}
+}
+
+void AVampsCharacter::PresentCombatImpact(const FVampsPendingContact& Contact, AVampsCharacter& Attacker)
+{
+	const UVampsCombatSettings& AttackSettings = *Attacker.CombatSettings;
+	UNiagaraSystem* ImpactEffect = AttackSettings.HitEffect;
+	if (Contact.bGuardBreak)
+	{
+		ImpactEffect = AttackSettings.GuardBreakEffect;
+	}
+	else if (Contact.bBlocked)
+	{
+		ImpactEffect = AttackSettings.GuardEffect;
+	}
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+	    this, ImpactEffect, Contact.ImpactLocation, Contact.AttackDirection.Rotation());
+
+	for (AVampsCharacter* Fighter : {this, &Attacker})
+	{
+		Fighter->BeginCombatHitstop(Contact.StepSettings.HitstopDuration);
+
+		if (APlayerController* FighterPlayer = Cast<APlayerController>(Fighter->GetController()))
+		{
+			FighterPlayer->ClientStartCameraShake(Contact.StepSettings.ContactCameraShake);
+		}
+	}
+}
+
+void AVampsCharacter::BeginCombatHitstop(float Duration)
+{
+	const float RemainingHitstop = FMath::Max(0.f, GetWorldTimerManager().GetTimerRemaining(HitstopTimer));
+	if (!FMath::IsFinite(Duration) || Duration <= RemainingHitstop)
+	{
+		return;
+	}
+
+	CombatState.bInHitstop = true;
+	GetMesh()->GlobalAnimRateScale = 0.f;
+	GetWorldTimerManager().SetTimer(HitstopTimer, this, &AVampsCharacter::EndCombatHitstop, Duration);
+}
+
+void AVampsCharacter::EndCombatHitstop()
+{
+	GetWorldTimerManager().ClearTimer(HitstopTimer);
+	CombatState.bInHitstop = false;
+	GetMesh()->GlobalAnimRateScale = 1.f;
 }
 
 void AVampsCharacter::ApplyCombatReaction(const FVampsPendingContact& Contact)
@@ -1066,7 +1118,9 @@ void AVampsCharacter::ApplyCombatReaction(const FVampsPendingContact& Contact)
 	}
 
 	// The contact refreshes the action lock even when the existing guard montage keeps playing.
-	GetWorldTimerManager().SetTimer(CombatReactionTimer, this, &AVampsCharacter::FinishCombatReaction, Duration);
+	const float RemainingHitstop = FMath::Max(0.f, GetWorldTimerManager().GetTimerRemaining(HitstopTimer));
+	GetWorldTimerManager().SetTimer(
+	    CombatReactionTimer, this, &AVampsCharacter::FinishCombatReaction, Duration + RemainingHitstop);
 	if (CombatState.Reaction == EVampsCombatReaction::Guard && NewReaction == EVampsCombatReaction::Guard &&
 	    ReactionPlaybackInstanceID != INDEX_NONE)
 	{

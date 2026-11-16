@@ -5,6 +5,8 @@
 
 class UAnimMontage;
 class UBlendSpace;
+class UCameraShakeBase;
+class UNiagaraSystem;
 class AVampsWeapon;
 
 USTRUCT(BlueprintType)
@@ -48,6 +50,12 @@ struct VAMPS_API FVampsCombatStepSettings
 	// <------- Combo window ------>|         <-------Combo window ----->
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0.001", Units = "s"))
 	float ContactReactionDuration = 0.5f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat", meta = (ClampMin = "0", Units = "s"))
+	float HitstopDuration = 0.07f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combat")
+	TSubclassOf<UCameraShakeBase> ContactCameraShake;
 };
 
 // Per-fighter setup for equipment, animation, attacks, guard, and mobility.
@@ -95,6 +103,15 @@ public:
 	// death while blocking
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Death")
 	TObjectPtr<UAnimMontage> GuardDeathMontage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Impact")
+	TObjectPtr<UNiagaraSystem> HitEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Impact")
+	TObjectPtr<UNiagaraSystem> GuardEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Impact")
+	TObjectPtr<UNiagaraSystem> GuardBreakEffect;
 
 	// damage by non critical before calculations
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Damage", meta = (ClampMin = "0"))

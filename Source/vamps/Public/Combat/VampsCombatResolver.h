@@ -24,6 +24,7 @@ struct FVampsPendingContact
 	FVector AttackOrigin = FVector::ZeroVector;			// Attacker position at the sweep, used for hit alignment
 	FVector AttackDirection = FVector::ForwardVector;	// Attacker facing at the sweep, used for displacement
 	FVampsCombatStepSettings StepSettings;				// Reaction and displacement settings for this combo step
+	FVector ImpactLocation = FVector::ZeroVector;
 
 	bool bBlocked = false;								// Set when the resolver classifies the contact as blocked
 	bool bGuardBreak = false;							// Set on the blocked contact that fills the guard meter

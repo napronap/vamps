@@ -24,6 +24,10 @@ class VAMPS_API UVampsCombatMovementComponent : public UCharacterMovementCompone
 
 public:
 
+	virtual void TickComponent(float DeltaTime,
+	                           ELevelTick TickType,
+	                           FActorComponentTickFunction* ThisTickFunction) override;
+
 	// Uses the configured sprint speed while sprinting and the movement mode's speed otherwise
 	virtual float GetMaxSpeed() const override;
 
@@ -74,7 +78,7 @@ private:
 	FVector CombatPushDirection = FVector::ZeroVector;
 	FQuat CombatFacingStart = FQuat::Identity;
 	FQuat CombatFacingGoal = FQuat::Identity;
-	double CombatMotionStartedAt = 0;
+	float CombatMotionElapsed = 0.f;
 	float CombatMotionDuration = 0.f;
 	float PendingKnockbackDistance = 0.f;
 	bool bCombatMotionBlocked = false;

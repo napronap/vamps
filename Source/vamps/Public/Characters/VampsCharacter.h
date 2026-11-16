@@ -78,7 +78,7 @@ public:
 	bool CanHitCombatTarget(const AVampsCharacter* OtherFighter) const;
 
 	// The weapon calls this after confirming an unobstructed hit on a valid target.
-	void QueueWeaponContact(AVampsCharacter& Recipient);
+	void QueueWeaponContact(AVampsCharacter& Recipient, const FVector& ImpactLocation);
 
 	// the match mode stops the round. Both game modes can reset a fighter for reuse
 	void StopMatchCombat();
@@ -124,6 +124,7 @@ private:
 	FGameplayAbilitySpecHandle DefendHandle;
 	FTimerHandle NARecoveryTimer;
 	FTimerHandle CombatReactionTimer;
+	FTimerHandle HitstopTimer;
 	double GuardRecoveryStartsAt = 0;
 
 	int32 ReactionPlaybackInstanceID = INDEX_NONE;
@@ -155,6 +156,9 @@ private:
 	void ClearCombatTimers();
 
 	void ReceiveCombatHit(const FVampsPendingContact& Contact, AVampsCharacter& Attacker);
+	void PresentCombatImpact(const FVampsPendingContact& Contact, AVampsCharacter& Attacker);
+	void BeginCombatHitstop(float Duration);
+	void EndCombatHitstop();
 	void ApplyCombatReaction(const FVampsPendingContact& Contact);
 	bool PlayCombatReactionMontage(UAnimInstance* Animation, UAnimMontage* ReactionMontage, float Duration);
 	void HandleGuardMontageEnded(UAnimMontage* Montage, bool bInterrupted, int32 PlaybackInstanceID);
